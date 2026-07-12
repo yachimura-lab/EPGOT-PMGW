@@ -5,11 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# pybind11 に旧式の Python 検出ではなく FindPython を使わせる
 set(PYBIND11_FINDPYTHON ON)
 
-# -DPython_EXECUTABLE=... で指定された Python と、
-# その拡張モジュール用ヘッダーを検出する
 find_package(
     Python
     COMPONENTS Interpreter Development.Module
@@ -27,31 +24,29 @@ target_link_libraries(
         Eigen3::Eigen
 )
 
-# src/computation から2階層上のプロジェクトルート
+# Notebook の sys.path に含まれる src/ にモジュールを出力
 get_filename_component(
-    EPOT_PROJECT_ROOT
-    "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+    CPP_ENGINE_OUTPUT_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/.."
     ABSOLUTE
 )
 
 set_target_properties(
     cpp_engine
     PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${EPOT_PROJECT_ROOT}"
-        RUNTIME_OUTPUT_DIRECTORY "${EPOT_PROJECT_ROOT}"
+        LIBRARY_OUTPUT_DIRECTORY "${CPP_ENGINE_OUTPUT_DIR}"
+        RUNTIME_OUTPUT_DIRECTORY "${CPP_ENGINE_OUTPUT_DIR}"
 )
 
-# マルチ構成ジェネレーター向け
 foreach(CONFIG DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
     set_target_properties(
         cpp_engine
         PROPERTIES
-            LIBRARY_OUTPUT_DIRECTORY_${CONFIG} "${EPOT_PROJECT_ROOT}"
-            RUNTIME_OUTPUT_DIRECTORY_${CONFIG} "${EPOT_PROJECT_ROOT}"
+            LIBRARY_OUTPUT_DIRECTORY_${CONFIG} "${CPP_ENGINE_OUTPUT_DIR}"
+            RUNTIME_OUTPUT_DIRECTORY_${CONFIG} "${CPP_ENGINE_OUTPUT_DIR}"
     )
 endforeach()
 
 message(STATUS "Python executable: ${Python_EXECUTABLE}")
 message(STATUS "Python version: ${Python_VERSION}")
-message(STATUS "Python include dirs: ${Python_INCLUDE_DIRS}")
-message(STATUS "cpp_engine output directory: ${EPOT_PROJECT_ROOT}")
+message(STATUS "cpp_engine output directory: ${CPP_ENGINE_OUTPUT_DIR}")
