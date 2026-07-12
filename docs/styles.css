@@ -1,0 +1,84 @@
+/* Custom styles for psiclone website */
+
+/* Change "On this page" to "目次" */
+.sidebar nav[role=doc-toc] > h2::before {
+  content: "目次";
+  visibility: visible;
+  display: block;
+  height: auto;
+}
+
+.sidebar nav[role=doc-toc] > h2 {
+  visibility: hidden;
+  height: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Change "Other Formats" to "ダウンロードリンク" */
+.sidebar .quarto-alternate-formats > h2::before {
+  content: "ダウンロードリンク";
+  visibility: visible;
+  display: block;
+  height: auto;
+}
+
+.callout-body-container p {
+  margin-top: 0.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.sidebar .quarto-alternate-formats > h2 {
+  visibility: hidden;
+  height: 0;
+  margin-bottom: 1.5rem;
+}
+
+/* Ensure the download links section is always visible */
+.sidebar .quarto-alternate-formats {
+  display: block !important;
+  margin-top: 1rem;
+  padding-top: 0rem;
+}
+
+/* すべてのnavbarリンクのアクティブ状態を無効化 */
+.navbar-nav .nav-link.active,
+.navbar-nav .nav-item.active,
+.navbar-nav .nav-link[aria-current="page"] {
+  color: inherit !important;
+  font-weight: normal !important;
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* ホバー時のスタイルも通常に戻す */
+.navbar-nav .nav-link.active:hover {
+  color: var(--bs-navbar-hover-color, inherit) !important;
+}
+
+/* Notebook cell and output grouping */
+.cell {
+  border: 1px solid #e6f2ff;
+  border-radius: 6px;
+  background-color: #f8faff;
+  padding: 10px;
+  margin-bottom: 1rem;
+}
+
+/* Notebook cell output styling */
+.cell-output {
+  border-radius: 4px;
+  padding: 8px;
+  margin-top: 1rem;
+  margin-bottom: -2rem;
+}
+
+.cell-output-display:not(.no-overflow-x), .knitsql-table:not(.no-overflow-x) {
+  margin-bottom: -1.5rem;
+}
+
+/* Ensure code cells have proper spacing */
+div.sourceCode {
+  margin-top: 0rem;
+  margin-bottom: 0rem;
+  border-radius: 4px;
+}

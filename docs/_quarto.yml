@@ -1,0 +1,39 @@
+project:
+  title: "mixture_wasserstein_website"
+  type: website
+  render:
+    - "*.qmd"
+    - "*.ipynb"
+  resources:
+    - /asset/
+
+website:
+  title: "mixture_wasserstein_website"
+  page-navigation: true
+  navbar:
+    left:
+      - href: index.qmd
+        text: トップページ
+    tools:
+    - icon: github
+      menu:
+        - text: GitHub
+          href: https://github.com/deltaex-corp/mixture-wasserstein-project/
+  sidebar:
+    - id: get-started
+      title: Get Started
+      style: floating
+      align: left
+      contents:
+        - href: index.qmd
+          text: トップページ
+        - section: "notebooks"
+          style: docked
+          contents:
+            - auto: "notebook/*.ipynb"
+
+format:
+  html:
+    theme: yeti
+    css: styles.css
+    toc: true
