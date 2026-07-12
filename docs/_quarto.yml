@@ -18,7 +18,7 @@ website:
     - icon: github
       menu:
         - text: GitHub
-          href: https://github.com/deltaex-corp/mixture-wasserstein-project/
+          href: https://github.com/deltaex-corp/EPOT-pMGW/
   sidebar:
     - id: get-started
       title: Get Started
