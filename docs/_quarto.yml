@@ -1,5 +1,5 @@
 project:
-  title: "mixture_wasserstein_website"
+  title: "Entropic Partial OT"
   type: website
   render:
     - "*.qmd"
@@ -8,7 +8,7 @@ project:
     - /asset/
 
 website:
-  title: "mixture_wasserstein_website"
+  title: "Entropic Partial OT"
   page-navigation: true
   navbar:
     left:
