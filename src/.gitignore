@@ -1,0 +1,56 @@
+################################
+# Python
+################################
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+build/
+dist/
+
+################################
+# Virtual environments
+################################
+.venv/
+venv/
+env/
+
+################################
+# Jupyter Notebook
+################################
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+################################
+# Data / results (generated)
+################################
+data/
+results/
+outputs/
+figures/
+*.csv
+*.tsv
+*.npy
+*.npz
+*.pkl
+*.h5
+
+################################
+# Logs / temp
+################################
+*.log
+*.tmp
+*.bak
+
+################################
+# OS / editor
+################################
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+################################
+#other repository
+################################
+gmmot_pkg
+PGW_Metric

@@ -1,0 +1,57 @@
+cmake_minimum_required(VERSION 3.15)
+project(EntropicPartialOT LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# pybind11 に旧式の Python 検出ではなく FindPython を使わせる
+set(PYBIND11_FINDPYTHON ON)
+
+# -DPython_EXECUTABLE=... で指定された Python と、
+# その拡張モジュール用ヘッダーを検出する
+find_package(
+    Python
+    COMPONENTS Interpreter Development.Module
+    REQUIRED
+)
+
+find_package(pybind11 CONFIG REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+pybind11_add_module(cpp_engine MODULE engine.cpp)
+
+target_link_libraries(
+    cpp_engine
+    PRIVATE
+        Eigen3::Eigen
+)
+
+# src/computation から2階層上のプロジェクトルート
+get_filename_component(
+    EPOT_PROJECT_ROOT
+    "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+    ABSOLUTE
+)
+
+set_target_properties(
+    cpp_engine
+    PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${EPOT_PROJECT_ROOT}"
+        RUNTIME_OUTPUT_DIRECTORY "${EPOT_PROJECT_ROOT}"
+)
+
+# マルチ構成ジェネレーター向け
+foreach(CONFIG DEBUG RELEASE RELWITHDEBINFO MINSIZEREL)
+    set_target_properties(
+        cpp_engine
+        PROPERTIES
+            LIBRARY_OUTPUT_DIRECTORY_${CONFIG} "${EPOT_PROJECT_ROOT}"
+            RUNTIME_OUTPUT_DIRECTORY_${CONFIG} "${EPOT_PROJECT_ROOT}"
+    )
+endforeach()
+
+message(STATUS "Python executable: ${Python_EXECUTABLE}")
+message(STATUS "Python version: ${Python_VERSION}")
+message(STATUS "Python include dirs: ${Python_INCLUDE_DIRS}")
+message(STATUS "cpp_engine output directory: ${EPOT_PROJECT_ROOT}")
