@@ -1157,10 +1157,10 @@ def compute_T_X_to_Z_C(
         denominator = 0.0
 
         for k in range(Kx):
-            # 分母累计: \sum a_k * p_k(x)
-            denominator += a[k] * p_vals[k]
-
             for l in range(Ky):
+                # 分母累计: \sum gamma_{kl} * p_k(x)
+                denominator += gamma[k, l] * p_vals[k]
+
                 if (k, l) in A_matrices:
                     # 局部变换: T^{k,l}_{W2}(x) = \mu_l + A_{kl}(x - \mu_k)
                     Tkl = mixY.means_[l] + A_matrices[(k, l)] @ (x - mixX.means_[k])
