@@ -11,6 +11,8 @@ from scipy.linalg import det
 import scipy.stats as sps
 from matplotlib.colors import LogNorm
 from sklearn.mixture import GaussianMixture as skGaussianMixture
+import time
+from lib import gromov
 
 
 class Gaussian:
@@ -1197,3 +1199,238 @@ def sample_from_gmm(alpha, means, covs, N):
                 mean=means[k], cov=covs[k], size=len(idx)
             )
     return samples
+
+
+def gaussian_w2_squared(mean_0,mean_1,Cov_0,Cov_1):
+    ### squared W_2 distance between Gaussian distributions (this returns W_2^2, not W_2)
+    sqCov_1 = spl.sqrtm(Cov_1).real
+    return spl.norm(mean_0 - mean_1)**2 + np.trace(Cov_0) + np.trace(Cov_1) - 2*np.trace(spl.sqrtm(sqCov_1@Cov_0@sqCov_1).real)
+
+def gaussian_cost_matrix(gmm):
+    K = gmm.K
+    C = np.zeros((K,K))
+    for i in range(K):
+        for j in range(K):
+            C[i,j] = gaussian_w2_squared(gmm.comp_mean[i], gmm.comp_mean[j],
+                                gmm.comp_cov[i],  gmm.comp_cov[j])
+    return C
+
+
+def validate_partial_coupling(gamma, a, b, tol=1e-8):
+    ### check that gamma is a feasible (non-negative, sub-marginal) partial coupling
+    gamma = np.asarray(gamma, dtype=float)
+    if np.any(gamma < -tol):
+        raise ValueError("Partial coupling Gamma has negative entries.")
+    if np.any(gamma.sum(axis=1) > np.asarray(a) + tol):
+        raise ValueError("Partial coupling violates the source marginal a (Gamma 1 <= a).")
+    if np.any(gamma.sum(axis=0) > np.asarray(b) + tol):
+        raise ValueError("Partial coupling violates the target marginal b (Gamma^T 1 <= b).")
+    Z = float(gamma.sum())
+    if not (0.0 < Z <= 1.0 + tol):
+        raise ValueError(f"Z_lambda = {Z} is out of the expected (0, 1] range.")
+    return Z
+
+
+def matched_statistics(gamma, mu, nu, mass_tol=1e-14):
+    ### Z_lambda, row/col matched masses, and matched means m0_lambda, m1_lambda
+    gamma = np.asarray(gamma, dtype=float)
+    Z = float(gamma.sum())
+    if not np.isfinite(Z) or Z <= mass_tol:
+        raise ValueError("The partial coupling has zero matched mass (Z_lambda <= 0); "
+                          "barycentric map is undefined.")
+    row_mass = gamma.sum(axis=1)   # r_k = sum_l Gamma[k,l]
+    col_mass = gamma.sum(axis=0)   # s_l = sum_k Gamma[k,l]
+    m0 = (row_mass[:, None] * mu.comp_mean).sum(axis=0) / Z
+    m1 = (col_mass[:, None] * nu.comp_mean).sum(axis=0) / Z
+    return Z, row_mass, col_mass, m0, m1
+
+
+def alignment_loss(P, gamma, mu_c, nu_c):
+    ### J_Gamma(P) = sum_{k,l} Gamma[k,l] * W2^2(centered_mu_k, P_# centered_nu_l)
+    ### mu_c, nu_c must already be centered on the MATCHED means m0_lambda, m1_lambda
+    value = 0.0
+    for k in range(mu_c.K):
+        for l in range(nu_c.K):
+            if gamma[k, l] == 0.0:
+                continue
+            target_mean = P @ nu_c.comp_mean[l]
+            target_cov = P @ nu_c.comp_cov[l] @ P.T
+            value += gamma[k, l] * gaussian_w2_squared(
+                mu_c.comp_mean[k], target_mean, mu_c.comp_cov[k], target_cov
+            )
+    return float(value)
+
+
+def alignment_grad(P, gamma, mu_c, nu_c):
+    ### gradient of J_Gamma(P); reuses the existing grad_gauss/grad formulas,
+    ### but on matched-centered GMMs so it matches alignment_loss exactly.
+    return grad(P, gamma, mu_c, nu_c)
+
+
+def partial_projected_gradient_descent(P0, gamma, mu_c, nu_c, step_size=1.0, max_iter=150, tol=1e-8):
+    ### projected gradient descent on the Stiefel manifold for J_Gamma(P);
+    ### the recorded loss and the update direction are the same functional.
+    P = P0.copy()
+    losses = [alignment_loss(P, gamma, mu_c, nu_c)]
+    for _ in range(max_iter):
+        G = alignment_grad(P, gamma, mu_c, nu_c)
+        P_next = proj_stiefel(P - step_size * G)
+        losses.append(alignment_loss(P_next, gamma, mu_c, nu_c))
+        if np.linalg.norm(P_next - P) <= tol * (1.0 + np.linalg.norm(P)):
+            P = P_next
+            break
+        P = P_next
+    return P, losses
+
+
+def partial_mgw_barycentric_map(X, mu, nu, P, gamma, m0_match, m1_match, density_tol=None):
+    """
+    Partial barycentric map T_b^{GW,lambda}(x), normalized by the MATCHED
+    source density (not the full mixture density mu.pdf(x)):
+
+        T_b^{GW,lambda}(x) =
+            [ sum_{k,l} Gamma[k,l] p_mu_k(x) R_kl(x) ]
+          / [ sum_{k,l} Gamma[k,l] p_mu_k(x) ]
+          = [ sum_k  r_k p_mu_k(x)  R_k(x) ] / [ sum_k r_k p_mu_k(x) ]
+
+    where R_kl is built from the optimal Gaussian map between the
+    matched-centered mu_k and the P-embedded, matched-centered nu_l.
+    Raises FloatingPointError if the matched source density underflows to
+    zero, instead of silently perturbing gamma.
+    """
+    X = np.asarray(X, dtype=float)
+    single = X.ndim == 1
+    X2 = X[None, :] if single else X
+
+    mu_P_centered = gmm_transform(mu, P=P.T, b=-P.T @ m0_match)
+    nu_centered = gmm_transform(nu, b=-m1_match)
+
+    component_pdf = np.vstack([mu.comp[k].pdf(X2) for k in range(mu.K)])  # (K, n)
+    row_mass = gamma.sum(axis=1)  # r_k
+    denominator = (row_mass[:, None] * component_pdf).sum(axis=0)
+
+    if density_tol is None:
+        density_tol = np.finfo(float).tiny
+    if np.any(denominator <= density_tol):
+        raise FloatingPointError(
+            "Matched source density underflowed to zero at one or more query points; "
+            "the barycentric map is not defined there."
+        )
+
+    X_P = np.einsum('ij,bj->bi', P.T, X2 - m0_match)
+
+    numerator = np.zeros((X2.shape[0], nu.dim), dtype=float)
+    for k in range(mu.K):
+        for l in range(nu.K):
+            if gamma[k, l] == 0.0:
+                continue
+            R = T_map_Gaussian(X_P, mu_P_centered.comp[k], nu_centered.comp[l])
+            numerator += gamma[k, l] * component_pdf[k][:, None] * R
+
+    mapped = numerator / denominator[:, None] + m1_match
+    return mapped[0] if single else mapped
+
+
+def pMGW2_coup(
+    X, Y, Lambda, n_components_X, n_components_Y,
+    solver_tol=1e-12, step_size=1.0, max_alignment_iter=150,
+    normalize_costs=True, points=True, return_both=False, verbose=False,
+):
+    """
+    Partial mixture Gromov-Wasserstein coupling and (partial) barycentric map.
+
+    Corrections applied vs. the original version (see correction guide):
+      - Gamma (output of partial_gromov_ver1) is used as-is everywhere:
+        no "Gamma + eps" perturbation, and the SAME Gamma is used for the
+        alignment step and for the barycentric map.
+      - centering uses matched statistics (Gamma's row/column masses),
+        not the full-mixture means mu.mean()/nu.mean().
+      - the alignment loss and its gradient are the same functional J_Gamma(P).
+      - the barycentric map is normalized by the matched source density.
+      - `annealing` / `n_iter_annealing` are removed (unused on this path);
+        `reg` is renamed `solver_tol` since it is the solver's stopping
+        tolerance, not an entropic regularization parameter.
+      - T_rand is not used on the partial path: for a partial coupling its
+        per-point assignment probabilities do not sum to 1 (see guide 4.6).
+
+    Lambda is interpreted on the NORMALIZED cost scale (i.e. after C1, C2
+    are divided by M = max(C1.max(), C2.max())), when normalize_costs=True.
+    If you have a Lambda tuned for the raw (non-normalized) cost scale,
+    convert it first: Lambda_normalized = Lambda_raw / M**2.
+    """
+    # 1. Fit GMMs
+    mix = sklmi.GaussianMixture(n_components=n_components_X)
+    mix.fit(X)
+    mu = GaussianMixture(mix.weights_, mix.means_, mix.covariances_)
+    del mix
+    mix = sklmi.GaussianMixture(n_components=n_components_Y)
+    mix.fit(Y)
+    nu = GaussianMixture(mix.weights_, mix.means_, mix.covariances_)
+    del mix
+
+    # 2. Intra-mixture W2^2 cost matrices, with a zero-guard on normalization
+    C1 = gaussian_cost_matrix(mu)
+    C2 = gaussian_cost_matrix(nu)
+    M = max(float(C1.max()), float(C2.max()))
+    if normalize_costs and M > 0.0:
+        C1_solver, C2_solver = C1 / M, C2 / M
+    else:
+        C1_solver, C2_solver = C1.copy(), C2.copy()
+
+    a = mu.weights
+    b = nu.weights
+
+    if verbose:
+        print(f'Deriving partial MGW coupling with Lambda={Lambda}')
+
+    # 3. Solve the non-entropic partial GW coupling (p=q=2, square loss).
+    start_time = time.time()
+    Gamma = gromov.partial_gromov_ver1(
+        C1_solver, C2_solver, a, b,
+        Lambda=Lambda,
+        nb_dummies=1,
+        G0=None,
+        thres=1,
+        numItermax=None,
+        numItermax_gw=1000,
+        tol=solver_tol,
+        log=False,
+        verbose=verbose,
+        line_search=True,
+    )
+    if np.isnan(Gamma).any():
+        raise FloatingPointError("Partial GW solver returned NaN entries in Gamma.")
+
+    # feasibility check: Gamma is used as-is from here on, never perturbed
+    Z = validate_partial_coupling(Gamma, a, b)
+    if verbose:
+        print(f"Calculation time: {time.time() - start_time:.6f} sec")
+        print(f"Total matched mass Z_lambda = {Z:.6f}")
+
+    # 4. Matched centering (replaces full-mixture means mu.mean()/nu.mean())
+    Z, row_mass, col_mass, m0, m1 = matched_statistics(Gamma, mu, nu)
+
+    # 5. Alignment: loss and gradient share the same centered, matched objective
+    mu_c = gmm_transform(mu, b=-m0)
+    nu_c = gmm_transform(nu, b=-m1)
+    cross = sum(
+        Gamma[k, l] * np.outer(mu_c.comp_mean[k], nu_c.comp_mean[l])
+        for k in range(mu.K) for l in range(nu.K)
+    )
+    P0 = proj_stiefel(cross)
+    P, losses = partial_projected_gradient_descent(
+        P0, Gamma, mu_c, nu_c,
+        step_size=step_size, max_iter=max_alignment_iter,
+    )
+
+    # 6. Partial barycentric map, normalized by the matched source density
+    Z_map = partial_mgw_barycentric_map(X, mu, nu, P, Gamma, m0, m1)
+
+    # 7. Nearest-neighbor projection onto the target point cloud
+    if return_both or points:
+        nbrs = NearestNeighbors(n_neighbors=1, algorithm='ball_tree').fit(Y)
+        idx = nbrs.kneighbors(Z_map, return_distance=False).ravel()
+        if return_both:
+            return idx, Z_map
+        return idx
+    return Z_map
