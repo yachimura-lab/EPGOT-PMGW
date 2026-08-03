@@ -6,7 +6,7 @@ import imageio.v2 as imageio
 from scipy.stats import multivariate_normal
 from matplotlib.colors import LogNorm
 
-# 设置路径
+# Set up the import path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import cpp_engine
 
@@ -39,7 +39,7 @@ def display_gmm(
     pos = np.dstack((X, Y)).reshape(-1, 2)
     Z = gmm.pdf(pos).reshape(n, n)
 
-    # 关键：强制 1:1 比例，否则椭圆会看起来像被挤压的形状
+    # Important: force a 1:1 aspect ratio, otherwise the ellipses look squashed
     axis.set_aspect("equal", adjustable="box")
 
     z_max = max(Z.max(), 1e-8)
@@ -79,7 +79,7 @@ def entropic_partial_barycentric_interpolation(gmm_1, gmm_2, t, Lambda, reg):
     for i in range(gmm_1.K):
         for j in range(gmm_2.K):
             if W[i, j] > 1e-5:
-                # 调用 C++ 迭代重心
+                # Call the iterative barycenter from C++
                 m_ij, c_ij = cpp_engine.GaussianBarycenterW2(
                     [gmm_1.comp_mean[i], gmm_2.comp_mean[j]],
                     [gmm_1.comp_cov[i], gmm_2.comp_cov[j]],
@@ -94,7 +94,7 @@ def entropic_partial_barycentric_interpolation(gmm_1, gmm_2, t, Lambda, reg):
 
 
 def main():
-    # 按照用户要求的数据生成
+    # Data as requested
     alpha_A = np.array([0.5, 0.5])
     means_A = np.array([[-8.0, -5.0], [1.0, -8.0]])
     covs_A = 0.2 * np.array([[[1, 0.2], [0.2, 1]], [[1, -0.1], [-0.1, 1]]])
@@ -107,7 +107,7 @@ def main():
     )
     Gmm_2 = GaussianMixture(alpha_B, means_B, covs_B)
 
-    # 生成 GIF
+    # Render the GIF
     frames = []
     t_list = np.linspace(0, 1, 15)
     os.makedirs("output", exist_ok=True)

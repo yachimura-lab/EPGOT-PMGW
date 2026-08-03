@@ -1,21 +1,21 @@
 import sys
 import os
 
-# 1. 絶対パスを定義 (ユーザー環境に合わせる)
+# 1. Define the absolute path (adjust it to your own environment)
 PROJECT_ROOT = "/home/arnold/Documents/report/project"
 root_dir = PROJECT_ROOT
-# 2. sys.path の先頭に追加
+# 2. Prepend it to sys.path
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-# 3. パスを追加した「後」でインポート
+# 3. Import only *after* the path has been added
 try:
     import cpp_engine
 
-    print("cpp_engine の読み込みに成功しました。")
+    print("cpp_engine loaded successfully.")
 except ImportError as e:
-    print(f"エラー: {e}")
-    print(f"検索パス: {sys.path}")
+    print(f"Error: {e}")
+    print(f"Search path: {sys.path}")
     sys.exit(1)
 
 import numpy as np
@@ -24,7 +24,7 @@ from scipy.stats import multivariate_normal
 from matplotlib.colors import LogNorm
 
 
-# --- クラス・関数定義 ---
+# --- Class and function definitions ---
 class GaussianMixture:
     def __init__(self, weights, means, covs):
         self.weights = np.array(weights)
@@ -98,7 +98,7 @@ def entropic_partial_barycentric_interpolation(gmm_1, gmm_2, t, Lambda, reg):
 
 
 def main():
-    # データの定義
+    # Data definitions
     alpha_A = np.array([0.5, 0.5])
     means_A = np.array([[-8.0, -5.0], [1.0, -8.0]])
     covs_A = 0.2 * np.array([[[1, 0.2], [0.2, 1]], [[1, -0.1], [-0.1, 1]]])
@@ -142,17 +142,17 @@ def main():
                 ax.set_xticklabels([])
 
     plt.tight_layout()
-    plt.show()  # 修正ポイント: DPIを上げる(300以上)、またはPDFで保存する
+    plt.show()  # fix: raise the DPI (300+) or save as PDF instead
     output_eps = os.path.join(PROJECT_ROOT, "output", "comparison_high_res.eps")
     output_pdf = os.path.join(
         PROJECT_ROOT, "output", "comparison_high_res.pdf"
-    )  # PDFの方が確実
+    )  # PDF is the safer choice
 
-    # rasterized=False を明示的に指定（ベクトルを維持）
+    # Pass rasterized=False explicitly to keep the output vectorized
     plt.savefig(output_eps, format="eps", dpi=300, bbox_inches="tight")
     plt.savefig(output_pdf, format="pdf", bbox_inches="tight")
 
-    print(f"保存完了: {output_eps}")
+    print(f"Saved: {output_eps}")
 
 
 if __name__ == "__main__":

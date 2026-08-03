@@ -3,19 +3,19 @@ project(EntropicPartialOT)
 
 set(CMAKE_CXX_STANDARD 17)
 
-# 寻找依赖
+# Find dependencies
 find_package(pybind11 REQUIRED)
 find_package(Eigen3 REQUIRED)
 
-# 定义模块：源文件就在当前目录
+# Define the module: the source file sits in this directory
 pybind11_add_module(cpp_engine engine.cpp)
 
-# 链接 Eigen
+# Link Eigen
 target_link_libraries(cpp_engine PRIVATE Eigen3::Eigen)
 
-# 关键修正：确保输出到项目根目录 (project/)
-# PROJECT_SOURCE_DIR 通常指向最顶层的 CMakeLists，但在你目前的结构中
-# 使用 CMAKE_CURRENT_SOURCE_DIR/.. 是最保险的
+# Important: make sure the module is emitted into the project root (project/).
+# PROJECT_SOURCE_DIR usually points at the top-level CMakeLists, but with the
+# current layout using CMAKE_CURRENT_SOURCE_DIR/.. is the safest choice.
 set_target_properties(cpp_engine PROPERTIES 
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.."
 )

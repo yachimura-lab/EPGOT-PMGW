@@ -4,7 +4,7 @@ import matplotlib.cm as cm
 from matplotlib.colors import Normalize
 
 # ----------------------------
-# パラメータ
+# Parameters
 # ----------------------------
 Lambda_list = np.arange(0.125, 0.5625, 0.0625)
 reg_list = np.arange(0.01, 0.31, 0.1)
@@ -19,25 +19,25 @@ M = gaussian_W(Gmm_1, Gmm_2)
 M = M / np.max(M)
 
 # ----------------------------
-# Figure 作成
+# Create the figure
 # ----------------------------
 fig, axes = plt.subplots(len(reg_list), len(Lambda_list), figsize=(30, 30))
 
 # ----------------------------
-# カラーマップ設定
+# Colormap settings
 # ----------------------------
 cmap = cm.get_cmap("viridis")
-norm = Normalize(vmin=0, vmax=np.max(M))  # R[i,j] の最大値に応じてスケーリング
+norm = Normalize(vmin=0, vmax=np.max(M))  # scale by the largest R[i, j]
 
 # ----------------------------
-# メインループ
+# Main loop
 # ----------------------------
 for row, reg in enumerate(reg_list):
     for col, Lambda in enumerate(Lambda_list):
         ax = axes[row, col]
         plt.sca(ax)
 
-        # --- GMM 描画 ---
+        # --- Draw the GMMs ---
         display_gmm(
             [Gmm_1.K, Gmm_1.weights, Gmm_1.comp_mean, Gmm_1.comp_cov],
             n=100,
@@ -99,27 +99,27 @@ for row, reg in enumerate(reg_list):
             ax.text(x + 0.05, y + 0.05, f"2-{j}", color="black", fontsize=12)
 
 # ----------------------------
-# カラーバー配置（下段）
+# Colorbar placement (bottom row)
 # ----------------------------
 fig.subplots_adjust(
     bottom=0.10,
     top=0.95,
     left=0.05,
     right=0.95,
-    wspace=0.15,  # 列間を少し狭く
-    hspace=0.05,  # 行間を最小化
+    wspace=0.15,  # tighten the gap between columns a little
+    hspace=0.05,  # minimize the gap between rows
 )
 
-# 下段に横カラーバー
+# Horizontal colorbar along the bottom
 cbar_ax = fig.add_axes([0.05, 0.03, 0.90, 0.02])
 sm = cm.ScalarMappable(cmap=cmap, norm=norm)
 sm.set_array([])
 cbar = fig.colorbar(sm, cax=cbar_ax, orientation="horizontal")
 cbar.set_label(r"$w_{ij}$ (coupling weight)", fontsize=12)
 
-# tight_layout で調整（カラーバーと干渉しないように下端を確保）
+# Adjust with tight_layout (reserve the bottom so it does not clash with the colorbar)
 plt.tight_layout(rect=[0, 0.05, 1, 1])
 
-# 保存＆表示
+# Save and show
 plt.savefig("fig_lambda_reg_sweep_optimized.eps", format="eps")
 plt.show()

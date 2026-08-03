@@ -1,19 +1,19 @@
 [build]
 publish = "docs/_site"
 command = """
-  # 1. uv をインストール
+  # 1. Install uv
   chmod +x ./setup-uv.sh && ./setup-uv.sh
 
-  # 2. Quarto をインストール
+  # 2. Install Quarto
   curl -Lo quarto.tar.gz https://quarto.org/download/latest/quarto-linux-amd64.tar.gz
-  mkdir quarto  # 展開先ディレクトリを作成
+  mkdir quarto  # create the extraction directory
   tar -xzf quarto.tar.gz --strip-components=1 -C quarto
-  export PATH=$PATH:$PWD/quarto/bin  # ダウンロードしたバイナリをパスに追加
+  export PATH=$PATH:$PWD/quarto/bin  # add the downloaded binary to PATH
 
-  # 3. 必要な Python モジュールをインストール
+  # 3. Install the required Python modules
   uv sync
 
-  # 4. ドキュメントをビルド
+  # 4. Build the documentation
   export QUARTO_PYTHON=$(pwd)/.venv/bin/python
   quarto render docs
 """
