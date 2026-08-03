@@ -24,7 +24,7 @@ target_link_libraries(
         Eigen3::Eigen
 )
 
-# Notebook の sys.path に含まれる src/ にモジュールを出力
+# Emit the module into src/, which is on the notebooks' sys.path
 get_filename_component(
     CPP_ENGINE_OUTPUT_DIR
     "${CMAKE_CURRENT_SOURCE_DIR}/.."

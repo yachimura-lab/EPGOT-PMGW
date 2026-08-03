@@ -13,7 +13,7 @@ website:
   navbar:
     left:
       - href: index.qmd
-        text: トップページ
+        text: Home
     tools:
     - icon: github
       menu:
@@ -26,7 +26,7 @@ website:
       align: left
       contents:
         - href: index.qmd
-          text: トップページ
+          text: Home
         - section: "notebooks"
           style: docked
           contents:

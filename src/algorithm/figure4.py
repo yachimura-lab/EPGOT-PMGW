@@ -12,7 +12,7 @@ from scipy.stats import multivariate_normal
 from matplotlib.colors import LogNorm
 
 
-# 设置路径
+# Set up the import path
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -56,7 +56,7 @@ def display_gmm(
 
     Z = gmm.pdf(pos).reshape(n, n)
 
-    # 关键：强制 1:1 比例，否则椭圆会看起来像被挤压的形状
+    # Important: force a 1:1 aspect ratio, otherwise the ellipses look squashed
 
     axis.set_aspect("equal", adjustable="box")
 
@@ -102,7 +102,7 @@ def entropic_partial_barycentric_interpolation(gmm_1, gmm_2, t, Lambda, reg):
     for i in range(gmm_1.K):
         for j in range(gmm_2.K):
             if W[i, j] > 1e-5:
-                # 调用 C++ 迭代重心
+                # Call the iterative barycenter from C++
 
                 m_ij, c_ij = cpp_engine.GaussianBarycenterW2(
                     [gmm_1.comp_mean[i], gmm_2.comp_mean[j]],
@@ -132,13 +132,13 @@ def main():
         [[[1, -0.1], [-0.1, 1]], [[1, 0.2], [0.2, 1]], [[1, 0.0], [0.0, 1]]]
     )
     Gmm_2 = GaussianMixture(alpha_B, means_B, covs_B)
-    # --- 設定 ---
+    # --- Settings ---
     t_steps = 5
     t_list = np.linspace(0, 1, t_steps)
     Lambda = 0.25
     reg = 0.01
 
-    # 1行5列のキャンバスを作成
+    # Create a 1-row, 5-column canvas
     fig, axes = plt.subplots(1, t_steps, figsize=(20, 4))
 
     if t_steps == 1:
@@ -148,27 +148,27 @@ def main():
     for i, t in enumerate(t_list):
         ax = axes[i]
 
-        # 背景として始点(Red)と終点(Blue)を薄く表示
+        # Draw the source (red) and target (blue) faintly in the background
         display_gmm(Gmm_1, cmap="Reds", axis=ax)
         display_gmm(Gmm_2, cmap="Blues", axis=ax)
 
-        # Partial OT による補間計算
+        # Interpolate via partial OT
         gmm_t = entropic_partial_barycentric_interpolation(Gmm_1, Gmm_2, t, Lambda, reg)
 
-        # 補間結果を表示 (Viridis)
+        # Draw the interpolation result (viridis)
         display_gmm(gmm_t, cmap="viridis", axis=ax)
 
         ax.set_xlim(-12, 12)
         ax.set_ylim(-12, 12)
         ax.set_title(f"t = {t:.2f}")
 
-        # 見栄えのため軸ラベルを消去（任意）
+        # Drop the axis labels for a cleaner look (optional)
         if i > 0:
             ax.set_yticklabels([])
 
     plt.tight_layout()
 
-    # 保存
+    # Save
     output_path = "output/interpolation_line_L025_R001.eps"
     os.makedirs("output", exist_ok=True)
     plt.savefig(output_path, dpi=200)

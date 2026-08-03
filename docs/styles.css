@@ -1,8 +1,8 @@
 /* Custom styles for psiclone website */
 
-/* Change "On this page" to "目次" */
+/* Re-render the "On this page" heading via ::before */
 .sidebar nav[role=doc-toc] > h2::before {
-  content: "目次";
+  content: "On this page";
   visibility: visible;
   display: block;
   height: auto;
@@ -14,9 +14,9 @@
   margin-bottom: 1.5rem;
 }
 
-/* Change "Other Formats" to "ダウンロードリンク" */
+/* Re-render the "Other Formats" heading via ::before */
 .sidebar .quarto-alternate-formats > h2::before {
-  content: "ダウンロードリンク";
+  content: "Download links";
   visibility: visible;
   display: block;
   height: auto;
@@ -40,7 +40,7 @@
   padding-top: 0rem;
 }
 
-/* すべてのnavbarリンクのアクティブ状態を無効化 */
+/* Disable the active state on every navbar link */
 .navbar-nav .nav-link.active,
 .navbar-nav .nav-item.active,
 .navbar-nav .nav-link[aria-current="page"] {
@@ -50,7 +50,7 @@
   border: none !important;
 }
 
-/* ホバー時のスタイルも通常に戻す */
+/* Reset the hover style back to normal as well */
 .navbar-nav .nav-link.active:hover {
   color: var(--bs-navbar-hover-color, inherit) !important;
 }

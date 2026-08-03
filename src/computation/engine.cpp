@@ -1,7 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/eigen.h>
-#include <pybind11/stl.h>  // 必须包含此头文件
+#include <pybind11/stl.h>  // this header is required
 #include <Eigen/Dense>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <vector>
@@ -9,7 +9,7 @@
 
 namespace py = pybind11;
 
-// 1. 严格实现 GaussianW2
+// 1. Faithful implementation of GaussianW2
 double GaussianW2(const Eigen::VectorXd& m0, const Eigen::VectorXd& m1, 
                   const Eigen::MatrixXd& Sigma0, const Eigen::MatrixXd& Sigma1) {
     Eigen::MatrixXd Sigma00 = Sigma0.sqrt();
@@ -18,7 +18,7 @@ double GaussianW2(const Eigen::VectorXd& m0, const Eigen::VectorXd& m1,
     return std::max(0.0, d);
 }
 
-// 2. 严格实现 GaussianBarycenterW2 (Banzato 迭代)
+// 2. Faithful implementation of GaussianBarycenterW2 (Banzato iteration)
 std::pair<Eigen::VectorXd, Eigen::MatrixXd> GaussianBarycenterW2(
     const std::vector<Eigen::VectorXd>& mu, 
     const std::vector<Eigen::MatrixXd>& Sigma, 
@@ -43,7 +43,7 @@ std::pair<Eigen::VectorXd, Eigen::MatrixXd> GaussianBarycenterW2(
     return {mun, Sigman};
 }
 
-// 3. 严格实现 Entropic Partial OT
+// 3. Faithful implementation of Entropic Partial OT
 Eigen::MatrixXd entropic_partial_ot(
     const Eigen::VectorXd& a, 
     const Eigen::VectorXd& b, 

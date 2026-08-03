@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
-# 设置路径
+# Set up the import path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import cpp_engine
 
@@ -12,13 +12,13 @@ from matplotlib.colors import LogNorm
 import scipy.stats as sps
 
 
-# --- 1. 概率密度计算 ---
+# --- 1. Probability density evaluation ---
 def densite_theorique2d(mu, Sigma, alpha, x):
     alpha = np.atleast_1d(alpha)
     K = mu.shape[0]
     y = np.zeros(x.shape[0])
     for j in range(K):
-        # 确保协方差矩阵和均值的形状正确
+        # Make sure the covariance matrix and the mean have the right shape
         s = np.array(Sigma[j]).reshape(2, 2) + np.eye(2) * 1e-6
         m = np.array(mu[j]).flatten()
         try:
@@ -28,7 +28,7 @@ def densite_theorique2d(mu, Sigma, alpha, x):
     return y
 
 
-# --- 2. 绘图函数 (调整了裾野宽度) ---
+# --- 2. Plotting helper (with a widened distribution tail) ---
 def display_gmm(
     gmm,
     n=100,
@@ -55,8 +55,8 @@ def display_gmm(
     Z = np.maximum(Z, 1e-20)
     Zmax = Z.max()
 
-    # --- 调整重点：裾の幅を広く (lower_bound 小さく) ---
-    # 之前是 1e-2，改为 1e-4 可以看到更微弱的分布边缘
+    # --- Tuning note: widen the tails by lowering lower_bound ---
+    # It used to be 1e-2; 1e-4 makes the faint edges of the distribution visible.
     lower_bound = 1e-4
     levels = np.logspace(np.log10(Zmax * lower_bound), np.log10(Zmax), num_levels)
     norm = LogNorm(vmin=Zmax * lower_bound, vmax=Zmax)
@@ -77,7 +77,7 @@ def display_gmm(
     axis.set_ylim(ay, by)
 
 
-# --- 3. 初始化数据 ---
+# --- 3. Initial data ---
 means_A = np.array([[-9.0, -9.0], [2.0, -9.0]])
 covs_A = 0.2 * np.array([[[1, 0.2], [0.2, 1]], [[1, -0.1], [-0.1, 1]]])
 alpha_A = np.array([0.5, 0.5])
@@ -91,22 +91,22 @@ alpha_B = np.array([0.45, 0.45, 0.1])
 gmm_source = [alpha_A, means_A, covs_A]
 gmm_target = [alpha_B, means_B, covs_B]
 
-# 参数矩阵
+# Parameter grid
 lambdas = [0.1, 0.25, 0.4, 0.5]
 regs = [0.01, 1, 10]
 
-# 预计算成本矩阵
+# Pre-compute the cost matrix
 M = cpp_engine.compute_cost(means_A, list(covs_A), means_B, list(covs_B))
 M_normalized = M / np.max(M)
 
-# 确保输出目录存在
+# Make sure the output directory exists
 output_dir = "output"
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 grid_results = []
 
-# --- 4. 生成矩阵动画 ---
+# --- 4. Generate the animation matrix ---
 for lb_val in lambdas:
     row_files = []
     for rg_val in regs:
@@ -123,7 +123,7 @@ for lb_val in lambdas:
             ax.clear()
             t = ts[frame]
 
-            # 背景辅助线
+            # Background reference contours
             display_gmm(
                 gmm_source,
                 axis=ax,
@@ -175,7 +175,7 @@ for lb_val in lambdas:
             )
             ax.set_title(f"L={current_lb}, R={current_rg} | t={t:.2f}", fontsize=10)
 
-        # --- 调整重点：interval=200 使播放速度变慢 ---
+        # --- Tuning note: interval=200 slows the playback down ---
         ani = FuncAnimation(fig, update, frames=len(ts), interval=200)
 
         filename = f"matrix_L{str(lb_val).replace('.', '_')}_R{str(rg_val).replace('.', '_')}.gif"
@@ -188,7 +188,7 @@ for lb_val in lambdas:
 
     grid_results.append(row_files)
 
-# --- 5. 生成 HTML 报告 ---
+# --- 5. Generate the HTML report ---
 html_path = "compare_report.html"
 with open(html_path, "w") as f:
     f.write(
@@ -203,7 +203,7 @@ with open(html_path, "w") as f:
     for i, lb in enumerate(lambdas):
         f.write(f"<tr><td class='label'>Lambda = {lb}</td>")
         for gif_path in grid_results[i]:
-            # 使用相对路径显示图片
+            # Reference the images by relative path
             f.write(
                 f"<td><img src='{gif_path}'><br><small>{os.path.basename(gif_path)}</small></td>"
             )
