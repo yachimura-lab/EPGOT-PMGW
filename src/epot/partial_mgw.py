@@ -16,10 +16,14 @@ from .gaussian import (
     grad,
     proj_stiefel,
 )
+from .reproducibility import DEFAULT_SEED
 
 
-def _fit_gmm(points, n_components):
-    mixture = sklmi.GaussianMixture(n_components=n_components)
+def _fit_gmm(points, n_components, random_state=DEFAULT_SEED):
+    mixture = sklmi.GaussianMixture(
+        n_components=n_components,
+        random_state=random_state,
+    )
     mixture.fit(points)
     return GaussianMixture(
         mixture.weights_,
@@ -177,6 +181,7 @@ def pMGW2_coup(
     points=True,
     return_both=False,
     verbose=False,
+    random_state=DEFAULT_SEED,
 ):
     """Compute a partial-MGW coupling and barycentric map.
 
@@ -184,8 +189,8 @@ def pMGW2_coup(
     ``normalize_costs`` is true. The solver coupling is used unchanged for
     matched centering, alignment, and the barycentric map.
     """
-    mu = _fit_gmm(X, n_components_X)
-    nu = _fit_gmm(Y, n_components_Y)
+    mu = _fit_gmm(X, n_components_X, random_state)
+    nu = _fit_gmm(Y, n_components_Y, random_state)
 
     C1 = gaussian_cost_matrix(mu)
     C2 = gaussian_cost_matrix(nu)

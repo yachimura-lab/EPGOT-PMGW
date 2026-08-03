@@ -45,8 +45,23 @@ from .partial_ot import (
     partial_wasserstein_lagrange_entropic,
     to_numpy,
 )
+from .reproducibility import (
+    DEFAULT_SEED,
+    DEFAULT_SOURCE_DATE_EPOCH,
+    freeze_output_timestamps,
+    get_rng,
+    set_reproducible,
+    set_seed,
+)
 
 __all__ = [
+    # Reproducibility
+    "DEFAULT_SEED",
+    "DEFAULT_SOURCE_DATE_EPOCH",
+    "freeze_output_timestamps",
+    "get_rng",
+    "set_reproducible",
+    "set_seed",
     # Gaussian models, geometry, and maps
     "Gaussian",
     "GaussianMixture",
