@@ -8,7 +8,7 @@ figures change from one run to the next.
 
 Two things are pinned here:
 
-* **Random draws.** Every stochastic step in :mod:`epot` takes its numbers
+* **Random draws.** Every stochastic step in :mod:`pgot` takes its numbers
   from :func:`get_rng`, which defaults to a package-level generator seeded
   with :data:`DEFAULT_SEED` at import time. Calls therefore stay
   statistically independent within a session while the session as a whole

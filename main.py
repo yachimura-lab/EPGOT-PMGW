@@ -1,5 +1,5 @@
 def main():
-    print("Hello from epot-pmgw!")
+    print("Hello from epgot-pmgw!")
 
 
 if __name__ == "__main__":
