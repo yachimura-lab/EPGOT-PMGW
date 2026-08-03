@@ -1,6 +1,6 @@
 # EPGOT-pMGW — Entropic Partial Gromov Optimal Transport
 
-This repository publishes research code and notebooks on entropic partial Gromov optimal transport (EPGOT) between Gaussian mixture models (GMMs). The main logic lives in `src/`, together with Jupyter notebooks that reproduce the figures in the paper.
+This repository publishes research code and notebooks on entropic partial Gromov optimal transport (EPGOT) between Gaussian mixture models (GMMs). The main logic lives in `src/`, and the Jupyter notebooks that reproduce the figures in the paper live in `docs/notebook/`.
 
 📖 **Rendered notebooks (with outputs)**: https://epgot-pmgw.netlify.app/
 
@@ -13,26 +13,36 @@ Each notebook corresponds to figures in the paper. You can browse them directly 
 | [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure1_2_3) | Visualization of transport plans from entropic partial OT between GMMs (Figures 1–3) |
 | [figure4.ipynb](docs/notebook/figure4.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure4) | Barycentric interpolation of GMMs based on partial OT (Figure 4, uses `cpp_engine`) |
 | [figure5.ipynb](docs/notebook/figure5.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure5) | Transport maps between point clouds via barycentric projection (Figure 5) |
+| [PMGW_corrected.ipynb](docs/notebook/PMGW_corrected.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/PMGW_corrected) | pMGW2 / MGW2 / GW2 / PGW2 compared on the same pair of 3D point clouds (uses the vendored `PGW_Metric` code) |
 
 ## Repository layout
 
 ```
 .
 ├── src/
-│   ├── pgot/               # Main logic (Python package)
-│   │   ├── __init__.py     #   GMM classes, Gaussian W2, MGW2 / MEW2,
-│   │   │                   #   entropic partial OT, barycentric projection maps
-│   │   └── reproducibility.py  # Seeds and figure timestamps (see below)
-│   ├── computation/        # C++ computation engine (Eigen + pybind11)
-│   │   ├── engine.cpp      #   Fast GaussianW2 / W2 barycenter implementations
-│   │   └── CMakeLists.txt  #   Builds the cpp_engine module into src/
-│   ├── figure1_2_3.ipynb   # Notebook reproducing Figures 1–3
-│   ├── figure4.ipynb       # Notebook reproducing Figure 4 (uses cpp_engine)
-│   └── figure5.ipynb       # Notebook reproducing Figure 5
-├── docs/                   # Quarto documentation site (published on Netlify)
-│   └── notebook/           #   Notebooks published on the site
-├── pyproject.toml          # Python dependencies (managed with uv)
-└── netlify.toml            # Site build / deploy configuration
+│   ├── pgot/                    # Main logic (Python package)
+│   │   ├── __init__.py          #   Public API, re-exported from the modules below
+│   │   ├── gaussian.py          #   GMM classes, Gaussian W2, transport maps
+│   │   ├── mgw.py               #   MGW2 between mixtures
+│   │   ├── mew.py               #   MEW2 between mixtures
+│   │   ├── partial_ot.py        #   Entropic partial OT, barycentric projection
+│   │   ├── partial_mgw.py       #   Partial MGW2
+│   │   └── reproducibility.py   #   Seeds and figure timestamps (see below)
+│   ├── computation/             # C++ computation engine (Eigen + pybind11)
+│   │   ├── engine.cpp           #   Fast GaussianW2 / W2 barycenter implementations
+│   │   └── CMakeLists.txt       #   Builds the cpp_engine module into src/
+│   └── algorithm/               # Standalone scripts kept from earlier experiments
+├── docs/                        # Quarto documentation site (published on Netlify)
+│   ├── _quarto.yml              #   Site configuration
+│   └── notebook/                #   The notebooks published on the site
+│       ├── figure1_2_3.ipynb    #     Figures 1–3
+│       ├── figure4.ipynb        #     Figure 4 (uses cpp_engine)
+│       ├── figure5.ipynb        #     Figure 5
+│       └── PMGW_corrected.ipynb #     pMGW2 / MGW2 / GW2 / PGW2 comparison
+├── vendor/                      # PGW_Metric submodule, packaged as the `lib` module
+├── forward/                     # Original files as received, kept for reference
+├── pyproject.toml               # Python dependencies (managed with uv)
+└── netlify.toml                 # Site build / deploy configuration
 ```
 
 ## Setup
@@ -51,7 +61,12 @@ If uv is not installed yet, you can install it with the bundled script:
 
 ### 1. Install Python dependencies
 
+`vendor/PGW_Metric` is a git submodule, and `uv sync` packages it as the `lib` module that
+`PMGW_corrected.ipynb` and `pgot.pMGW2_coup` import. Check it out first if the repository was
+cloned without `--recurse-submodules`:
+
 ```bash
+git submodule update --init --recursive
 uv sync
 ```
 
@@ -80,10 +95,10 @@ cmake --build src/computation/build
 
 ## Running the notebooks
 
-Open the notebooks under `src/` with Jupyter:
+Open the notebooks under `docs/notebook/` with Jupyter:
 
 ```bash
-uv run jupyter lab src/
+uv run jupyter lab docs/notebook/
 ```
 
 ## Reproducibility
@@ -105,7 +120,7 @@ exactly:
   SVG files, so saving the same figure twice yields different bytes. Setting
   `SOURCE_DATE_EPOCH` replaces that stamp with a fixed date.
 
-Each notebook does both in its first cell:
+Each notebook does both in its first code cell:
 
 ```python
 from pgot import set_reproducible
