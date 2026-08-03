@@ -1,0 +1,96 @@
+---
+title: "EPGOT-pMGW"
+subtitle: "Entropic partial Gromov optimal transport between Gaussian mixtures"
+toc: false
+---
+
+Research code and notebooks on entropic partial Gromov optimal transport (EPGOT)
+between Gaussian mixture models (GMMs). Each notebook reproduces figures from the
+paper and is published here with its outputs, so the figures on this site are the
+ones the code actually produces.
+
+Source: [yachimura-lab/EPGOT-PMGW](https://github.com/yachimura-lab/EPGOT-PMGW).
+
+## The notebooks
+
+| Notebook | What it shows |
+| --- | --- |
+| [Figures 1–3](notebook/figure1_2_3.ipynb) | Transport plans from entropic partial OT between two GMMs, swept over $\lambda$ and $\varepsilon$ |
+| [Figure 4](notebook/figure4.ipynb) | Barycentric interpolation between the same two mixtures, driven by a partial plan |
+| [Figure 5](notebook/figure5.ipynb) | Transport maps between sampled point clouds, via barycentric projection |
+| [pMGW2 / MGW2 / GW2 / PGW2](notebook/PMGW_corrected.ipynb) | The four matching methods compared on one pair of 3D point clouds |
+
+## Why partial transport
+
+The running example in the first three notebooks is a pair of Gaussian mixtures:
+`A`, with two components, and `B`, with two matching components plus a third of
+weight $0.1$ parked far away — an outlier.
+
+Balanced optimal transport has to move *all* of A's mass, so that outlier always
+receives something. Entropic partial transport prices mass instead, solving
+
+$$
+\min_{\gamma \ge 0,\ \gamma \mathbf{1} \le a,\ \gamma^\top \mathbf{1} \le b}
+\ \langle \gamma,\ M - 2\lambda \rangle
++ \varepsilon \sum_{ij} \gamma_{ij}\left(\log \gamma_{ij} - 1\right),
+$$
+
+where $M$ is the cost between components, $\lambda$ is the reward per unit of
+transported mass and $\varepsilon$ is the entropic regularisation strength. Mass
+only moves while it pays for itself, so the transported mass
+$\sum_{ij} \gamma_{ij}$ can fall below $1$ and the outlier can simply be skipped.
+
+The two knobs pull in different directions, and the sweeps in
+[Figures 1–3](notebook/figure1_2_3.ipynb) show it directly: raising $\lambda$ buys
+more transport, until the outlier becomes worth reaching after all, while raising
+$\varepsilon$ blurs the plan until every pair carries a little mass and nothing is
+cleanly excluded.
+
+The same trade-off carries over to Gromov–Wasserstein in
+[the point-cloud comparison](notebook/PMGW_corrected.ipynb), where only the
+relative geometry of each cloud is available and nothing marks the outlier blob as
+spurious.
+
+## Reproducibility
+
+Sampling point clouds and fitting mixtures are both stochastic, so without a fixed
+seed every run draws different data and `sklearn`'s `GaussianMixture` converges to
+a different local optimum — the figures then change from one run to the next.
+
+Each notebook opens with
+
+```python
+from pgot import set_reproducible
+
+set_reproducible()
+```
+
+which seeds `pgot`'s generator — along with the global `numpy.random`, `random`
+and PyTorch generators — using `DEFAULT_SEED = 42`, and pins `SOURCE_DATE_EPOCH`
+so the timestamp Matplotlib writes into EPS, PDF and SVG files stays fixed.
+Re-running a notebook therefore reproduces its figures exactly, rather than merely
+producing something like them.
+
+To vary an experiment deliberately, pass a different seed —
+`set_reproducible(seed=7)` — or override it per call: the entry points
+(`pMGW2_coup`, `MGW2_coup`, `MEW2_coup`, `compute_T_X_to_Z`, …) accept
+`random_state` for the mixture fits, and the sampling helpers (`sample_from_gmm`,
+`T_rand`, …) accept `rng`.
+
+## Running the code
+
+The logic lives in the `pgot` package under `src/`. `figure4` additionally needs
+the compiled `cpp_engine` module, and `PMGW_corrected` needs the vendored
+`PGW_Metric` submodule. Dependencies are managed with
+[uv](https://docs.astral.sh/uv/):
+
+```bash
+git clone --recurse-submodules https://github.com/yachimura-lab/EPGOT-PMGW.git
+cd EPGOT-PMGW
+uv sync
+uv run jupyter lab docs/notebook/
+```
+
+Building `cpp_engine` takes a few extra steps — CMake, a C++17 compiler and
+Eigen3 — documented in the
+[README](https://github.com/yachimura-lab/EPGOT-PMGW#2-build-the-c-computation-engine-cpp_engine).
