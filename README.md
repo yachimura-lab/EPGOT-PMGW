@@ -1,8 +1,8 @@
-# EPOT-pMGW — Entropic Partial Optimal Transport
+# EPGOT-pMGW — Entropic Partial Gromov Optimal Transport
 
-This repository publishes research code and notebooks on entropic partial optimal transport (EPOT) between Gaussian mixture models (GMMs). The main logic lives in `src/`, together with Jupyter notebooks that reproduce the figures in the paper.
+This repository publishes research code and notebooks on entropic partial Gromov optimal transport (EPGOT) between Gaussian mixture models (GMMs). The main logic lives in `src/`, together with Jupyter notebooks that reproduce the figures in the paper.
 
-📖 **Rendered notebooks (with outputs)**: https://epot-pmgw.netlify.app/
+📖 **Rendered notebooks (with outputs)**: https://epgot-pmgw.netlify.app/
 
 ## Notebooks
 
@@ -10,16 +10,16 @@ Each notebook corresponds to figures in the paper. You can browse them directly 
 
 | Notebook | Rendered page | Description |
 | --- | --- | --- |
-| [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | [View online](https://epot-pmgw.netlify.app/notebook/figure1_2_3) | Visualization of transport plans from entropic partial OT between GMMs (Figures 1–3) |
-| [figure4.ipynb](docs/notebook/figure4.ipynb) | [View online](https://epot-pmgw.netlify.app/notebook/figure4) | Barycentric interpolation of GMMs based on partial OT (Figure 4, uses `cpp_engine`) |
-| [figure5.ipynb](docs/notebook/figure5.ipynb) | [View online](https://epot-pmgw.netlify.app/notebook/figure5) | Transport maps between point clouds via barycentric projection (Figure 5) |
+| [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure1_2_3) | Visualization of transport plans from entropic partial OT between GMMs (Figures 1–3) |
+| [figure4.ipynb](docs/notebook/figure4.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure4) | Barycentric interpolation of GMMs based on partial OT (Figure 4, uses `cpp_engine`) |
+| [figure5.ipynb](docs/notebook/figure5.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure5) | Transport maps between point clouds via barycentric projection (Figure 5) |
 
 ## Repository layout
 
 ```
 .
 ├── src/
-│   ├── epot/               # Main logic (Python package)
+│   ├── pgot/               # Main logic (Python package)
 │   │   ├── __init__.py     #   GMM classes, Gaussian W2, MGW2 / MEW2,
 │   │   │                   #   entropic partial OT, barycentric projection maps
 │   │   └── reproducibility.py  # Seeds and figure timestamps (see below)
@@ -96,8 +96,8 @@ different local optimum — the figures then change from one run to the next.
 Two things are pinned so that re-running a notebook reproduces its figures
 exactly:
 
-- **Random draws.** Every stochastic step in `epot` takes its numbers from a
-  package-level generator seeded with `epot.DEFAULT_SEED` (42), and each
+- **Random draws.** Every stochastic step in `pgot` takes its numbers from a
+  package-level generator seeded with `pgot.DEFAULT_SEED` (42), and each
   `GaussianMixture` fit is given that seed as its `random_state`. Calls stay
   statistically independent within a session while the session as a whole
   replays identically.
@@ -108,12 +108,12 @@ exactly:
 Each notebook does both in its first cell:
 
 ```python
-from epot import set_reproducible
+from pgot import set_reproducible
 
 set_reproducible()
 ```
 
-Besides seeding `epot` itself, `set_reproducible()` seeds the global
+Besides seeding `pgot` itself, `set_reproducible()` seeds the global
 `numpy.random`, `random`, and PyTorch generators, so the `np.random.*` calls
 made directly in the notebooks are covered too. Run it before any sampling.
 

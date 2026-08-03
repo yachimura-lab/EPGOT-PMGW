@@ -1,4 +1,4 @@
-"""EPOT public API.
+"""PGOT public API.
 
 Implementations live in responsibility-specific modules; imports from the
 package root remain available for compatibility with existing notebooks.

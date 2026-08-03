@@ -206,38 +206,6 @@ wheels = [
 ]
 
 [[package]]
-name = "epot"
-version = "0.1.0"
-source = { editable = "." }
-dependencies = [
-    { name = "ipykernel" },
-    { name = "matplotlib" },
-    { name = "numba" },
-    { name = "numpy" },
-    { name = "pgw-metric-vendored" },
-    { name = "pot" },
-    { name = "pybind11" },
-    { name = "scikit-learn" },
-    { name = "scipy" },
-    { name = "torch", version = "2.13.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.13.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "ipykernel", specifier = ">=7.3.0" },
-    { name = "matplotlib", specifier = ">=3.11.0" },
-    { name = "numba", specifier = ">=0.58.1" },
-    { name = "numpy", specifier = ">=2.4,<2.5" },
-    { name = "pgw-metric-vendored", directory = "vendor" },
-    { name = "pot", specifier = ">=0.9.7" },
-    { name = "pybind11", specifier = ">=3.0.4" },
-    { name = "scikit-learn", specifier = ">=1.9.0" },
-    { name = "scipy", specifier = ">=1.10.1" },
-    { name = "torch", specifier = ">=2.0.1", index = "https://download.pytorch.org/whl/cpu" },
-]
-
-[[package]]
 name = "executing"
 version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -754,6 +722,38 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9e/c3/059298687310d527a58bb01f3b1965787ee3b40dce76752eda8b44e9a2c5/pexpect-4.9.0-py2.py3-none-any.whl", hash = "sha256:7236d1e080e4936be2dc3e326cec0af72acf9212a7e1d060210e70a47e253523", size = 63772, upload-time = "2023-11-25T06:56:14.81Z" },
+]
+
+[[package]]
+name = "pgot"
+version = "0.1.0"
+source = { editable = "." }
+dependencies = [
+    { name = "ipykernel" },
+    { name = "matplotlib" },
+    { name = "numba" },
+    { name = "numpy" },
+    { name = "pgw-metric-vendored" },
+    { name = "pot" },
+    { name = "pybind11" },
+    { name = "scikit-learn" },
+    { name = "scipy" },
+    { name = "torch", version = "2.13.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
+    { name = "torch", version = "2.13.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "ipykernel", specifier = ">=7.3.0" },
+    { name = "matplotlib", specifier = ">=3.11.0" },
+    { name = "numba", specifier = ">=0.58.1" },
+    { name = "numpy", specifier = ">=2.4,<2.5" },
+    { name = "pgw-metric-vendored", directory = "vendor" },
+    { name = "pot", specifier = ">=0.9.7" },
+    { name = "pybind11", specifier = ">=3.0.4" },
+    { name = "scikit-learn", specifier = ">=1.9.0" },
+    { name = "scipy", specifier = ">=1.10.1" },
+    { name = "torch", specifier = ">=2.0.1", index = "https://download.pytorch.org/whl/cpu" },
 ]
 
 [[package]]
