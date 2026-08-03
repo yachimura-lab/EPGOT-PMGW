@@ -20,8 +20,9 @@ Each notebook corresponds to figures in the paper. You can browse them directly 
 .
 ├── src/
 │   ├── epot/               # Main logic (Python package)
-│   │   └── __init__.py     #   GMM classes, Gaussian W2, MGW2 / MEW2,
-│   │                       #   entropic partial OT, barycentric projection maps
+│   │   ├── __init__.py     #   GMM classes, Gaussian W2, MGW2 / MEW2,
+│   │   │                   #   entropic partial OT, barycentric projection maps
+│   │   └── reproducibility.py  # Seeds and figure timestamps (see below)
 │   ├── computation/        # C++ computation engine (Eigen + pybind11)
 │   │   ├── engine.cpp      #   Fast GaussianW2 / W2 barycenter implementations
 │   │   └── CMakeLists.txt  #   Builds the cpp_engine module into src/
@@ -84,6 +85,44 @@ Open the notebooks under `src/` with Jupyter:
 ```bash
 uv run jupyter lab src/
 ```
+
+## Reproducibility
+
+The figures are produced by pipelines that sample point clouds and fit
+Gaussian mixtures. Both steps are stochastic, so without a fixed seed every
+run draws different data and `sklearn`'s `GaussianMixture` converges to a
+different local optimum — the figures then change from one run to the next.
+
+Two things are pinned so that re-running a notebook reproduces its figures
+exactly:
+
+- **Random draws.** Every stochastic step in `epot` takes its numbers from a
+  package-level generator seeded with `epot.DEFAULT_SEED` (42), and each
+  `GaussianMixture` fit is given that seed as its `random_state`. Calls stay
+  statistically independent within a session while the session as a whole
+  replays identically.
+- **Figure metadata.** Matplotlib stamps the current time into EPS, PDF, and
+  SVG files, so saving the same figure twice yields different bytes. Setting
+  `SOURCE_DATE_EPOCH` replaces that stamp with a fixed date.
+
+Each notebook does both in its first cell:
+
+```python
+from epot import set_reproducible
+
+set_reproducible()
+```
+
+Besides seeding `epot` itself, `set_reproducible()` seeds the global
+`numpy.random`, `random`, and PyTorch generators, so the `np.random.*` calls
+made directly in the notebooks are covered too. Run it before any sampling.
+
+To vary the experiment deliberately, pass a different seed —
+`set_reproducible(seed=7)` — or override it per call: the entry points
+(`pMGW2_coup`, `MGW2_coup`, `MEW2_coup`, `compute_T_X_to_Z`,
+`compute_T_X_to_Z_C`, …) accept `random_state` for the mixture fits, and the
+sampling helpers (`sample_from_gmm`, `GaussianMixture.sample`, `T_rand`, …)
+accept `rng`.
 
 ## Building the documentation site (for developers)
 

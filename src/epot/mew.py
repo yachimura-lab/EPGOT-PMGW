@@ -17,10 +17,14 @@ from .gaussian import (
     proj_gradient_descent,
     proj_stiefel,
 )
+from .reproducibility import DEFAULT_SEED, get_rng
 
 
-def _fit_gmm(points, n_components):
-    mixture = sklmi.GaussianMixture(n_components=n_components)
+def _fit_gmm(points, n_components, random_state=DEFAULT_SEED):
+    mixture = sklmi.GaussianMixture(
+        n_components=n_components,
+        random_state=random_state,
+    )
     mixture.fit(points)
     return GaussianMixture(
         mixture.weights_,
@@ -41,6 +45,7 @@ def MEW2_GM(
     init_phase=True,
     symmetry=True,
     verbose=False,
+    rng=None,
 ):
     """Compute mixture embedded W2 between two Gaussian mixtures."""
 
@@ -122,7 +127,7 @@ def MEW2_GM(
         if init == "Gaussian":
             P = P0 @ I(mu.dim, nu.dim) @ P1.T
         elif init == "random":
-            P = proj_stiefel(np.random.rand(mu.dim, nu.dim))
+            P = proj_stiefel(get_rng(rng).random((mu.dim, nu.dim)))
         else:
             raise ValueError("init must be 'Gaussian', 'random', or a matrix")
     else:
@@ -150,7 +155,7 @@ def MEW2_GM(
     return P, weights, loss
 
 
-def EW2(X, Y, a=None, b=None, eps=1e-3, n_iter_max=10000, verbose=False):
+def EW2(X, Y, a=None, b=None, eps=1e-3, n_iter_max=10000, verbose=False, rng=None):
     """Compute embedded W2 between two point clouds."""
     m = X.shape[1]
     n = Y.shape[1]
@@ -158,7 +163,7 @@ def EW2(X, Y, a=None, b=None, eps=1e-3, n_iter_max=10000, verbose=False):
         a = ot.unif(X.shape[0])
     if b is None:
         b = ot.unif(Y.shape[0])
-    P = proj_stiefel(np.random.rand(m, n))
+    P = proj_stiefel(get_rng(rng).random((m, n)))
     M = ot.dist(X, np.einsum("mn,bn->bm", P, Y))
     weights = ot.emd(a, b, M, numItermax=1000000)
     loss = np.trace(weights.T @ M)
@@ -186,11 +191,12 @@ def aEW2(
     reg_init=1,
     beta=0.95,
     verbose=False,
+    rng=None,
 ):
     """Compute embedded W2 with an annealed entropic scheme."""
     m = X.shape[1]
     n = Y.shape[1]
-    P = proj_stiefel(np.random.rand(m, n))
+    P = proj_stiefel(get_rng(rng).random((m, n)))
     M = ot.dist(X, np.einsum("mn,bn->bm", P, Y))
     if a is None:
         a = ot.unif(X.shape[0])
@@ -216,10 +222,19 @@ def aEW2(
     return P, weights, loss
 
 
-def MEW2(X, Y, n_components=20, annealing=True, n_iter_annealing=10, beta=0.99):
+def MEW2(
+    X,
+    Y,
+    n_components=20,
+    annealing=True,
+    n_iter_annealing=10,
+    beta=0.99,
+    random_state=DEFAULT_SEED,
+    rng=None,
+):
     """Compute MEW2 between two point clouds."""
-    mu = _fit_gmm(X, n_components)
-    nu = _fit_gmm(Y, n_components)
+    mu = _fit_gmm(X, n_components, random_state)
+    nu = _fit_gmm(Y, n_components, random_state)
     if annealing:
         P, _, _ = aEW2(
             mu.comp_mean,
@@ -227,6 +242,7 @@ def MEW2(X, Y, n_components=20, annealing=True, n_iter_annealing=10, beta=0.99):
             n_iter_max=n_iter_annealing,
             beta=0.99,
             verbose=False,
+            rng=rng,
         )
         _, _, loss = MEW2_GM(
             mu,
@@ -238,6 +254,7 @@ def MEW2(X, Y, n_components=20, annealing=True, n_iter_annealing=10, beta=0.99):
             init_phase=False,
             symmetry=False,
             verbose=False,
+            rng=rng,
         )
     else:
         _, _, loss = MEW2_GM(
@@ -249,6 +266,7 @@ def MEW2(X, Y, n_components=20, annealing=True, n_iter_annealing=10, beta=0.99):
             init_phase=True,
             symmetry=True,
             verbose=False,
+            rng=rng,
         )
     return loss
 
@@ -263,10 +281,12 @@ def MEW2_coup(
     method="T_rand",
     points=True,
     return_both=False,
+    random_state=DEFAULT_SEED,
+    rng=None,
 ):
     """Return an MEW map, or nearest target-point indices, for point clouds."""
-    mu = _fit_gmm(X, n_components)
-    nu = _fit_gmm(Y, n_components)
+    mu = _fit_gmm(X, n_components, random_state)
+    nu = _fit_gmm(Y, n_components, random_state)
     if annealing:
         P, _, _ = aEW2(
             mu.comp_mean,
@@ -274,6 +294,7 @@ def MEW2_coup(
             n_iter_max=n_iter_annealing,
             beta=0.99,
             verbose=False,
+            rng=rng,
         )
         P, weights, _ = MEW2_GM(
             mu,
@@ -285,6 +306,7 @@ def MEW2_coup(
             init_phase=False,
             symmetry=False,
             verbose=False,
+            rng=rng,
         )
     else:
         P, weights, _ = MEW2_GM(
@@ -296,12 +318,13 @@ def MEW2_coup(
             init_phase=True,
             symmetry=True,
             verbose=False,
+            rng=rng,
         )
 
     if method == "T_mean":
         Z = T_mean(X, mu, nu, P, weights)
     elif method == "T_rand":
-        Z = T_rand(X, mu, nu, P, weights)
+        Z = T_rand(X, mu, nu, P, weights, rng=rng)
     else:
         raise ValueError("method must be 'T_mean' or 'T_rand'")
 

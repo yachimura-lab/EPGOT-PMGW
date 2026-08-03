@@ -13,10 +13,14 @@ from .gaussian import (
     proj_gradient_descent,
     proj_stiefel,
 )
+from .reproducibility import DEFAULT_SEED
 
 
-def _fit_gmm(points, n_components):
-    mixture = sklmi.GaussianMixture(n_components=n_components)
+def _fit_gmm(points, n_components, random_state=DEFAULT_SEED):
+    mixture = sklmi.GaussianMixture(
+        n_components=n_components,
+        random_state=random_state,
+    )
     mixture.fit(points)
     return GaussianMixture(
         mixture.weights_,
@@ -62,10 +66,10 @@ def aMGW2_GM(mu, nu, n_step=10, reg_init=1, beta=0.95, verbose=False):
     )
 
 
-def MGW2(X, Y, n_components=20, annealing=False):
+def MGW2(X, Y, n_components=20, annealing=False, random_state=DEFAULT_SEED):
     """Compute MGW2 between two point clouds."""
-    mu = _fit_gmm(X, n_components)
-    nu = _fit_gmm(Y, n_components)
+    mu = _fit_gmm(X, n_components, random_state)
+    nu = _fit_gmm(Y, n_components, random_state)
     if annealing:
         return aMGW2_GM(mu, nu)
     return MGW2_GM(mu, nu)
@@ -117,14 +121,16 @@ def MGW2_coup(
     points=True,
     return_both=False,
     verbose=False,
+    random_state=DEFAULT_SEED,
+    rng=None,
 ):
     """Return an MGW map, or nearest target-point indices, for two point clouds."""
     if verbose:
         print("fitting mixture 1")
-    mu = _fit_gmm(X, n_components)
+    mu = _fit_gmm(X, n_components, random_state)
     if verbose:
         print("fitting mixture 2")
-    nu = _fit_gmm(Y, n_components)
+    nu = _fit_gmm(Y, n_components, random_state)
 
     if verbose:
         print("deriving coupling between GMMs")
@@ -147,7 +153,7 @@ def MGW2_coup(
     if method == "T_mean":
         Z = T_mean(X, mu, nu, P, weights)
     elif method == "T_rand":
-        Z = T_rand(X, mu, nu, P, weights)
+        Z = T_rand(X, mu, nu, P, weights, rng=rng)
     else:
         raise ValueError("method must be 'T_mean' or 'T_rand'")
 

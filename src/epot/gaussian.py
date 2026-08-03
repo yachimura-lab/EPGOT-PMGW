@@ -5,6 +5,8 @@ import numpy as np
 import scipy.linalg as spl
 from scipy.stats import multivariate_normal
 
+from .reproducibility import get_rng
+
 
 class Gaussian:
     """Gaussian distribution described by a mean and covariance matrix."""
@@ -14,8 +16,8 @@ class Gaussian:
         self.cov = np.array(cov)
         self.dim = len(mean)
 
-    def sample(self, n_samples):
-        return np.random.multivariate_normal(self.mean, self.cov, n_samples)
+    def sample(self, n_samples, rng=None):
+        return get_rng(rng).multivariate_normal(self.mean, self.cov, n_samples)
 
     def pdf(self, x):
         return multivariate_normal.pdf(x, mean=self.mean, cov=self.cov)
@@ -32,11 +34,12 @@ class GaussianMixture:
         self.dim = len(mean_list[0])
         self.K = len(mean_list)
 
-    def sample(self, n_samples, return_K=False):
+    def sample(self, n_samples, return_K=False, rng=None):
         """Sample points and, optionally, their component indices."""
-        idx_list = np.random.choice(np.arange(self.K), n_samples, p=self.weights)
+        rng = get_rng(rng)
+        idx_list = rng.choice(np.arange(self.K), n_samples, p=self.weights)
         samples_list = [
-            np.random.multivariate_normal(self.comp_mean[i], self.comp_cov[i])
+            rng.multivariate_normal(self.comp_mean[i], self.comp_cov[i])
             for i in idx_list
         ]
         if return_K:
@@ -68,9 +71,9 @@ class GaussianMixture:
             for k in range(self.K)
         )
 
-    def plot_scatter_2d(self, n_samples, T=None, *args):
+    def plot_scatter_2d(self, n_samples, T=None, *args, rng=None):
         """Plot samples, optionally after applying a transport map."""
-        X, idx_list = self.sample(n_samples, True)
+        X, idx_list = self.sample(n_samples, True, rng=rng)
         if T is not None:
             Y = np.array([T(X[k], idx_list[k], *args) for k in range(len(X))])
         else:
@@ -293,11 +296,11 @@ def T_mean(X, mu, nu, P, weights):
     return Y + nu.mean()
 
 
-def T_rand(x, mu, nu, P, weights):
+def T_rand(x, mu, nu, P, weights, rng=None):
     """Apply the randomized mixture transport map."""
     mu_P_centered = gmm_transform(mu, P=P.T, b=-P.T @ mu.mean())
     nu_centered = gmm_transform(nu, b=-nu.mean())
-    rng = np.random.default_rng()
+    rng = get_rng(rng)
     probs = np.array(
         [
             weights[k, l] * mu.comp[k].pdf(x) / mu.pdf(x)
@@ -312,15 +315,16 @@ def T_rand(x, mu, nu, P, weights):
     return T_map_Gaussian_rand(x, mu_P_centered, nu_centered, idx_list)
 
 
-def sample_from_gmm(alpha, means, covs, N):
+def sample_from_gmm(alpha, means, covs, N, rng=None):
     """Sample ``N`` points from a Gaussian mixture."""
+    rng = get_rng(rng)
     K, d = means.shape
     samples = np.zeros((N, d))
-    comp_ids = np.random.choice(K, size=N, p=alpha)
+    comp_ids = rng.choice(K, size=N, p=alpha)
     for k in range(K):
         idx = np.where(comp_ids == k)[0]
         if len(idx) > 0:
-            samples[idx] = np.random.multivariate_normal(
+            samples[idx] = rng.multivariate_normal(
                 mean=means[k],
                 cov=covs[k],
                 size=len(idx),

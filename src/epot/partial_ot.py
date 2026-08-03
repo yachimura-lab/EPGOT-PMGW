@@ -8,6 +8,8 @@ from matplotlib.colors import LogNorm
 from scipy.linalg import det, inv, sqrtm
 from sklearn.mixture import GaussianMixture as skGaussianMixture
 
+from .reproducibility import DEFAULT_SEED
+
 
 def to_numpy(x):
     """Convert a list, array, or tensor-like value to NumPy."""
@@ -163,7 +165,7 @@ def _fit_figure5_mixtures(
     Y,
     n_components_X,
     n_components_Y,
-    random_state=None,
+    random_state=DEFAULT_SEED,
 ):
     mixX = skGaussianMixture(
         n_components=n_components_X,
@@ -208,6 +210,7 @@ def compute_T_X_to_Z(
     epsilon=1e-2,
     Lambda=None,
     nb_dummies=1,
+    random_state=DEFAULT_SEED,
 ):
     """Compute the original Figure 5 partial-OT barycentric projection."""
     mixX, mixY = _fit_figure5_mixtures(
@@ -215,6 +218,7 @@ def compute_T_X_to_Z(
         Y,
         n_components_X,
         n_components_Y,
+        random_state=random_state,
     )
     a = mixX.weights_
     b = mixY.weights_
@@ -275,6 +279,7 @@ def compute_T_X_to_Z_C(
     epsilon=1e-2,
     Lambda=1e-1,
     nb_dummies=1,
+    random_state=DEFAULT_SEED,
 ):
     """Compute Figure 5's matched-density barycentric projection map."""
     mixX, mixY = _fit_figure5_mixtures(
@@ -282,7 +287,7 @@ def compute_T_X_to_Z_C(
         Y,
         n_components_X,
         n_components_Y,
-        random_state=42,
+        random_state=random_state,
     )
     a = mixX.weights_
     b = mixY.weights_
