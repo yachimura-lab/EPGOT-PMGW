@@ -1,3 +1,4 @@
 *.so
 *.eps
 *.pdf
+__pycache__/

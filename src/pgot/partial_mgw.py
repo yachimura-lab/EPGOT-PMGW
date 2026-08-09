@@ -269,6 +269,8 @@ def pMGW2_coup(
     nu=None,
     C1=None,
     C2=None,
+    coupling=None,
+    log=False,
 ):
     """Compute a partial-MGW coupling and barycentric map.
 
@@ -301,22 +303,27 @@ def pMGW2_coup(
         print(f"Deriving partial MGW coupling with Lambda={Lambda}")
 
     start_time = time.time()
-    gamma = gromov.partial_gromov_ver1(
-        C1_solver,
-        C2_solver,
-        a,
-        b,
-        Lambda=Lambda,
-        nb_dummies=1,
-        G0=None,
-        thres=1,
-        numItermax=None,
-        numItermax_gw=1000,
-        tol=solver_tol,
-        log=False,
-        verbose=verbose,
-        line_search=True,
-    )
+    if coupling is None:
+        gamma = gromov.partial_gromov_ver1(
+            C1_solver,
+            C2_solver,
+            a,
+            b,
+            Lambda=Lambda,
+            nb_dummies=1,
+            G0=None,
+            thres=1,
+            numItermax=None,
+            numItermax_gw=1000,
+            tol=solver_tol,
+            log=False,
+            verbose=verbose,
+            line_search=True,
+        )
+        solver = "PGW_Metric partial_gromov_ver1"
+    else:
+        gamma = np.asarray(coupling, dtype=float)
+        solver = "reused coupling"
     if np.isnan(gamma).any():
         raise FloatingPointError("Partial GW solver returned NaN entries in Gamma.")
 
@@ -334,7 +341,7 @@ def pMGW2_coup(
         for l in range(nu.K)
     )
     P0 = proj_stiefel(cross)
-    P, _ = partial_projected_gradient_descent(
+    P, losses = partial_projected_gradient_descent(
         P0,
         gamma,
         mu_c,
@@ -348,6 +355,22 @@ def pMGW2_coup(
         nbrs = NearestNeighbors(n_neighbors=1, algorithm="ball_tree").fit(Y)
         idx = nbrs.kneighbors(mapped, return_distance=False).ravel()
         if return_both:
-            return idx, mapped
-        return idx
-    return mapped
+            result = (idx, mapped)
+        else:
+            result = idx
+    else:
+        result = mapped
+    if log:
+        return result, {
+            "solver": solver,
+            "coupling": gamma,
+            "matched_mass": matched_mass,
+            "alignment": P,
+            "alignment_losses": losses,
+            "matched_source_mean": m0,
+            "matched_target_mean": m1,
+            "cost_normalization_scale": maximum_cost if normalize_costs else 1.0,
+            "solver_lambda": float(Lambda),
+            "runtime_seconds": time.time() - start_time,
+        }
+    return result

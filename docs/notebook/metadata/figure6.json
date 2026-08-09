@@ -1,0 +1,207 @@
+{
+  "environment": {
+    "implementation": "CPython",
+    "packages": {
+      "POT": "0.9.7",
+      "matplotlib": "3.11.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0"
+    },
+    "platform": "Linux-6.18.39-79.141.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "python": "3.13.15"
+  },
+  "figure": 6,
+  "generated_at": "2000-01-01T00:00:00+00:00",
+  "inputs": {
+    "component_cost_scale": 195.43322120774667,
+    "penalty_conversion": "Lambda = lambda_tilde * balanced mean distortion",
+    "point_cost_scale": 214.21762363723474,
+    "source_gmm": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "2f1e4c6203a78cdd8cc595ef47944c2d426222dc19c043f72db37d4e583d5d99",
+        "shape": [
+          6,
+          3,
+          3
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "2414af9a0407192f80a53bc46925dc12906a1e6ba2353337c69a47d2a59c66f5",
+        "shape": [
+          6,
+          3
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "fb8968142dbf1c48b5d1b74c409177e3a5d883140efcb936f7c0d4775bc8170c",
+        "shape": [
+          6
+        ]
+      }
+    },
+    "source_points": {
+      "dtype": "float64",
+      "sha256": "acbf178debf714ad79bc2284aedfba328c73b9f04a6d99319da78dda281fdd5a",
+      "shape": [
+        300,
+        3
+      ]
+    },
+    "target_gmm": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "60d2c058a1b3a79ee22ff376e7541c044eaeef33d5e7d70d6893752f5422a7a9",
+        "shape": [
+          7,
+          3,
+          3
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "0ddf56c75b7c7c6032f018281e39f19e50d2a0f126fee20ccb31565d78973abb",
+        "shape": [
+          7,
+          3
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "cd95844429bd49855313f8113c03572086cf0e8c520612e282c4a10c700e0a5f",
+        "shape": [
+          7
+        ]
+      }
+    },
+    "target_noise_points": {
+      "dtype": "float64",
+      "sha256": "a5a23e951635f273746127976429b33bdcf8db0dffa026934947ad99553263a5",
+      "shape": [
+        10,
+        3
+      ]
+    },
+    "target_ring_points": {
+      "dtype": "float64",
+      "sha256": "997d2f0810be479599c584e3b753c0e98ebf75c0559f584ff0e72974ae68081d",
+      "shape": [
+        300,
+        3
+      ]
+    }
+  },
+  "notes": "All four methods use barycentric projections before nearest assignment.",
+  "outputs": [
+    {
+      "bytes": 453598,
+      "path": "outputs/figure6.pdf",
+      "sha256": "0c8a28afbb725b05fb0a5ebf48496281c152040daf76d5b92f5d7c4932d1d864"
+    }
+  ],
+  "panels": [
+    {
+      "column_residual": 0.0,
+      "constraint": "balanced marginal",
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "8fceabd1ca0e628f5b35e4eddec12e808752fde25419ddd8260615e8aeb36c36",
+        "shape": [
+          300,
+          310
+        ]
+      },
+      "lambda_tilde": 0.9198960759538775,
+      "matched_mass": 0.9999999999999999,
+      "method": "GW2",
+      "minimum_entry": 0.0,
+      "paper_lambda": null,
+      "row_residual": 6.505213034913027e-17,
+      "runtime_seconds": 0.2625559350126423,
+      "solve_id": "aaf07168ac29f59367f46fd8ec67b824382aa08190f2227ce1b046ab895b03eb",
+      "solver": "POT gromov_wasserstein",
+      "solver_lambda": null
+    },
+    {
+      "column_residual": 0.0,
+      "constraint": "sub-marginal",
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "8e96bcd6583bdab769f69a6caa83230351c4f7986bce4180702aa6549070a712",
+        "shape": [
+          300,
+          310
+        ]
+      },
+      "lambda_tilde": 0.9198960759538775,
+      "matched_mass": 0.967741935483871,
+      "method": "PGW2",
+      "minimum_entry": 0.0,
+      "paper_lambda": 0.01,
+      "row_residual": 0.0,
+      "runtime_seconds": 0.17600296500313561,
+      "solve_id": "7100a94e4f234069606cbcb329858779ef90c92be47ac63abdc1d64dd7ad64f8",
+      "solver": "PGW_Metric partial_gromov_ver1",
+      "solver_lambda": 0.01
+    },
+    {
+      "column_residual": 2.7755575615628914e-17,
+      "constraint": "balanced marginal",
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "bde2f8764a7141815ed9837605c53a90eb677589b293509506b0ee5a17cb6b2d",
+        "shape": [
+          6,
+          7
+        ]
+      },
+      "lambda_tilde": 0.9198960759538775,
+      "matched_mass": 0.9999999999999999,
+      "method": "MGW2",
+      "minimum_entry": 0.0,
+      "paper_lambda": null,
+      "row_residual": 0.0,
+      "runtime_seconds": 0.10909216200525407,
+      "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
+      "solver": "POT gromov_wasserstein",
+      "solver_lambda": null
+    },
+    {
+      "column_residual": 0.0,
+      "constraint": "sub-marginal",
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "ea4ab0a2f586cd85d082bba1ddfbb3cf0ef161aa600dd968d11669a5a60b125a",
+        "shape": [
+          6,
+          7
+        ]
+      },
+      "lambda_tilde": 0.9198960759538775,
+      "matched_mass": 0.9677419354838708,
+      "method": "pMGW2",
+      "minimum_entry": 0.0,
+      "paper_lambda": 0.01,
+      "row_residual": 0.0,
+      "runtime_seconds": 0.135420560836792,
+      "solve_id": "5a39269c9131e99831304d1138a0690d2dd21f328a8158c5476fbfcbcac5dc29",
+      "solver": "PGW_Metric partial_gromov_ver1",
+      "solver_lambda": 0.013249170800775967
+    }
+  ],
+  "schema_version": 1,
+  "seeds": {
+    "fit": 42,
+    "noise_sampling": 44,
+    "source_sampling": 42,
+    "target_sampling": 43
+  },
+  "source": {
+    "commit": "f87ed8ee38acc6349ea89a11933dfc8f1c179d24",
+    "dirty": true,
+    "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
+  }
+}

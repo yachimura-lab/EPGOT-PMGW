@@ -1,5 +1,6 @@
-#/bin/bash
-# Pin the uv version
-UV_VERSION=0.5.9
-curl -LsSf https://astral.sh/uv/$UV_VERSION/install.sh | sh
-echo 'eval "$(uv generate-shell-completion bash)"' >> ~/.bashrc
+#!/usr/bin/env bash
+set -euo pipefail
+
+# This is the version that generated uv.lock.
+UV_VERSION=0.12.3
+curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh

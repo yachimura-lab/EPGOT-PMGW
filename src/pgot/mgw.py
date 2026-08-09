@@ -1,5 +1,7 @@
 """Mixture Gromov-Wasserstein distances and couplings."""
 
+from time import perf_counter
+
 import numpy as np
 import ot
 import sklearn.mixture as sklmi
@@ -133,6 +135,8 @@ def MGW2_coup(
     C1=None,
     C2=None,
     step_size=1.0,
+    coupling=None,
+    log=False,
 ):
     """Return an MGW map, or nearest target-point indices, for two point clouds.
 
@@ -149,12 +153,19 @@ def MGW2_coup(
             print("fitting mixture 2")
         nu = _fit_gmm(Y, n_components, random_state)
 
-    if verbose:
-        print("deriving coupling between GMMs")
-    if annealing:
-        weights = aMGW2_GM_coup(mu, nu)
+    started = perf_counter()
+    if coupling is None:
+        if verbose:
+            print("deriving coupling between GMMs")
+        if annealing:
+            weights = aMGW2_GM_coup(mu, nu)
+            solver = "POT annealed entropic GW initialization + GW"
+        else:
+            weights = MGW2_GM_coup(mu, nu, C1=C1, C2=C2)
+            solver = "POT gromov_wasserstein"
     else:
-        weights = MGW2_GM_coup(mu, nu, C1=C1, C2=C2)
+        weights = np.asarray(coupling, dtype=float)
+        solver = "reused coupling"
 
     if verbose:
         print("deriving map from coupling")
@@ -170,7 +181,7 @@ def MGW2_coup(
             for l in range(nu.K)
         )
     )
-    P, _ = proj_gradient_descent(P, weights, mu_c, nu_c, step_size)
+    P, losses = proj_gradient_descent(P, weights, mu_c, nu_c, step_size)
 
     if method == "T_mean":
         Z = T_mean(X, mu, nu, P, weights)
@@ -183,6 +194,18 @@ def MGW2_coup(
         nbrs = NearestNeighbors(n_neighbors=1, algorithm="ball_tree").fit(Y)
         idx = nbrs.kneighbors(Z, return_distance=False).ravel()
         if return_both:
-            return idx, Z
-        return idx
-    return Z
+            result = (idx, Z)
+        else:
+            result = idx
+    else:
+        result = Z
+    if log:
+        return result, {
+            "solver": solver,
+            "coupling": weights,
+            "matched_mass": float(weights.sum()),
+            "alignment": P,
+            "alignment_losses": losses,
+            "runtime_seconds": perf_counter() - started,
+        }
+    return result

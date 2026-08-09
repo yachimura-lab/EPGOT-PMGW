@@ -1,0 +1,216 @@
+{
+  "environment": {
+    "implementation": "CPython",
+    "packages": {
+      "POT": "0.9.7",
+      "matplotlib": "3.11.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0"
+    },
+    "platform": "Linux-6.18.39-79.141.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "python": "3.13.15"
+  },
+  "figure": 2,
+  "generated_at": "2000-01-01T00:00:00+00:00",
+  "inputs": {
+    "cost": "squared Gaussian W2 divided by its cross-matrix maximum",
+    "source": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "34a19f4889c3951312e49fe236dcab87934d7bd6ad5cfeb27320ff57beb94508",
+        "shape": [
+          2,
+          2,
+          2
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "cf26ce7fcdf6e810a97a1a8fa55937428497a32018c73d317dbf4dcd03061c99",
+        "shape": [
+          2,
+          2
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "d5626176b54c5c2def7687f6801dfb62b197fb6f322cd6ea213b00586506c515",
+        "shape": [
+          2
+        ]
+      }
+    },
+    "target": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "9c6ba4da6b530b6e4fa1e07789a9e685f042cae6d1799ea20d199a3861e744d3",
+        "shape": [
+          3,
+          2,
+          2
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "c5bd0474205f3948347250da2b6d80ad8a41b91676ba0533e965eecc0a5f61ab",
+        "shape": [
+          3,
+          2
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "91ce3f57bc874baf065bdebfd406bbabdcb39718dbb76104ac527b6a22c1d4c7",
+        "shape": [
+          3
+        ]
+      }
+    }
+  },
+  "notes": "Exact 1 x 5 paper sweep.",
+  "outputs": [
+    {
+      "bytes": 143001,
+      "path": "outputs/figure2.pdf",
+      "sha256": "1111791eeb5cd9057193221de2a5895e54a3556c7804db71df9297e274fa54cc"
+    }
+  ],
+  "panels": [
+    {
+      "column_residual": 2.220446049250313e-16,
+      "converged": true,
+      "cost_normalization_scale": 445.2540510775958,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "cd52a41e26a423d7df566d536813eb66ecb160309f04c1e4d94f862085baffd1",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "coupling_sha256": "fd824af97b3fecb3419528e020329c45306ba8dc6b704072efe79296dfcfe595",
+      "epsilon": 0.01,
+      "fallback_iterations": 16,
+      "fallback_used": true,
+      "iterations": 19999,
+      "matched_mass": 1.4607973486480662e-05,
+      "paper_lambda": 0.0,
+      "residual_tolerance": 1e-09,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.20616174300084822,
+      "solver": "POT sinkhorn + SciPy SLSQP refinement",
+      "solver_lambda": 0.0
+    },
+    {
+      "column_residual": 1.3825829370262e-11,
+      "converged": true,
+      "cost_normalization_scale": 445.2540510775958,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "12eda54a6766364f34384a01b190972850e14d45a64b30274fb77e2ce9889b4e",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "coupling_sha256": "91ed2a137231ce033e6864042f5b44c6843d67b7960be8d17b0b369162aab875",
+      "epsilon": 0.01,
+      "fallback_iterations": 0,
+      "fallback_used": false,
+      "iterations": 70,
+      "matched_mass": 0.41964125817416104,
+      "paper_lambda": 0.125,
+      "residual_tolerance": 1e-09,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.000794129999121651,
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.125
+    },
+    {
+      "column_residual": 2.3740565069374497e-11,
+      "converged": true,
+      "cost_normalization_scale": 445.2540510775958,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "0f6c6897e150bc116f6258bf9c413fe4ce9300a6eda8d2e9d54f48ec8eb51824",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "coupling_sha256": "3d89c599f06f3e9e0ed2812e7ffdfef428b235b3cf92b22717f4812692ec1dab",
+      "epsilon": 0.01,
+      "fallback_iterations": 0,
+      "fallback_used": false,
+      "iterations": 110,
+      "matched_mass": 0.8999999494798236,
+      "paper_lambda": 0.25,
+      "residual_tolerance": 1e-09,
+      "row_residual": 0.0,
+      "runtime_seconds": 0.0011360630014678463,
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25
+    },
+    {
+      "column_residual": 5.179839890345761e-11,
+      "converged": true,
+      "cost_normalization_scale": 445.2540510775958,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "59bc53a519d191512f8392ea96f99e9d40cb0625d285604dd4bdbe992e71cb61",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "coupling_sha256": "d4fb2e61c108c7c2c62c99a6a831ded500b0bf634a5e62e17b31fdb4b013c816",
+      "epsilon": 0.01,
+      "fallback_iterations": 0,
+      "fallback_used": false,
+      "iterations": 330,
+      "matched_mass": 0.9488551803021824,
+      "paper_lambda": 0.375,
+      "residual_tolerance": 1e-09,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0033729429997038096,
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.375
+    },
+    {
+      "column_residual": 5.551115123125783e-17,
+      "converged": true,
+      "cost_normalization_scale": 445.2540510775958,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "21eec8e7ee6bc6f7ae5ccd8a73b51a24376d3c7d748162697cba581ad413fe8a",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "coupling_sha256": "17db219cd8a4b9f3b835210bd5d6ed011a47fa9e61a00aae8050234f7adea21c",
+      "epsilon": 0.01,
+      "fallback_iterations": 5,
+      "fallback_used": true,
+      "iterations": 19999,
+      "matched_mass": 0.9999755021609629,
+      "paper_lambda": 0.5,
+      "residual_tolerance": 1e-09,
+      "row_residual": 0.0,
+      "runtime_seconds": 0.20574037100595888,
+      "solver": "POT sinkhorn + SciPy SLSQP refinement",
+      "solver_lambda": 0.5
+    }
+  ],
+  "schema_version": 1,
+  "seeds": {
+    "fit": null,
+    "sampling": null
+  },
+  "source": {
+    "commit": "f87ed8ee38acc6349ea89a11933dfc8f1c179d24",
+    "dirty": true,
+    "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
+  }
+}

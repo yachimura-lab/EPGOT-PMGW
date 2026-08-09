@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.22.2)
 project(EntropicPartialOT LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -13,8 +13,8 @@ find_package(
     REQUIRED
 )
 
-find_package(pybind11 CONFIG REQUIRED)
-find_package(Eigen3 REQUIRED)
+find_package(pybind11 3.0.4 EXACT CONFIG REQUIRED)
+find_package(Eigen3 3.3.9 EXACT REQUIRED)
 
 pybind11_add_module(cpp_engine MODULE engine.cpp)
 

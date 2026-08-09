@@ -1,0 +1,430 @@
+{
+  "environment": {
+    "implementation": "CPython",
+    "packages": {
+      "POT": "0.9.7",
+      "matplotlib": "3.11.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0"
+    },
+    "platform": "Linux-6.18.39-79.141.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "python": "3.13.15"
+  },
+  "figure": 4,
+  "generated_at": "2000-01-01T00:00:00+00:00",
+  "inputs": {
+    "density_grid": {
+      "limits": [
+        -12,
+        12
+      ],
+      "points_per_axis": 400
+    },
+    "shared_density_levels": {
+      "dtype": "float64",
+      "sha256": "f024c6b4952a612e449813eab2f6231c26146ab14cfb6286899f40a43a7cd19b",
+      "shape": [
+        7
+      ]
+    },
+    "source_covariances": {
+      "dtype": "float64",
+      "sha256": "34a19f4889c3951312e49fe236dcab87934d7bd6ad5cfeb27320ff57beb94508",
+      "shape": [
+        2,
+        2,
+        2
+      ]
+    },
+    "source_means": {
+      "dtype": "float64",
+      "sha256": "cf26ce7fcdf6e810a97a1a8fa55937428497a32018c73d317dbf4dcd03061c99",
+      "shape": [
+        2,
+        2
+      ]
+    },
+    "source_weights": {
+      "dtype": "float64",
+      "sha256": "d5626176b54c5c2def7687f6801dfb62b197fb6f322cd6ea213b00586506c515",
+      "shape": [
+        2
+      ]
+    },
+    "target_covariances": {
+      "dtype": "float64",
+      "sha256": "9c6ba4da6b530b6e4fa1e07789a9e685f042cae6d1799ea20d199a3861e744d3",
+      "shape": [
+        3,
+        2,
+        2
+      ]
+    },
+    "target_means": {
+      "dtype": "float64",
+      "sha256": "c5bd0474205f3948347250da2b6d80ad8a41b91676ba0533e965eecc0a5f61ab",
+      "shape": [
+        3,
+        2
+      ]
+    },
+    "target_weights": {
+      "dtype": "float64",
+      "sha256": "91ce3f57bc874baf065bdebfd406bbabdcb39718dbb76104ac527b6a22c1d4c7",
+      "shape": [
+        3
+      ]
+    }
+  },
+  "notes": "Equation (4.17) closed form; (4.18) sub-probability mass.",
+  "outputs": [
+    {
+      "bytes": 1069159,
+      "path": "outputs/figure4.pdf",
+      "sha256": "14f8d5627dca31fb01d0d981de8022a25d1c143ea782f70f8a8b2ed04a14e1e6"
+    }
+  ],
+  "panels": [
+    {
+      "column": 0,
+      "column_residual": 3.1899866081985806e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "da67381e0e48dfc9f6152966d9541ae61730db150876476c0dd70d560f13d846",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.8875741736863674,
+      "paper_lambda": 0.25,
+      "row": 0,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.002032363001490012,
+      "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.0
+    },
+    {
+      "column": 1,
+      "column_residual": 3.1899866081985806e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "da67381e0e48dfc9f6152966d9541ae61730db150876476c0dd70d560f13d846",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.8875741736863674,
+      "paper_lambda": 0.25,
+      "row": 0,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.002032363001490012,
+      "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.25
+    },
+    {
+      "column": 2,
+      "column_residual": 3.1899866081985806e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "da67381e0e48dfc9f6152966d9541ae61730db150876476c0dd70d560f13d846",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.8875741736863674,
+      "paper_lambda": 0.25,
+      "row": 0,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.002032363001490012,
+      "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.5
+    },
+    {
+      "column": 3,
+      "column_residual": 3.1899866081985806e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "da67381e0e48dfc9f6152966d9541ae61730db150876476c0dd70d560f13d846",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.8875741736863674,
+      "paper_lambda": 0.25,
+      "row": 0,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.002032363001490012,
+      "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.75
+    },
+    {
+      "column": 4,
+      "column_residual": 3.1899866081985806e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "da67381e0e48dfc9f6152966d9541ae61730db150876476c0dd70d560f13d846",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.8875741736863674,
+      "paper_lambda": 0.25,
+      "row": 0,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.002032363001490012,
+      "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 1.0
+    },
+    {
+      "column": 0,
+      "column_residual": 1.399269589086316e-12,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3ce53f50bfd1956e3abfbb8669524a1f1e38079be2721e23284ed1f62fd25da3",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.1,
+      "matched_mass": 0.680744147404491,
+      "paper_lambda": 0.25,
+      "row": 1,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0004227540048304945,
+      "solve_id": "2672f64d3ef8879c0be493771451101eb02f7751fffc45199474f63c86fffb50",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.0
+    },
+    {
+      "column": 1,
+      "column_residual": 1.399269589086316e-12,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3ce53f50bfd1956e3abfbb8669524a1f1e38079be2721e23284ed1f62fd25da3",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.1,
+      "matched_mass": 0.680744147404491,
+      "paper_lambda": 0.25,
+      "row": 1,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0004227540048304945,
+      "solve_id": "2672f64d3ef8879c0be493771451101eb02f7751fffc45199474f63c86fffb50",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.25
+    },
+    {
+      "column": 2,
+      "column_residual": 1.399269589086316e-12,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3ce53f50bfd1956e3abfbb8669524a1f1e38079be2721e23284ed1f62fd25da3",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.1,
+      "matched_mass": 0.680744147404491,
+      "paper_lambda": 0.25,
+      "row": 1,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0004227540048304945,
+      "solve_id": "2672f64d3ef8879c0be493771451101eb02f7751fffc45199474f63c86fffb50",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.5
+    },
+    {
+      "column": 3,
+      "column_residual": 1.399269589086316e-12,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3ce53f50bfd1956e3abfbb8669524a1f1e38079be2721e23284ed1f62fd25da3",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.1,
+      "matched_mass": 0.680744147404491,
+      "paper_lambda": 0.25,
+      "row": 1,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0004227540048304945,
+      "solve_id": "2672f64d3ef8879c0be493771451101eb02f7751fffc45199474f63c86fffb50",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 0.75
+    },
+    {
+      "column": 4,
+      "column_residual": 1.399269589086316e-12,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3ce53f50bfd1956e3abfbb8669524a1f1e38079be2721e23284ed1f62fd25da3",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.1,
+      "matched_mass": 0.680744147404491,
+      "paper_lambda": 0.25,
+      "row": 1,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0004227540048304945,
+      "solve_id": "2672f64d3ef8879c0be493771451101eb02f7751fffc45199474f63c86fffb50",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25,
+      "t": 1.0
+    },
+    {
+      "column": 0,
+      "column_residual": 8.089877656658473e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3eb3a767ea589e6c89215b78734e99094ddcabcee01b2dabd304823ee6410654",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.9937141257319839,
+      "paper_lambda": 0.5,
+      "row": 2,
+      "row_residual": 5.551115123125783e-17,
+      "runtime_seconds": 0.0072673990071052685,
+      "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.5,
+      "t": 0.0
+    },
+    {
+      "column": 1,
+      "column_residual": 8.089877656658473e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3eb3a767ea589e6c89215b78734e99094ddcabcee01b2dabd304823ee6410654",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.9937141257319839,
+      "paper_lambda": 0.5,
+      "row": 2,
+      "row_residual": 5.551115123125783e-17,
+      "runtime_seconds": 0.0072673990071052685,
+      "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.5,
+      "t": 0.25
+    },
+    {
+      "column": 2,
+      "column_residual": 8.089877656658473e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3eb3a767ea589e6c89215b78734e99094ddcabcee01b2dabd304823ee6410654",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.9937141257319839,
+      "paper_lambda": 0.5,
+      "row": 2,
+      "row_residual": 5.551115123125783e-17,
+      "runtime_seconds": 0.0072673990071052685,
+      "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.5,
+      "t": 0.5
+    },
+    {
+      "column": 3,
+      "column_residual": 8.089877656658473e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3eb3a767ea589e6c89215b78734e99094ddcabcee01b2dabd304823ee6410654",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.9937141257319839,
+      "paper_lambda": 0.5,
+      "row": 2,
+      "row_residual": 5.551115123125783e-17,
+      "runtime_seconds": 0.0072673990071052685,
+      "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.5,
+      "t": 0.75
+    },
+    {
+      "column": 4,
+      "column_residual": 8.089877656658473e-10,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3eb3a767ea589e6c89215b78734e99094ddcabcee01b2dabd304823ee6410654",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "matched_mass": 0.9937141257319839,
+      "paper_lambda": 0.5,
+      "row": 2,
+      "row_residual": 5.551115123125783e-17,
+      "runtime_seconds": 0.0072673990071052685,
+      "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.5,
+      "t": 1.0
+    }
+  ],
+  "schema_version": 1,
+  "seeds": {
+    "fit": null,
+    "sampling": null
+  },
+  "source": {
+    "commit": "f87ed8ee38acc6349ea89a11933dfc8f1c179d24",
+    "dirty": true,
+    "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
+  }
+}
