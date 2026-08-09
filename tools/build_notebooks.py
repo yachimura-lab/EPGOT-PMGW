@@ -766,26 +766,38 @@ common_inputs = {
     },
     "point_cost_scale": figure67_problem["point_cost_scale"],
     "component_cost_scale": figure67_problem["component_cost_scale"],
-    "partial_init": "balanced coupling of the same representation",
 }
+
+# Every panel carries what its own solve was given, so that no reader has to
+# pair a penalty with the right entry of common_inputs to interpret it:
+# paper_lambda is what Section 7.2 states, solver_lambda is the number the
+# solver received, cost_normalization_scale is the constant its cost matrices
+# were divided by, and partial_init is the starting point of the solve. The
+# balanced methods take no penalty and no starting point, and record null.
+POINT_SCALE = figure67_problem["point_cost_scale"]
+COMPONENT_SCALE = figure67_problem["component_cost_scale"]
+PARTIAL_INIT = "balanced coupling of the same representation"
+
 method_panels = []
-for method, key, solver_lambda in [
-    ("GW2", "coupling_gw", None),
-    ("PGW2", "coupling_pgw", figure67_solved["lambda_point"]),
-    ("MGW2", "coupling_mgw", None),
-    ("pMGW2", "coupling_pmgw", figure67_solved["lambda_component"]),
+for method, key, solver_lambda, cost_scale in [
+    ("GW2", "coupling_gw", None, POINT_SCALE),
+    ("PGW2", "coupling_pgw", figure67_solved["lambda_point"], POINT_SCALE),
+    ("MGW2", "coupling_mgw", None, COMPONENT_SCALE),
+    ("pMGW2", "coupling_pmgw", figure67_solved["lambda_component"],
+     COMPONENT_SCALE),
 ]:
+    partial = method in {"PGW2", "pMGW2"}
     method_panels.append(
         {
             "method": method,
-            "paper_lambda": (
-                PAPER_LAMBDA if method in {"PGW2", "pMGW2"} else None
-            ),
+            "paper_lambda": PAPER_LAMBDA if partial else None,
             "solver_lambda": solver_lambda,
+            "cost_normalization_scale": cost_scale,
+            "partial_init": PARTIAL_INIT if partial else None,
             "solver": (
-                "POT gromov_wasserstein"
-                if method in {"GW2", "MGW2"}
-                else "PGW_Metric partial_gromov_ver1"
+                "PGW_Metric partial_gromov_ver1"
+                if partial
+                else "POT gromov_wasserstein"
             ),
             "solve_id": figure67_solved["solve_ids"][method],
             "coupling": figure67_solved[key],
