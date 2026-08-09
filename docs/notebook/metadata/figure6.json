@@ -15,7 +15,6 @@
   "generated_at": "2000-01-01T00:00:00+00:00",
   "inputs": {
     "component_cost_scale": 195.43322120774667,
-    "penalty_conversion": "Lambda = lambda_tilde * balanced mean distortion",
     "point_cost_scale": 214.21762363723474,
     "source_gmm": {
       "covariances": {
@@ -97,15 +96,16 @@
   "notes": "All four methods use barycentric projections before nearest assignment.",
   "outputs": [
     {
-      "bytes": 453598,
+      "bytes": 455908,
       "path": "outputs/figure6.pdf",
-      "sha256": "0c8a28afbb725b05fb0a5ebf48496281c152040daf76d5b92f5d7c4932d1d864"
+      "sha256": "24229890f10b66e03ec58af199040e018cd230b2b3e73531925ae80a12418cac"
     }
   ],
   "panels": [
     {
       "column_residual": 0.0,
       "constraint": "balanced marginal",
+      "cost_normalization_scale": 214.21762363723474,
       "coupling": {
         "dtype": "float64",
         "sha256": "8fceabd1ca0e628f5b35e4eddec12e808752fde25419ddd8260615e8aeb36c36",
@@ -114,13 +114,13 @@
           310
         ]
       },
-      "lambda_tilde": 0.9198960759538775,
       "matched_mass": 0.9999999999999999,
       "method": "GW2",
       "minimum_entry": 0.0,
       "paper_lambda": null,
+      "partial_init": null,
       "row_residual": 6.505213034913027e-17,
-      "runtime_seconds": 0.20204563200240955,
+      "runtime_seconds": 0.2106218310073018,
       "solve_id": "aaf07168ac29f59367f46fd8ec67b824382aa08190f2227ce1b046ab895b03eb",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -128,28 +128,30 @@
     {
       "column_residual": 0.0,
       "constraint": "sub-marginal",
+      "cost_normalization_scale": 214.21762363723474,
       "coupling": {
         "dtype": "float64",
-        "sha256": "8e96bcd6583bdab769f69a6caa83230351c4f7986bce4180702aa6549070a712",
+        "sha256": "bae97687c0a9e81c7bcab91384c239f513a9a636457522628a0c21a38ec9e554",
         "shape": [
           300,
           310
         ]
       },
-      "lambda_tilde": 0.9198960759538775,
       "matched_mass": 0.967741935483871,
       "method": "PGW2",
       "minimum_entry": 0.0,
       "paper_lambda": 0.01,
+      "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.1677427110116696,
-      "solve_id": "7100a94e4f234069606cbcb329858779ef90c92be47ac63abdc1d64dd7ad64f8",
+      "runtime_seconds": 0.07706783499452285,
+      "solve_id": "0d6f12818e72883420570d9666084640b6c5c9dd56eedb90c4b053fd547c9641",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
     },
     {
       "column_residual": 2.7755575615628914e-17,
       "constraint": "balanced marginal",
+      "cost_normalization_scale": 195.43322120774667,
       "coupling": {
         "dtype": "float64",
         "sha256": "bde2f8764a7141815ed9837605c53a90eb677589b293509506b0ee5a17cb6b2d",
@@ -158,13 +160,13 @@
           7
         ]
       },
-      "lambda_tilde": 0.9198960759538775,
       "matched_mass": 0.9999999999999999,
       "method": "MGW2",
       "minimum_entry": 0.0,
       "paper_lambda": null,
+      "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.10670712499995716,
+      "runtime_seconds": 0.10451973100134637,
       "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -172,24 +174,25 @@
     {
       "column_residual": 0.0,
       "constraint": "sub-marginal",
+      "cost_normalization_scale": 195.43322120774667,
       "coupling": {
         "dtype": "float64",
-        "sha256": "ea4ab0a2f586cd85d082bba1ddfbb3cf0ef161aa600dd968d11669a5a60b125a",
+        "sha256": "622b148a75662aa5f04db05c707b2f592f94b8853a2dc79f3d8ad1728147cb34",
         "shape": [
           6,
           7
         ]
       },
-      "lambda_tilde": 0.9198960759538775,
       "matched_mass": 0.9677419354838708,
       "method": "pMGW2",
       "minimum_entry": 0.0,
       "paper_lambda": 0.01,
+      "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.14569330215454102,
-      "solve_id": "5a39269c9131e99831304d1138a0690d2dd21f328a8158c5476fbfcbcac5dc29",
+      "runtime_seconds": 0.14890503883361816,
+      "solve_id": "a2b3f272ea072409519b4bc40def14cc16038ba16d29e5c92b6e3cc2ca46e7dd",
       "solver": "PGW_Metric partial_gromov_ver1",
-      "solver_lambda": 0.013249170800775967
+      "solver_lambda": 0.01
     }
   ],
   "schema_version": 1,
@@ -200,7 +203,7 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "5d09476fdc784dd43813520655244c3422ef3792",
+    "commit": "e9adfa2a7d8bbf2d7f3212974a9b52de608535b9",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }

@@ -164,7 +164,7 @@ def EW2(X, Y, a=None, b=None, eps=1e-3, n_iter_max=10000, verbose=False, rng=Non
     if b is None:
         b = ot.unif(Y.shape[0])
     P = proj_stiefel(get_rng(rng).random((m, n)))
-    M = ot.dist(X, np.einsum("mn,bn->bm", P, Y))
+    M = ot.dist(X, np.einsum("mn,bn->bm", P, Y), metric="sqeuclidean")
     weights = ot.emd(a, b, M, numItermax=1000000)
     loss = np.trace(weights.T @ M)
     loss_old = 0
@@ -174,7 +174,7 @@ def EW2(X, Y, a=None, b=None, eps=1e-3, n_iter_max=10000, verbose=False, rng=Non
             print("iteration " + str(n_iter) + ": loss = " + str(loss))
         loss_old = loss
         P = proj_stiefel(X.T @ weights @ Y)
-        M = ot.dist(X, np.einsum("mn,bn->bm", P, Y))
+        M = ot.dist(X, np.einsum("mn,bn->bm", P, Y), metric="sqeuclidean")
         weights = ot.emd(a, b, M, numItermax=1000000)
         loss = np.trace(weights.T @ M)
         n_iter += 1
@@ -197,7 +197,7 @@ def aEW2(
     m = X.shape[1]
     n = Y.shape[1]
     P = proj_stiefel(get_rng(rng).random((m, n)))
-    M = ot.dist(X, np.einsum("mn,bn->bm", P, Y))
+    M = ot.dist(X, np.einsum("mn,bn->bm", P, Y), metric="sqeuclidean")
     if a is None:
         a = ot.unif(X.shape[0])
     if b is None:
@@ -213,7 +213,7 @@ def aEW2(
         loss_old = loss
         reg *= beta
         P = proj_stiefel(X.T @ weights @ Y)
-        M = ot.dist(X, np.einsum("mn,bn->bm", P, Y))
+        M = ot.dist(X, np.einsum("mn,bn->bm", P, Y), metric="sqeuclidean")
         a = ot.unif(X.shape[0])
         b = ot.unif(Y.shape[0])
         weights = ot.bregman.sinkhorn_stabilized(a, b, M, reg)

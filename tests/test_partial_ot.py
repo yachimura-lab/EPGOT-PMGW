@@ -98,6 +98,60 @@ class PartialOTRegressionTests(unittest.TestCase):
         )
         np.testing.assert_allclose(legacy, canonical, atol=1e-12, rtol=1e-12)
 
+    def test_no_penalty_stands_in_for_the_balanced_problem(self):
+        # A finite Lambda never makes the dummy node empty at eps > 0, so a
+        # default penalty would hand back a partial coupling while the caller
+        # believed they had asked for balanced entropic OT.
+        with self.assertRaises(TypeError):
+            entropic_partial_coupling(self.source, self.target, epsilon=0.03)
+        with self.assertRaisesRegex(ValueError, "Lambda must be specified"):
+            entropic_partial_coupling(
+                self.source, self.target, epsilon=0.03, Lambda=None
+            )
+
+    def test_the_superseded_solver_is_not_reachable_from_the_package_root(self):
+        # It solves 'M - Lambda' with entropy on the real block only, so a
+        # caller who reaches it from `from pgot import ...` gets a coupling
+        # that is not the paper's (3.1) while every name around it is.
+        import pgot
+        import pgot.legacy
+
+        self.assertNotIn("partial_wasserstein_lagrange_entropic", pgot.__all__)
+        self.assertFalse(hasattr(pgot, "partial_wasserstein_lagrange_entropic"))
+        # Still importable, so published results stay reproducible.
+        with self.assertWarns(DeprecationWarning):
+            pgot.legacy.partial_wasserstein_lagrange_entropic(
+                np.array([0.5, 0.5]),
+                np.array([0.5, 0.5]),
+                np.array([[0.0, 1.0], [1.0, 0.0]]),
+                Lambda=0.5,
+            )
+
+    def test_both_figure5_entry_points_demand_the_penalty(self):
+        # compute_T_X_to_Z and compute_T_X_to_Z_C are documented as
+        # equivalent, so a default penalty on one and not the other would let
+        # the same call give two different couplings.
+        points = sample_from_gmm(
+            self.source.weights,
+            self.source.comp_mean,
+            self.source.comp_cov,
+            40,
+            rng=np.random.default_rng(0),
+        )
+        for entry_point in (compute_T_X_to_Z, compute_T_X_to_Z_C):
+            with self.subTest(entry_point=entry_point.__name__):
+                with self.assertRaises(TypeError):
+                    entry_point(points, points, 2, 2, epsilon=0.03)
+
+    def test_the_dummy_node_keeps_mass_at_the_penalty_that_was_the_default(self):
+        # The removed default was Lambda = max(M) = 1 on the normalized cost.
+        # It leaves matched mass short of one, which is what made calling it
+        # the balanced limit wrong.
+        coupling = entropic_partial_coupling(
+            self.source, self.target, epsilon=0.03, Lambda=1.0
+        )
+        self.assertLess(coupling.sum(), 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()

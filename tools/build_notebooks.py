@@ -493,7 +493,6 @@ Figure 7 displays the raw mixture barycentric maps, and Figure 6 applies nearest
 target assignment to those same maps.
 
 The dimensionality claim is limited to the coupling solve (300×310 versus 6×7).
-At N=300 the GMM fitting cost means this notebook does not claim end-to-end speedup.
 '''),
         ("code", r'''
 import os
@@ -526,24 +525,24 @@ from pgot import (
     gw_mean_distortion,
     make_figure6,
     make_figure7,
-    partial_gw_penalty,
     solve_point_cloud_matching,
     write_figure_sidecar,
 )
 
 # ---------------------------------------------------------------
-# Section 7.2 point clouds. The paper fixes the ring radius, the
-# sample sizes and the number of noise points; it does not state the
-# target height or the noise distribution, so both are pinned here.
+# Section 7.2 point clouds. The source ring lies in the plane z = 0
+# and the target ring is its translate into z = HEIGHT. The target
+# additionally carries a cluster of noise points, which the balanced
+# methods have to match and the partial methods may leave unmatched.
 # ---------------------------------------------------------------
 COMPONENTS = 6            # six equally weighted components per ring
 POINTS = 300              # points sampled from each ring
-SIGMA = 0.2               # component standard deviation
+SIGMA = 0.2               # component standard deviation, covariance 0.04 I_3
 RADIUS = 4.0              # ring radius, identical for source and target
-HEIGHT = 10.0             # not stated in the paper
+HEIGHT = 10.0             # the target ring lies in the plane z = HEIGHT
 NOISE_POINTS = 10         # outlying points added to the target
-NOISE_CENTRE = np.array([2.5 * RADIUS, 0.0, HEIGHT])  # not stated in the paper
-NOISE_RADIUS = 0.3        # not stated in the paper
+NOISE_CENTRE = np.array([2.5 * RADIUS, 0.0, HEIGHT])  # centre of the noise ball
+NOISE_RADIUS = 0.3        # radius of that ball
 
 # Independent generators: the source and the target ring must be separate
 # samples, not an affine image of one another.
@@ -624,8 +623,14 @@ target_gmm = fit_mixture(figure67_data["target"], TARGET_COMPONENTS)
 component_source = gaussian_cost_matrix(source_gmm)
 component_target = gaussian_cost_matrix(target_gmm)
 component_scale = float(max(component_source.max(), component_target.max()))
-point_source = ot.dist(figure67_data["source"], figure67_data["source"])
-point_target = ot.dist(figure67_data["target"], figure67_data["target"])
+# metric="sqeuclidean" is POT's default; naming it keeps the notebook
+# explicit that these are the intra-space squared-distance matrices.
+point_source = ot.dist(
+    figure67_data["source"], figure67_data["source"], metric="sqeuclidean"
+)
+point_target = ot.dist(
+    figure67_data["target"], figure67_data["target"], metric="sqeuclidean"
+)
 point_scale = float(max(point_source.max(), point_target.max()))
 
 figure67_problem = {
@@ -651,16 +656,17 @@ print(
 '''),
         ("code", r'''
 # ---------------------------------------------------------------
-# Penalty conversion.
+# Penalty. Section 7.2 sets lambda = 0.01 for both partial methods, and
+# both solvers receive that number unchanged, on cost matrices that have
+# already been divided by their own pair maximum.
 #
-# The two representations normalize their costs by different constants, so
-# the same numeric lambda does not mean the same thing in both. We measure
-# lambda in units of the mean distortion of the balanced optimum:
-#
-#     Lambda = lambda_tilde * gw_mean_distortion(C1, C2, G_balanced)
-#
-# lambda_tilde is dimensionless and shared, and is fixed so that the
-# point-level penalty equals the lambda = 0.01 reported in Section 7.2.
+# Partial GW is non-convex, so the Frank-Wolfe start matters. The solver
+# default is the independent coupling, which on the 6 x 7 component
+# problem spreads every source component over the noise component too and
+# stalls at the empty coupling, even though the matching reached from the
+# balanced start scores a strictly better objective. Both partial solves
+# therefore start at the balanced coupling for the same representation,
+# which `solve_point_cloud_matching` receives below.
 # ---------------------------------------------------------------
 PAPER_LAMBDA = 0.01
 
@@ -683,17 +689,8 @@ coupling_mgw = MGW2_GM_coup(
 )
 runtime_mgw_coupling = perf_counter() - started
 
-point_distortion = gw_mean_distortion(point_source_n, point_target_n, coupling_gw)
-component_distortion = gw_mean_distortion(
-    component_source_n, component_target_n, coupling_mgw
-)
-lambda_tilde = PAPER_LAMBDA / point_distortion
-lambda_point = partial_gw_penalty(
-    lambda_tilde, point_source_n, point_target_n, coupling_gw
-)
-lambda_component = partial_gw_penalty(
-    lambda_tilde, component_source_n, component_target_n, coupling_mgw
-)
+lambda_point = PAPER_LAMBDA
+lambda_component = PAPER_LAMBDA
 
 figure67_solved = solve_point_cloud_matching(
     figure67_problem,
@@ -701,20 +698,25 @@ figure67_solved = solve_point_cloud_matching(
     coupling_mgw=coupling_mgw,
     lambda_point=lambda_point,
     lambda_component=lambda_component,
-    # These four keys feed the solve identifiers; keep them stable so that a
+    # These keys feed the solve identifiers; keep them stable so that a
     # refactor does not silently change the recorded provenance.
     method_parameters={
         "paper_lambda": PAPER_LAMBDA,
-        "lambda_tilde": lambda_tilde,
         "point_solver_lambda": lambda_point,
         "component_solver_lambda": lambda_component,
+        "partial_init": "balanced coupling of the same representation",
     },
     runtime_gw=runtime_gw,
     runtime_mgw_coupling=runtime_mgw_coupling,
 )
-figure67_solved["point_mean_distortion"] = point_distortion
-figure67_solved["component_mean_distortion"] = component_distortion
-print(f"lambda_tilde={lambda_tilde:.6f}")
+# Reported for the record: the balanced couplings must match the noise, and
+# the distortion they carry is what the partial couplings shed.
+figure67_solved["point_mean_distortion"] = gw_mean_distortion(
+    point_source_n, point_target_n, coupling_gw
+)
+figure67_solved["component_mean_distortion"] = gw_mean_distortion(
+    component_source_n, component_target_n, coupling_mgw
+)
 print(
     f"solver lambda: point={lambda_point:.6f}, "
     f"component={lambda_component:.6f}"
@@ -770,27 +772,38 @@ common_inputs = {
     },
     "point_cost_scale": figure67_problem["point_cost_scale"],
     "component_cost_scale": figure67_problem["component_cost_scale"],
-    "penalty_conversion": "Lambda = lambda_tilde * balanced mean distortion",
 }
+
+# Every panel carries what its own solve was given, so that no reader has to
+# pair a penalty with the right entry of common_inputs to interpret it:
+# paper_lambda is what Section 7.2 states, solver_lambda is the number the
+# solver received, cost_normalization_scale is the constant its cost matrices
+# were divided by, and partial_init is the starting point of the solve. The
+# balanced methods take no penalty and no starting point, and record null.
+POINT_SCALE = figure67_problem["point_cost_scale"]
+COMPONENT_SCALE = figure67_problem["component_cost_scale"]
+PARTIAL_INIT = "balanced coupling of the same representation"
+
 method_panels = []
-for method, key, solver_lambda in [
-    ("GW2", "coupling_gw", None),
-    ("PGW2", "coupling_pgw", figure67_solved["lambda_point"]),
-    ("MGW2", "coupling_mgw", None),
-    ("pMGW2", "coupling_pmgw", figure67_solved["lambda_component"]),
+for method, key, solver_lambda, cost_scale in [
+    ("GW2", "coupling_gw", None, POINT_SCALE),
+    ("PGW2", "coupling_pgw", figure67_solved["lambda_point"], POINT_SCALE),
+    ("MGW2", "coupling_mgw", None, COMPONENT_SCALE),
+    ("pMGW2", "coupling_pmgw", figure67_solved["lambda_component"],
+     COMPONENT_SCALE),
 ]:
+    partial = method in {"PGW2", "pMGW2"}
     method_panels.append(
         {
             "method": method,
-            "paper_lambda": (
-                PAPER_LAMBDA if method in {"PGW2", "pMGW2"} else None
-            ),
+            "paper_lambda": PAPER_LAMBDA if partial else None,
             "solver_lambda": solver_lambda,
-            "lambda_tilde": figure67_solved["lambda_tilde"],
+            "cost_normalization_scale": cost_scale,
+            "partial_init": PARTIAL_INIT if partial else None,
             "solver": (
-                "POT gromov_wasserstein"
-                if method in {"GW2", "MGW2"}
-                else "PGW_Metric partial_gromov_ver1"
+                "PGW_Metric partial_gromov_ver1"
+                if partial
+                else "POT gromov_wasserstein"
             ),
             "solve_id": figure67_solved["solve_ids"][method],
             "coupling": figure67_solved[key],

@@ -179,3 +179,41 @@ class SidecarsRecordEverySolve(unittest.TestCase):
                     continue
                 with self.subTest(sidecar=name, panel=index):
                     self.assertGreater(panel["runtime_seconds"], 0.0)
+
+    def test_every_penalty_is_recorded_with_the_scale_it_lives_on(self):
+        # A solver lambda is meaningless without the constant the cost
+        # matrices were divided by, so a panel that names one must name the
+        # other, and must say which value the paper states.
+        for name in ["figure6", "figure7"]:
+            sidecar = json.loads(
+                (NOTEBOOK_DIR / "metadata" / f"{name}.json").read_text()
+            )
+            for panel in sidecar["panels"]:
+                with self.subTest(sidecar=name, method=panel["method"]):
+                    self.assertGreater(panel["cost_normalization_scale"], 0.0)
+                    if panel["solver_lambda"] is None:
+                        self.assertIsNone(panel["paper_lambda"])
+                        self.assertIsNone(panel["partial_init"])
+                    else:
+                        self.assertEqual(panel["paper_lambda"], spec.PAPER_LAMBDA)
+                        self.assertEqual(panel["solver_lambda"], spec.PAPER_LAMBDA)
+                        self.assertTrue(panel["partial_init"])
+
+    def test_figures_6_and_7_report_the_same_mixture_solves(self):
+        # Figure 7 shows the raw maps of the same MGW2 and pMGW2 solves that
+        # Figure 6 assigns to nearest targets. Different solve identifiers
+        # would mean a second solve slipped in between the two figures.
+        identifiers = {
+            name: {
+                panel["method"]: panel["solve_id"]
+                for panel in json.loads(
+                    (NOTEBOOK_DIR / "metadata" / f"{name}.json").read_text()
+                )["panels"]
+            }
+            for name in ["figure6", "figure7"]
+        }
+        for method in ["MGW2", "pMGW2"]:
+            with self.subTest(method=method):
+                self.assertEqual(
+                    identifiers["figure6"][method], identifiers["figure7"][method]
+                )

@@ -24,7 +24,6 @@ from .partial_mgw import (
     gw_mean_distortion,
     nearest_target_indices,
     pMGW2_coup,
-    partial_gw_penalty,
 )
 from .partial_ot import (
     display_gmm,
@@ -153,7 +152,7 @@ def _plot_epot_grid(records, shape, figsize, source, target):
         orientation="horizontal",
         fraction=0.045,
         pad=0.05,
-        label=r"coupling weight $\omega_{ij}^{\varepsilon,\lambda}$",
+        label=r"coupling weight $\omega_{kl}^{\varepsilon,\lambda}$",
     )
     return fig
 
@@ -245,12 +244,16 @@ def solve_point_cloud_matching(
 ):
     """Solve each partial method once; Figures 6 and 7 consume the same maps.
 
-    The balanced couplings are supplied by the caller, which already needs
-    them to convert the paper's ``lambda`` into each solver's penalty. Passing
-    them in keeps the promise that every method is solved exactly once.
-    ``method_parameters`` is recorded in the solve identifiers, and the two
-    balanced runtimes are recorded alongside the partial ones so the sidecar
-    still times every solve.
+    The balanced couplings are supplied by the caller, and serve twice: they
+    are Figures 6 and 7's balanced panels, and they are the starting points of
+    the two partial solves. Partial GW is non-convex, and the solver's default
+    start is the independent coupling; on the component problem that start
+    leaves the solver at the empty coupling for the penalty of Section 7.2,
+    even though the matching found from the balanced start has a strictly
+    better objective. Passing them in also keeps the promise that every method
+    is solved exactly once. ``method_parameters`` is recorded in the solve
+    identifiers, and the two balanced runtimes are recorded alongside the
+    partial ones so the sidecar still times every solve.
     """
     source, target = problem["source"], problem["target"]
     source_gmm, target_gmm = problem["source_gmm"], problem["target_gmm"]
@@ -269,6 +272,7 @@ def solve_point_cloud_matching(
         p,
         q,
         Lambda=lambda_point,
+        G0=np.asarray(coupling_gw, dtype=float).copy(),
         numItermax_gw=100,
         tol=1e-12,
         verbose=False,
@@ -301,6 +305,7 @@ def solve_point_cloud_matching(
         nu=target_gmm,
         C1=problem["component_source_cost"],
         C2=problem["component_target_cost"],
+        init_coupling=coupling_mgw,
         solver_tol=1e-12,
         return_both=True,
         verbose=False,
@@ -378,21 +383,39 @@ def _draw_correspondences(axis, data, targets, title, source_mask=None):
     _equal_3d_axes(axis, np.vstack([source, target]))
 
 
+# Panel titles spell the method out. The sidecars keep the short GW2/PGW2/
+# MGW2/pMGW2 keys as solve identifiers, but a reader of the figure has only
+# the title, and "pMGW2" does not say which of the four cells of the
+# balanced/partial by point/mixture comparison a panel is.
+BALANCED_GW = "Balanced GW"
+PARTIAL_GW = "Partial GW"
+BALANCED_MIXTURE_GW = "Balanced mixture GW"
+PARTIAL_MIXTURE_GW = "Partial mixture GW"
+
+
 def make_figure6(data, solved):
     """Nearest-target assignments derived from the four barycentric maps."""
     target = data["target"]
     fig, axes = plt.subplots(2, 2, figsize=(14, 14), subplot_kw={"projection": "3d"})
     _draw_correspondences(
-        axes[0, 0], data, target[solved["index_gw"]], "(a) GW2", solved["mask_gw"]
+        axes[0, 0],
+        data,
+        target[solved["index_gw"]],
+        f"(a) {BALANCED_GW}",
+        solved["mask_gw"],
     )
     _draw_correspondences(
-        axes[0, 1], data, target[solved["index_pgw"]], "(b) PGW2", solved["mask_pgw"]
+        axes[0, 1],
+        data,
+        target[solved["index_pgw"]],
+        f"(b) {PARTIAL_GW}",
+        solved["mask_pgw"],
     )
     _draw_correspondences(
-        axes[1, 0], data, target[solved["index_mgw"]], "(c) MGW2"
+        axes[1, 0], data, target[solved["index_mgw"]], f"(c) {BALANCED_MIXTURE_GW}"
     )
     _draw_correspondences(
-        axes[1, 1], data, target[solved["index_pmgw"]], "(d) pMGW2"
+        axes[1, 1], data, target[solved["index_pmgw"]], f"(d) {PARTIAL_MIXTURE_GW}"
     )
     fig.tight_layout()
     return fig
@@ -401,7 +424,11 @@ def make_figure6(data, solved):
 def make_figure7(data, solved):
     """Raw mixture barycentric maps from the same MGW/pMGW solves as Figure 6."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 7), subplot_kw={"projection": "3d"})
-    _draw_correspondences(axes[0], data, solved["map_mgw"], "(a) MGW2")
-    _draw_correspondences(axes[1], data, solved["map_pmgw"], "(b) pMGW2")
+    _draw_correspondences(
+        axes[0], data, solved["map_mgw"], f"(a) {BALANCED_MIXTURE_GW}"
+    )
+    _draw_correspondences(
+        axes[1], data, solved["map_pmgw"], f"(b) {PARTIAL_MIXTURE_GW}"
+    )
     fig.tight_layout()
     return fig

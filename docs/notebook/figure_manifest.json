@@ -49,7 +49,8 @@
       "sidecar": "metadata/figure6.json",
       "paper_lambda": 0.01,
       "point_solver_lambda": 0.01,
-      "component_solver_lambda": "derived from lambda_tilde and D_match",
+      "component_solver_lambda": 0.01,
+      "partial_init": "balanced coupling of the same representation",
       "solver": "POT GW and PGW_Metric partial_gromov_ver1"
     },
     "7": {

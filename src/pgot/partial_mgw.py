@@ -57,22 +57,6 @@ def gw_mean_distortion(C1, C2, coupling):
     return float(total / mass**2)
 
 
-def partial_gw_penalty(lambda_tilde, C1, C2, balanced_coupling):
-    """Convert the dimensionless penalty to a solver ``Lambda``.
-
-    The paper states a single ``lambda`` for the partial methods, but the
-    point-level and component-level problems normalize their cost matrices
-    by different constants, so the same number means different things. We
-    fix the convention by measuring ``lambda`` in units of the mean
-    distortion of the *balanced* optimum for the same representation:
-
-        Lambda = lambda_tilde * gw_mean_distortion(C1, C2, G_balanced)
-
-    ``lambda_tilde`` is then dimensionless and shared by both methods.
-    """
-    return float(lambda_tilde) * gw_mean_distortion(C1, C2, balanced_coupling)
-
-
 def barycentric_projection(coupling, Y, tol=0.0):
     """Row-barycentric projection of a coupling onto the target points.
 
@@ -214,6 +198,15 @@ def partial_mgw_barycentric_map(
     ``sum[k,l] gamma[k,l] p_mu_k(x)`` rather than by the full mixture
     density. A zero matched density makes the map undefined and raises
     ``FloatingPointError``.
+
+    The source points and the source components are carried into the target
+    dimension by ``P.T`` first, and each component map is then taken between
+    the projected source Gaussian and the target Gaussian. This
+    implementation coincides with (6.8)--(6.9) in the square case ``d == d'``,
+    which is the setting used in the paper experiments (``d == d' == 3`` in
+    Section 7.2). For ``d > d'`` the composition above need not agree with
+    (6.8), which builds the component map in the source dimension ``d`` and
+    applies ``P.T`` last.
     """
     X = np.asarray(X, dtype=float)
     single = X.ndim == 1
@@ -270,6 +263,7 @@ def pMGW2_coup(
     C1=None,
     C2=None,
     coupling=None,
+    init_coupling=None,
     log=False,
 ):
     """Compute a partial-MGW coupling and barycentric map.
@@ -281,6 +275,14 @@ def pMGW2_coup(
     Pass ``mu``/``nu`` to reuse mixtures fitted elsewhere, and ``C1``/``C2``
     to reuse their pairwise Gaussian W2 matrices, so that a balanced and a
     partial run can be compared on exactly the same fit and cost.
+
+    ``init_coupling`` is the Frank-Wolfe starting point handed to the solver.
+    The problem is non-convex, and the solver's default start is the
+    independent coupling ``outer(a, b)``, which spreads every source component
+    over every target component. When a component of ``nu`` has no counterpart
+    in ``mu``, that start can leave the solver at the trivial empty coupling
+    even where a matching with strictly better objective exists, so callers
+    that already hold the balanced coupling should pass it here.
     """
     if mu is None:
         mu = _fit_gmm(X, n_components_X, random_state)
@@ -311,7 +313,7 @@ def pMGW2_coup(
             b,
             Lambda=Lambda,
             nb_dummies=1,
-            G0=None,
+            G0=None if init_coupling is None else np.asarray(init_coupling, float),
             thres=1,
             numItermax=None,
             numItermax_gw=1000,

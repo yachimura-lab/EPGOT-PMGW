@@ -54,18 +54,35 @@ Figures 1–5 use `pgot.entropic_partial_ot`, the extended dummy-point problem
 `(a, 1)` and `(b, 1)`, and entropy is applied to the full extended coupling.
 Therefore `Lambda` is exactly the paper's `lambda`, without rescaling.
 
-For Figures 6–7, point and component costs have different normalization
-scales. The notebook uses
+No figure in this repository uses `pgot.legacy`. That module holds
+`partial_wasserstein_lagrange_entropic`, which relaxes the mass with
+`M - Lambda` and regularizes only the real block, so it solves a different
+problem from (3.1); it is kept solely to reproduce results published with it
+and is not exported from the package root.
 
-```text
-Lambda_solver = lambda_tilde * gw_mean_distortion(C1, C2, balanced_coupling)
-```
+For Figures 6–7, both partial solvers receive the paper's `lambda=0.01`
+unchanged, on cost matrices already divided by their own pair maximum. PGW
+and pMGW both transport `300/310` mass, leaving the ten noise points
+unmatched.
 
-The paper's point-level `lambda=0.01` fixes `lambda_tilde`. The canonical
-inputs are `0.010000` at point level and `0.013249` at component level; PGW
-and pMGW both transport `300/310` mass. Reducing the coupling from `300×310`
-to `6×7` is a solver-dimensionality result, not an end-to-end speed claim at
-`N=300`, because GMM fitting also takes time.
+Partial GW is non-convex, so the Frank-Wolfe starting point is part of the
+specification. Both partial solves start from the balanced coupling of the
+same representation. From the solver's own default start — the independent
+coupling — the `6×7` component problem stalls at the empty coupling at
+`lambda=0.01`, even though the coupling reached from the balanced start
+scores a strictly better objective.
+
+Reducing the coupling from `300×310` to `6×7` is a solver-dimensionality
+result, not an end-to-end speed claim at `N=300`, because GMM fitting also
+takes time.
+
+`partial_mgw_barycentric_map` carries the source points and components into
+the target dimension by `P.T` and then maps between the projected source
+Gaussian and the target Gaussian. This implementation coincides with
+(6.8)–(6.9) in the square case `d = d'`, which is the setting used in the
+paper experiments (`d = d' = 3` in Section 7.2). The general case `d > d'`,
+where (6.8) builds the component map in the source dimension and applies
+`P.T` last, is not implemented.
 
 ## Reproducibility
 

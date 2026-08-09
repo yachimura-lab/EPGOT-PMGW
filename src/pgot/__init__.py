@@ -33,7 +33,6 @@ from .partial_mgw import (
     gw_mean_distortion,
     matched_statistics,
     nearest_target_indices,
-    partial_gw_penalty,
     pMGW2_coup,
     partial_mgw_barycentric_map,
     partial_projected_gradient_descent,
@@ -52,7 +51,6 @@ from .partial_ot import (
     gaussian_displacement_interpolation,
     normalize_cost,
     submixture_pdf,
-    partial_wasserstein_lagrange_entropic,
     to_numpy,
 )
 from .metadata import (
@@ -137,7 +135,6 @@ __all__ = [
     "gaussian_displacement_interpolation",
     "normalize_cost",
     "submixture_pdf",
-    "partial_wasserstein_lagrange_entropic",
     "to_numpy",
     # Partial mixture GW
     "alignment_grad",
@@ -146,7 +143,6 @@ __all__ = [
     "gw_mean_distortion",
     "matched_statistics",
     "nearest_target_indices",
-    "partial_gw_penalty",
     "pMGW2_coup",
     "partial_mgw_barycentric_map",
     "partial_projected_gradient_descent",
