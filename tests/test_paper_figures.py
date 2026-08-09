@@ -1,32 +1,140 @@
 import unittest
+from unittest import mock
 
 import matplotlib
 import numpy as np
 
 matplotlib.use("Agg")
 
+import ot
+import pgot.mgw as pgot_mgw
+from pgot import paper_figures
+
+from paper_setup import (
+    FIGURE2_LAMBDAS,
+    FIGURE3_EPSILONS,
+    FIGURE3_LAMBDAS,
+    PAPER_LAMBDA,
+    SOURCE_COMPONENTS,
+    TARGET_COMPONENTS,
+    normalized_cross_cost,
+    paper_mixtures,
+    point_cloud_data,
+)
 from pgot import (
-    FIGURE_PARAMETERS,
+    DEFAULT_SEED,
+    nearest_target_indices,
+    GaussianMixture,
     MGW2_GM_coup,
-    fit_figure67_problem,
-    generate_figure67_data,
+    gaussian_cost_matrix,
     gmm_transform,
+    gw_mean_distortion,
     make_figure1,
     make_figure2,
     make_figure3,
-    paper_gaussian_mixtures,
+    partial_gw_penalty,
     solve_epot_panels,
-    solve_figure67,
+    solve_point_cloud_matching,
 )
+from sklearn.mixture import GaussianMixture as SkGaussianMixture
+
+
+SOURCE, TARGET = paper_mixtures()
+COST, COST_SCALE = normalized_cross_cost(SOURCE, TARGET)
+
+
+def panels(lambdas, epsilons):
+    return solve_epot_panels(lambdas, epsilons, SOURCE, TARGET, COST, COST_SCALE)
+
+
+def solved_point_clouds():
+    data = point_cloud_data(DEFAULT_SEED)
+
+    def fit(points, components):
+        model = SkGaussianMixture(
+            n_components=components,
+            covariance_type="full",
+            random_state=DEFAULT_SEED,
+        ).fit(points)
+        return GaussianMixture(model.weights_, model.means_, model.covariances_)
+
+    source_gmm = fit(data["source"], SOURCE_COMPONENTS)
+    target_gmm = fit(data["target"], TARGET_COMPONENTS)
+    component_source = gaussian_cost_matrix(source_gmm)
+    component_target = gaussian_cost_matrix(target_gmm)
+    component_scale = float(max(component_source.max(), component_target.max()))
+    point_source = ot.dist(data["source"], data["source"])
+    point_target = ot.dist(data["target"], data["target"])
+    point_scale = float(max(point_source.max(), point_target.max()))
+    problem = {
+        **data,
+        "source_gmm": source_gmm,
+        "target_gmm": target_gmm,
+        "component_source_cost": component_source,
+        "component_target_cost": component_target,
+        "component_source_cost_normalized": component_source / component_scale,
+        "component_target_cost_normalized": component_target / component_scale,
+        "component_cost_scale": component_scale,
+        "point_source_cost_normalized": point_source / point_scale,
+        "point_target_cost_normalized": point_target / point_scale,
+        "point_cost_scale": point_scale,
+        "fit_random_state": DEFAULT_SEED,
+    }
+    p = ot.unif(len(data["source"]))
+    q = ot.unif(len(data["target"]))
+    coupling_gw = ot.gromov.gromov_wasserstein(
+        problem["point_source_cost_normalized"],
+        problem["point_target_cost_normalized"],
+        p,
+        q,
+        loss_fun="square_loss",
+    )
+    coupling_mgw = MGW2_GM_coup(
+        source_gmm,
+        target_gmm,
+        C1=problem["component_source_cost_normalized"],
+        C2=problem["component_target_cost_normalized"],
+    )
+    lambda_tilde = PAPER_LAMBDA / gw_mean_distortion(
+        problem["point_source_cost_normalized"],
+        problem["point_target_cost_normalized"],
+        coupling_gw,
+    )
+    lambda_point = partial_gw_penalty(
+        lambda_tilde,
+        problem["point_source_cost_normalized"],
+        problem["point_target_cost_normalized"],
+        coupling_gw,
+    )
+    lambda_component = partial_gw_penalty(
+        lambda_tilde,
+        problem["component_source_cost_normalized"],
+        problem["component_target_cost_normalized"],
+        coupling_mgw,
+    )
+    solved = solve_point_cloud_matching(
+        problem,
+        coupling_gw=coupling_gw,
+        coupling_mgw=coupling_mgw,
+        lambda_point=lambda_point,
+        lambda_component=lambda_component,
+        method_parameters={
+            "paper_lambda": PAPER_LAMBDA,
+            "lambda_tilde": lambda_tilde,
+            "point_solver_lambda": lambda_point,
+            "component_solver_lambda": lambda_component,
+        },
+        runtime_gw=0.0,
+        runtime_mgw_coupling=0.0,
+    )
+    return data, problem, solved
 
 
 class CanonicalEPOTFigureTests(unittest.TestCase):
     def test_figure1_2_3_parameters_and_residuals(self):
-        figure1 = solve_epot_panels([0.3], [0.01])
-        figure2 = solve_epot_panels(
-            FIGURE_PARAMETERS[2]["lambda"], [FIGURE_PARAMETERS[2]["epsilon"]]
-        )
-        difficult = solve_epot_panels([0.5], [0.01])
+        figure1 = panels([0.3], [0.01])
+        figure2 = panels(FIGURE2_LAMBDAS, [0.01])
+        difficult = panels([0.5], [0.01])
 
         self.assertEqual(len(figure1), 1)
         self.assertEqual([r["paper_lambda"] for r in figure2], [0, 0.125, 0.25, 0.375, 0.5])
@@ -37,13 +145,18 @@ class CanonicalEPOTFigureTests(unittest.TestCase):
             self.assertLess(record["column_residual"], 1e-8)
 
     def test_canonical_plot_layouts(self):
-        records1 = solve_epot_panels([0.3], [0.01])
-        records2 = solve_epot_panels(FIGURE_PARAMETERS[2]["lambda"], [0.01])
-        records3 = solve_epot_panels(FIGURE_PARAMETERS[3]["lambda"], [0.11])
+        records1 = panels([0.3], [0.01])
+        records2 = panels(FIGURE2_LAMBDAS, [0.01])
+        records3 = panels(FIGURE3_LAMBDAS, FIGURE3_EPSILONS)
         figures = [
-            make_figure1(records1),
-            make_figure2(records2),
-            make_figure3(records3 * 3),
+            make_figure1(records1, SOURCE, TARGET),
+            make_figure2(records2, SOURCE, TARGET),
+            make_figure3(
+                records3,
+                SOURCE,
+                TARGET,
+                (len(FIGURE3_EPSILONS), len(FIGURE3_LAMBDAS)),
+            ),
         ]
         # The last axes is the horizontal colorbar in each canonical figure.
         self.assertEqual(len(figures[0].axes), 2)
@@ -56,9 +169,7 @@ class CanonicalEPOTFigureTests(unittest.TestCase):
 class Figure67RegressionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.data = generate_figure67_data()
-        cls.problem = fit_figure67_problem(cls.data)
-        cls.solved = solve_figure67(cls.problem)
+        cls.data, cls.problem, cls.solved = solved_point_clouds()
 
     def test_geometry_is_independent_and_matches_paper_radius(self):
         source = self.data["source"]
@@ -78,16 +189,50 @@ class Figure67RegressionTests(unittest.TestCase):
         self.assertAlmostEqual(self.solved["lambda_point"], 0.01, places=12)
         self.assertAlmostEqual(self.solved["lambda_component"], 0.0132491708, places=9)
 
-    def test_figure6_and_7_share_mixture_solve_ids(self):
-        # Both figures are rendered from this one result object. The raw maps
-        # and nearest-neighbour assignments therefore retain the same IDs.
-        self.assertEqual(len(self.solved["solve_ids"]["MGW2"]), 64)
-        self.assertEqual(len(self.solved["solve_ids"]["pMGW2"]), 64)
-        self.assertEqual(len(self.solved["map_mgw"]), len(self.solved["index_mgw"]))
-        self.assertEqual(len(self.solved["map_pmgw"]), len(self.solved["index_pmgw"]))
+    def test_figure6_is_the_nearest_neighbour_view_of_figure7(self):
+        # Figure 7 shows map_*, Figure 6 shows index_*. If a method were solved
+        # a second time the two would no longer be tied by nearest-neighbour
+        # assignment on the same target cloud.
+        target = self.data["target"]
+        for name in ["mgw", "pmgw", "gw", "pgw"]:
+            with self.subTest(method=name):
+                np.testing.assert_array_equal(
+                    self.solved[f"index_{name}"],
+                    nearest_target_indices(self.solved[f"map_{name}"], target),
+                )
+
+    def test_balanced_solvers_are_never_called_inside_the_helper(self):
+        # The caller already solved GW and MGW to convert the paper's lambda.
+        # Making both balanced solvers explode proves the helper reuses those
+        # couplings instead of quietly solving them a second time.
+        def explode(*args, **kwargs):
+            raise AssertionError("a balanced solver ran inside the helper")
+
+        _, problem, _ = solved_point_clouds()
+        with mock.patch.object(paper_figures, "MGW2_GM_coup", explode), mock.patch.object(
+            pgot_mgw, "MGW2_GM_coup", explode
+        ), mock.patch.object(ot.gromov, "gromov_wasserstein", explode):
+            solved = solve_point_cloud_matching(
+                problem,
+                coupling_gw=self.solved["coupling_gw"],
+                coupling_mgw=self.solved["coupling_mgw"],
+                lambda_point=self.solved["lambda_point"],
+                lambda_component=self.solved["lambda_component"],
+                method_parameters={},
+                runtime_gw=1.25,
+                runtime_mgw_coupling=2.5,
+            )
+        np.testing.assert_array_equal(
+            solved["coupling_gw"], self.solved["coupling_gw"]
+        )
+        np.testing.assert_array_equal(
+            solved["coupling_mgw"], self.solved["coupling_mgw"]
+        )
+        self.assertEqual(solved["runtime_seconds"]["GW2"], 1.25)
+        self.assertEqual(solved["runtime_seconds"]["MGW2_coupling"], 2.5)
 
     def test_mgw_coupling_is_translation_invariant(self):
-        source, target = paper_gaussian_mixtures()
+        source, target = SOURCE, TARGET
         coupling = MGW2_GM_coup(source, target)
         shifted_source = gmm_transform(source, b=np.array([17.0, -4.0]))
         shifted_target = gmm_transform(target, b=np.array([-8.0, 11.0]))

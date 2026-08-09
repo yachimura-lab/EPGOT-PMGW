@@ -2,12 +2,12 @@ import unittest
 
 import numpy as np
 
+from paper_setup import paper_mixtures
 from pgot import (
     compute_T_X_to_Z,
     compute_T_X_to_Z_C,
     entropic_partial_coupling,
     entropic_partial_displacement_interpolation,
-    paper_gaussian_mixtures,
     sample_from_gmm,
     submixture_pdf,
 )
@@ -15,7 +15,7 @@ from pgot import (
 
 class PartialOTRegressionTests(unittest.TestCase):
     def setUp(self):
-        self.source, self.target = paper_gaussian_mixtures()
+        self.source, self.target = paper_mixtures()
 
     def test_figure5_epot_mass_and_residual(self):
         expected = {0.25: 0.8875742, 0.5: 0.9937141}

@@ -65,20 +65,15 @@ from .metadata import (
     write_figure_sidecar,
 )
 from .paper_figures import (
-    FIGURE_PARAMETERS,
-    fit_figure67_problem,
-    generate_figure67_data,
     make_figure1,
     make_figure2,
     make_figure3,
     make_figure5,
     make_figure6,
     make_figure7,
-    normalized_cross_cost,
-    paper_gaussian_mixtures,
     solve_epot_panels,
+    solve_point_cloud_matching,
     solve_figure5,
-    solve_figure67,
 )
 from .reproducibility import (
     DEFAULT_SEED,
@@ -157,12 +152,9 @@ __all__ = [
     "partial_projected_gradient_descent",
     "validate_partial_coupling",
     # Paper figure pipelines and provenance
-    "FIGURE_PARAMETERS",
     "array_sha256",
     "coupling_marginal_diagnostics",
     "file_sha256",
-    "fit_figure67_problem",
-    "generate_figure67_data",
     "git_revision",
     "make_figure1",
     "make_figure2",
@@ -170,12 +162,10 @@ __all__ = [
     "make_figure5",
     "make_figure6",
     "make_figure7",
-    "normalized_cross_cost",
-    "paper_gaussian_mixtures",
     "runtime_environment",
     "solve_epot_panels",
+    "solve_point_cloud_matching",
     "solve_figure5",
-    "solve_figure67",
     "solve_id",
     "write_figure_sidecar",
 ]
