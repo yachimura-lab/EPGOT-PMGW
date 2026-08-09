@@ -10,6 +10,7 @@ from matplotlib.colors import LogNorm
 from scipy.linalg import det, inv, sqrtm
 from sklearn.mixture import GaussianMixture as skGaussianMixture
 
+from .gaussian import GaussianMixture
 from .reproducibility import DEFAULT_SEED
 
 
@@ -224,6 +225,71 @@ def _cross_gaussian_cost(mixX, mixY, clip=False):
     return cost
 
 
+def _cross_gaussian_cost_gmm(mu, nu, clip=True):
+    """Cross-mixture squared Gaussian W2 cost for :class:`GaussianMixture`."""
+    cost = np.zeros((mu.K, nu.K))
+    for k in range(mu.K):
+        for l in range(nu.K):
+            cost[k, l] = _gaussian_w2_cost(
+                mu.comp_mean[k],
+                mu.comp_cov[k],
+                nu.comp_mean[l],
+                nu.comp_cov[l],
+                clip=clip,
+            )
+    return cost
+
+
+def entropic_partial_barycentric_map(
+    X,
+    mu,
+    nu,
+    epsilon=1e-2,
+    Lambda=None,
+    log=False,
+):
+    """Evaluate the entropic partial barycentric projection map (6.2).
+
+    ``mu`` and ``nu`` are :class:`~pgot.gaussian.GaussianMixture` objects
+    holding *known* component parameters, so nothing is fitted here. The
+    component coupling is the real-real block of (3.1) applied to the
+    weights with the normalized Gaussian cost (7.1), and the map is
+    normalized by the matched density ``sum_kl omega_kl p_k(x)``.
+
+    ``Lambda`` is the paper's ``lambda`` on the normalized cost scale.
+    """
+    X = np.asarray(X, dtype=float)
+    d = X.shape[1]
+
+    M = _cross_gaussian_cost_gmm(mu, nu)
+    M = M / np.max(M)
+    gamma = _figure5_component_coupling(
+        mu.weights, nu.weights, M, Lambda, epsilon, nb_dummies=1
+    )
+
+    A = {
+        (k, l): compute_monge_map_matrix(mu.comp_cov[k], nu.comp_cov[l])
+        for k in range(mu.K)
+        for l in range(nu.K)
+    }
+    component_pdf = np.vstack([mu.comp[k].pdf(X) for k in range(mu.K)])
+
+    row_mass = gamma.sum(axis=1)
+    denominator = (row_mass[:, None] * component_pdf).sum(axis=0)
+    numerator = np.zeros((X.shape[0], d), dtype=float)
+    for k in range(mu.K):
+        for l in range(nu.K):
+            Tkl = nu.comp_mean[l] + np.einsum(
+                "ij,bj->bi", A[(k, l)], X - mu.comp_mean[k]
+            )
+            numerator += gamma[k, l] * component_pdf[k][:, None] * Tkl
+
+    Z = numerator / (denominator[:, None] + 1e-300)
+    if log:
+        return Z, {"matched_mass": float(gamma.sum()), "coupling": gamma}
+    return Z
+
+
 def _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies):
     """Solve (3.1) between mixture components for the Figure 5 helpers.
 
@@ -342,7 +408,17 @@ def compute_T_X_to_Z_C(
 
     ``Lambda`` is the paper's ``lambda``, on the scale of the normalized
     cost matrix (7.1); it is passed to the solver unchanged.
+
+    This fits a mixture to each point cloud. Section 7.1.5 of the paper
+    instead evaluates (6.2) for the *known* mixtures GA and GB, which is
+    what :func:`entropic_partial_barycentric_map` does; prefer that when the
+    component parameters are available.
     """
+    if nb_dummies != 1:
+        raise ValueError(
+            "The paper's (3.1) uses exactly one dummy point; "
+            f"nb_dummies={nb_dummies} is not supported."
+        )
     mixX, mixY = _fit_figure5_mixtures(
         X,
         Y,
@@ -350,46 +426,8 @@ def compute_T_X_to_Z_C(
         n_components_Y,
         random_state=random_state,
     )
-    a = mixX.weights_
-    b = mixY.weights_
-    Kx = len(a)
-    Ky = len(b)
-    d = X.shape[1]
-
-    M = _cross_gaussian_cost(mixX, mixY, clip=True)
-    M = M / np.max(M)
-    gamma = _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies)
-
-    # Every component pair contributes to (6.2). Dropping small-weight pairs
-    # from the numerator while keeping them in the denominator would bias the
-    # map towards zero, so no threshold is applied here.
-    A_matrices = {
-        (k, l): compute_monge_map_matrix(
-            mixX.covariances_[k],
-            mixY.covariances_[l],
-        )
-        for k in range(Kx)
-        for l in range(Ky)
-    }
-
-    Z = np.zeros_like(X)
-    for i, x in enumerate(X):
-        p_vals = np.zeros(Kx)
-        for k in range(Kx):
-            diff = x - mixX.means_[k]
-            inv_cov = inv(mixX.covariances_[k])
-            exponent = -0.5 * diff @ inv_cov @ diff
-            norm_const = np.sqrt((2 * np.pi) ** d * det(mixX.covariances_[k]))
-            p_vals[k] = np.exp(exponent) / norm_const
-
-        numerator = np.zeros(d)
-        denominator = 0.0
-        for k in range(Kx):
-            for l in range(Ky):
-                denominator += gamma[k, l] * p_vals[k]
-                Tkl = mixY.means_[l] + A_matrices[(k, l)] @ (x - mixX.means_[k])
-                numerator += gamma[k, l] * p_vals[k] * Tkl
-        Z[i] = numerator / (denominator + 1e-300)
-    if log:
-        return Z, {"matched_mass": float(gamma.sum()), "coupling": gamma}
-    return Z
+    mu = GaussianMixture(mixX.weights_, mixX.means_, mixX.covariances_)
+    nu = GaussianMixture(mixY.weights_, mixY.means_, mixY.covariances_)
+    return entropic_partial_barycentric_map(
+        X, mu, nu, epsilon=epsilon, Lambda=Lambda, log=log
+    )
