@@ -4,14 +4,17 @@ command = """
   # 1. Install uv
   chmod +x ./setup-uv.sh && ./setup-uv.sh
 
-  # 2. Install Quarto
-  curl -Lo quarto.tar.gz https://quarto.org/download/latest/quarto-linux-amd64.tar.gz
+  # 2. Install the exact Quarto release used for validation
+  QUARTO_VERSION=1.10.18
+  QUARTO_SHA256=afad071b5bd22c02f2d300695743189d3650e0537a53073e654b630cff2b0c73
+  curl -Lo quarto.tar.gz "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.tar.gz"
+  echo "${QUARTO_SHA256}  quarto.tar.gz" | sha256sum -c -
   mkdir quarto  # create the extraction directory
   tar -xzf quarto.tar.gz --strip-components=1 -C quarto
   export PATH=$PATH:$PWD/quarto/bin  # add the downloaded binary to PATH
 
   # 3. Install the required Python modules
-  uv sync
+  uv sync --frozen
 
   # 4. Build the documentation
   export QUARTO_PYTHON=$(pwd)/.venv/bin/python

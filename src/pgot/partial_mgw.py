@@ -32,6 +32,70 @@ def _fit_gmm(points, n_components, random_state=DEFAULT_SEED):
     )
 
 
+def gw_mean_distortion(C1, C2, coupling):
+    """Mean square-loss distortion of a (possibly partial) GW coupling.
+
+    ``sum_ijkl (C1_ik - C2_jl)^2 G_ij G_kl / (sum G)^2``, evaluated in
+    ``O(n^2)`` with the standard square-loss identity. This is the natural
+    scale of the distortion term in (2.6) and (5.4): a coupling is worth
+    keeping only when ``2 lambda`` exceeds it, so it is what makes the
+    penalty comparable between the point-level and component-level
+    representations.
+    """
+    C1 = np.asarray(C1, dtype=float)
+    C2 = np.asarray(C2, dtype=float)
+    G = np.asarray(coupling, dtype=float)
+    mass = G.sum()
+    if mass <= 0.0:
+        raise ValueError("Cannot take the mean distortion of an empty coupling.")
+    row, col = G.sum(axis=1), G.sum(axis=0)
+    total = (
+        row @ (C1**2) @ row
+        - 2.0 * np.sum((C1 @ G) * (G @ C2))
+        + col @ (C2**2) @ col
+    )
+    return float(total / mass**2)
+
+
+def partial_gw_penalty(lambda_tilde, C1, C2, balanced_coupling):
+    """Convert the dimensionless penalty to a solver ``Lambda``.
+
+    The paper states a single ``lambda`` for the partial methods, but the
+    point-level and component-level problems normalize their cost matrices
+    by different constants, so the same number means different things. We
+    fix the convention by measuring ``lambda`` in units of the mean
+    distortion of the *balanced* optimum for the same representation:
+
+        Lambda = lambda_tilde * gw_mean_distortion(C1, C2, G_balanced)
+
+    ``lambda_tilde`` is then dimensionless and shared by both methods.
+    """
+    return float(lambda_tilde) * gw_mean_distortion(C1, C2, balanced_coupling)
+
+
+def barycentric_projection(coupling, Y, tol=0.0):
+    """Row-barycentric projection of a coupling onto the target points.
+
+    Returns ``(mapped, mask)`` where ``mask`` marks the source rows that
+    carry mass above ``tol``. Rows below the tolerance are unmatched: the
+    barycentre is undefined there, so they must be dropped rather than
+    assigned. For a balanced coupling every row is kept.
+    """
+    G = np.asarray(coupling, dtype=float)
+    Y = np.asarray(Y, dtype=float)
+    row_mass = G.sum(axis=1)
+    mask = row_mass > tol
+    mapped = (G[mask] @ Y) / row_mass[mask, None]
+    return mapped, mask
+
+
+def nearest_target_indices(mapped, Y):
+    """Index of the nearest target point for each mapped point."""
+    nbrs = NearestNeighbors(n_neighbors=1, algorithm="ball_tree").fit(Y)
+    return nbrs.kneighbors(np.asarray(mapped, dtype=float),
+                           return_distance=False).ravel()
+
+
 def validate_partial_coupling(gamma, a, b, tol=1e-8):
     """Validate a non-negative, sub-marginal partial coupling."""
     gamma = np.asarray(gamma, dtype=float)
@@ -100,18 +164,37 @@ def partial_projected_gradient_descent(
     step_size=1.0,
     max_iter=150,
     tol=1e-8,
+    max_backtrack=20,
 ):
-    """Optimize partial-MGW alignment on the Stiefel manifold."""
+    """Optimize partial-MGW alignment on the Stiefel manifold.
+
+    Each step is backtracked until :func:`alignment_loss` decreases, so the
+    returned matrix is never worse than ``P0``. Without that guard a fixed
+    ``step_size=1.0`` can drive the loss up by orders of magnitude and still
+    stop on the ``||P_next - P||`` criterion.
+    """
     P = P0.copy()
-    losses = [alignment_loss(P, gamma, mu_c, nu_c)]
+    current = alignment_loss(P, gamma, mu_c, nu_c)
+    losses = [current]
     for _ in range(max_iter):
         gradient = alignment_grad(P, gamma, mu_c, nu_c)
-        P_next = proj_stiefel(P - step_size * gradient)
-        losses.append(alignment_loss(P_next, gamma, mu_c, nu_c))
-        if np.linalg.norm(P_next - P) <= tol * (1.0 + np.linalg.norm(P)):
-            P = P_next
+        step = step_size
+        candidate = None
+        for _ in range(max_backtrack):
+            trial = proj_stiefel(P - step * gradient)
+            value = alignment_loss(trial, gamma, mu_c, nu_c)
+            if value <= current:
+                candidate = (trial, value)
+                break
+            step *= 0.5
+        if candidate is None:
             break
+        P_next, current = candidate
+        losses.append(current)
+        converged = np.linalg.norm(P_next - P) <= tol * (1.0 + np.linalg.norm(P))
         P = P_next
+        if converged:
+            break
     return P, losses
 
 
@@ -182,23 +265,37 @@ def pMGW2_coup(
     return_both=False,
     verbose=False,
     random_state=DEFAULT_SEED,
+    mu=None,
+    nu=None,
+    C1=None,
+    C2=None,
+    coupling=None,
+    log=False,
 ):
     """Compute a partial-MGW coupling and barycentric map.
 
     ``Lambda`` is interpreted on the normalized cost scale when
     ``normalize_costs`` is true. The solver coupling is used unchanged for
     matched centering, alignment, and the barycentric map.
-    """
-    mu = _fit_gmm(X, n_components_X, random_state)
-    nu = _fit_gmm(Y, n_components_Y, random_state)
 
-    C1 = gaussian_cost_matrix(mu)
-    C2 = gaussian_cost_matrix(nu)
+    Pass ``mu``/``nu`` to reuse mixtures fitted elsewhere, and ``C1``/``C2``
+    to reuse their pairwise Gaussian W2 matrices, so that a balanced and a
+    partial run can be compared on exactly the same fit and cost.
+    """
+    if mu is None:
+        mu = _fit_gmm(X, n_components_X, random_state)
+    if nu is None:
+        nu = _fit_gmm(Y, n_components_Y, random_state)
+
+    if C1 is None:
+        C1 = gaussian_cost_matrix(mu)
+    if C2 is None:
+        C2 = gaussian_cost_matrix(nu)
     maximum_cost = max(float(C1.max()), float(C2.max()))
     if normalize_costs and maximum_cost > 0.0:
         C1_solver, C2_solver = C1 / maximum_cost, C2 / maximum_cost
     else:
-        C1_solver, C2_solver = C1.copy(), C2.copy()
+        C1_solver, C2_solver = np.asarray(C1, float), np.asarray(C2, float)
 
     a = mu.weights
     b = nu.weights
@@ -206,22 +303,27 @@ def pMGW2_coup(
         print(f"Deriving partial MGW coupling with Lambda={Lambda}")
 
     start_time = time.time()
-    gamma = gromov.partial_gromov_ver1(
-        C1_solver,
-        C2_solver,
-        a,
-        b,
-        Lambda=Lambda,
-        nb_dummies=1,
-        G0=None,
-        thres=1,
-        numItermax=None,
-        numItermax_gw=1000,
-        tol=solver_tol,
-        log=False,
-        verbose=verbose,
-        line_search=True,
-    )
+    if coupling is None:
+        gamma = gromov.partial_gromov_ver1(
+            C1_solver,
+            C2_solver,
+            a,
+            b,
+            Lambda=Lambda,
+            nb_dummies=1,
+            G0=None,
+            thres=1,
+            numItermax=None,
+            numItermax_gw=1000,
+            tol=solver_tol,
+            log=False,
+            verbose=verbose,
+            line_search=True,
+        )
+        solver = "PGW_Metric partial_gromov_ver1"
+    else:
+        gamma = np.asarray(coupling, dtype=float)
+        solver = "reused coupling"
     if np.isnan(gamma).any():
         raise FloatingPointError("Partial GW solver returned NaN entries in Gamma.")
 
@@ -239,7 +341,7 @@ def pMGW2_coup(
         for l in range(nu.K)
     )
     P0 = proj_stiefel(cross)
-    P, _ = partial_projected_gradient_descent(
+    P, losses = partial_projected_gradient_descent(
         P0,
         gamma,
         mu_c,
@@ -253,6 +355,22 @@ def pMGW2_coup(
         nbrs = NearestNeighbors(n_neighbors=1, algorithm="ball_tree").fit(Y)
         idx = nbrs.kneighbors(mapped, return_distance=False).ravel()
         if return_both:
-            return idx, mapped
-        return idx
-    return mapped
+            result = (idx, mapped)
+        else:
+            result = idx
+    else:
+        result = mapped
+    if log:
+        return result, {
+            "solver": solver,
+            "coupling": gamma,
+            "matched_mass": matched_mass,
+            "alignment": P,
+            "alignment_losses": losses,
+            "matched_source_mean": m0,
+            "matched_target_mean": m1,
+            "cost_normalization_scale": maximum_cost if normalize_costs else 1.0,
+            "solver_lambda": float(Lambda),
+            "runtime_seconds": time.time() - start_time,
+        }
+    return result

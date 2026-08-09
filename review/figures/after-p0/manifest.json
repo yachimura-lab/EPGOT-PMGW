@@ -1,0 +1,37 @@
+[
+  {
+    "file": "fig04_displacement_interpolation.png",
+    "notebook": "figure4.ipynb",
+    "cell": 4,
+    "bytes": 142646,
+    "sha256_12": "87fe4d12e37c"
+  },
+  {
+    "file": "fig05a_lambda0.25.png",
+    "notebook": "figure5.ipynb",
+    "cell": 4,
+    "bytes": 75993,
+    "sha256_12": "5cc225be723c"
+  },
+  {
+    "file": "fig05b_lambda0.5.png",
+    "notebook": "figure5.ipynb",
+    "cell": 6,
+    "bytes": 75731,
+    "sha256_12": "509da934230b"
+  },
+  {
+    "file": "fig06_nearest_point.png",
+    "notebook": "PMGW_corrected.ipynb",
+    "cell": 6,
+    "bytes": 832895,
+    "sha256_12": "5599d79e88fc"
+  },
+  {
+    "file": "fig07_barycentric.png",
+    "notebook": "PMGW_corrected.ipynb",
+    "cell": 7,
+    "bytes": 427561,
+    "sha256_12": "d732770e5e41"
+  }
+]

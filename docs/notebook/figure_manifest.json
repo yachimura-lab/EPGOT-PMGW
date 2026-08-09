@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "source_of_truth": "paper equations and Section 7 experiment conditions",
+  "figures": {
+    "1": {
+      "notebook": "figure1_2_3.ipynb",
+      "canonical_output": "outputs/figure1.pdf",
+      "sidecar": "metadata/figure1.json",
+      "lambda": 0.3,
+      "epsilon": 0.01,
+      "solver": "pgot.entropic_partial_ot"
+    },
+    "2": {
+      "notebook": "figure1_2_3.ipynb",
+      "canonical_output": "outputs/figure2.pdf",
+      "sidecar": "metadata/figure2.json",
+      "lambda": [0.0, 0.125, 0.25, 0.375, 0.5],
+      "epsilon": 0.01,
+      "solver": "pgot.entropic_partial_ot"
+    },
+    "3": {
+      "notebook": "figure1_2_3.ipynb",
+      "canonical_output": "outputs/figure3.pdf",
+      "sidecar": "metadata/figure3.json",
+      "lambda": [0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5],
+      "epsilon": [0.01, 0.11, 0.21],
+      "solver": "pgot.entropic_partial_ot"
+    },
+    "4": {
+      "notebook": "figure4.ipynb",
+      "canonical_output": "outputs/figure4.pdf",
+      "sidecar": "metadata/figure4.json",
+      "lambda_epsilon": [[0.25, 0.03], [0.25, 0.1], [0.5, 0.03]],
+      "t": [0.0, 0.25, 0.5, 0.75, 1.0],
+      "solver": "pgot.entropic_partial_coupling"
+    },
+    "5": {
+      "notebook": "figure5.ipynb",
+      "canonical_output": "outputs/figure5.pdf",
+      "sidecar": "metadata/figure5.json",
+      "lambda": [0.25, 0.5],
+      "epsilon": 0.03,
+      "t": [0.2, 0.4, 0.6, 0.8, 1.0],
+      "solver": "pgot.entropic_partial_coupling"
+    },
+    "6": {
+      "notebook": "PMGW_corrected.ipynb",
+      "canonical_output": "outputs/figure6.pdf",
+      "sidecar": "metadata/figure6.json",
+      "paper_lambda": 0.01,
+      "point_solver_lambda": 0.01,
+      "component_solver_lambda": "derived from lambda_tilde and D_match",
+      "solver": "POT GW and PGW_Metric partial_gromov_ver1"
+    },
+    "7": {
+      "notebook": "PMGW_corrected.ipynb",
+      "canonical_output": "outputs/figure7.pdf",
+      "sidecar": "metadata/figure7.json",
+      "shared_solves": ["MGW2", "pMGW2"],
+      "solver": "same solve IDs as Figure 6"
+    }
+  }
+}

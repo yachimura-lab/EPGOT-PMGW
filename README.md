@@ -1,137 +1,111 @@
 # EPGOT-pMGW — Entropic Partial Gromov Optimal Transport
 
-This repository publishes research code and notebooks on entropic partial Gromov optimal transport (EPGOT) between Gaussian mixture models (GMMs). The main logic lives in `src/`, together with Jupyter notebooks that reproduce the figures in the paper.
+This repository publishes research code and canonical notebooks for Figures
+1–7 of the EPGOT/pMGW paper. Numerical pipelines live in `src/pgot/`; executed
+notebooks and figure provenance live under `docs/notebook/`.
 
-📖 **Rendered notebooks (with outputs)**: https://epgot-pmgw.netlify.app/
+Rendered notebooks: https://epgot-pmgw.netlify.app/
 
-## Notebooks
+## Paper figures
 
-Each notebook corresponds to figures in the paper. You can browse them directly on GitHub, or view the fully rendered versions on the documentation site.
+| Paper figure | Notebook | Canonical content |
+|---|---|---|
+| 1 | [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | EPOT at λ=0.3, ε=0.01; continuous weight colorbar |
+| 2 | [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | Exact 1×5 λ sweep at ε=0.01 |
+| 3 | [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | 3×7 ε/λ sweep with stopping residuals |
+| 4 | [figure4.ipynb](docs/notebook/figure4.ipynb) | Sub-probability interpolation (4.18), closed form (4.17) |
+| 5 | [figure5.ipynb](docs/notebook/figure5.ipynb) | Matched-density map (6.2), two-row paper layout |
+| 6 | [PMGW_corrected.ipynb](docs/notebook/PMGW_corrected.ipynb) | Four barycentric-projection-based nearest assignments |
+| 7 | [PMGW_corrected.ipynb](docs/notebook/PMGW_corrected.ipynb) | Raw MGW/pMGW maps from the same solves as Figure 6 |
 
-| Notebook | Rendered page | Description |
-| --- | --- | --- |
-| [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure1_2_3) | Visualization of transport plans from entropic partial OT between GMMs (Figures 1–3) |
-| [figure4.ipynb](docs/notebook/figure4.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure4) | Barycentric interpolation of GMMs based on partial OT (Figure 4, uses `cpp_engine`) |
-| [figure5.ipynb](docs/notebook/figure5.ipynb) | [View online](https://epgot-pmgw.netlify.app/notebook/figure5) | Transport maps between point clouds via barycentric projection (Figure 5) |
+The machine-readable mapping is
+[`figure_manifest.json`](docs/notebook/figure_manifest.json). Each figure has a
+unique PDF and JSON sidecar; the sidecar stores source and vendored-solver
+revisions, versions, seeds, fitted-input and coupling hashes, paper and solver
+parameters, matched mass, residuals, runtime, solve ID, and output SHA-256.
 
 ## Repository layout
 
-```
+```text
 .
-├── src/
-│   ├── pgot/               # Main logic (Python package)
-│   │   ├── __init__.py     #   GMM classes, Gaussian W2, MGW2 / MEW2,
-│   │   │                   #   entropic partial OT, barycentric projection maps
-│   │   └── reproducibility.py  # Seeds and figure timestamps (see below)
-│   ├── computation/        # C++ computation engine (Eigen + pybind11)
-│   │   ├── engine.cpp      #   Fast GaussianW2 / W2 barycenter implementations
-│   │   └── CMakeLists.txt  #   Builds the cpp_engine module into src/
-│   ├── figure1_2_3.ipynb   # Notebook reproducing Figures 1–3
-│   ├── figure4.ipynb       # Notebook reproducing Figure 4
-│   └── figure5.ipynb       # Notebook reproducing Figure 5
-├── docs/                   # Quarto documentation site (published on Netlify)
-│   └── notebook/           #   Notebooks published on the site
-├── pyproject.toml          # Python dependencies (managed with uv)
-└── netlify.toml            # Site build / deploy configuration
+├── src/pgot/                 # Algorithms and canonical figure pipelines
+├── src/computation/          # Legacy C++ engine (C++17, pybind11, Eigen)
+├── docs/notebook/            # Executed notebooks, manifest, sidecars
+├── tests/                    # Mathematical/reproducibility regressions
+├── tools/build_notebooks.py  # Rebuild concise notebook source cells
+├── tools/execute_notebooks.py# Execute all notebooks from clean kernels
+├── pyproject.toml            # Exact direct dependency versions
+└── uv.lock                   # Complete resolved environment
 ```
 
 ## Setup
 
-### Requirements
-
-- Python 3.13+
-- [uv](https://docs.astral.sh/uv/) (for dependency management)
-- CMake, a C++17 compiler, and Eigen3 (only to build the C++ engine for the legacy `src/algorithm/` scripts)
-
-If uv is not installed yet, you can install it with the bundled script:
-
-```bash
-./setup-uv.sh
-```
-
-### 1. Install Python dependencies
+Requirements are Python 3.13.15, `uv`, and the checked-out PGW_Metric
+submodule. The C++ engine is optional because canonical notebooks use the
+Python implementation.
 
 ```bash
 git submodule update --init --recursive
-uv sync
+uv sync --frozen
 ```
 
-### 2. Build the C++ computation engine (cpp_engine)
-
-This builds the fast computation module used by the legacy `src/algorithm/*.py` scripts. The notebooks under `docs/notebook/` no longer need it, so this step is optional. First install Eigen3 (example for Fedora / Amazon Linux):
-
-```bash
-sudo dnf install -y eigen3-devel
-```
-
-Then build with CMake. The resulting `cpp_engine` module is placed directly under `src/`, so the notebooks can import it as-is:
+To build the legacy C++ engine, install Eigen 3.3.9 and use the pinned
+pybind11 3.0.4 from the Python environment:
 
 ```bash
-rm -rf src/computation/build
-
-UV_PYTHON="$(uv run python -c 'import sys; print(sys.executable)')"
 PYBIND11_DIR="$(uv run python -m pybind11 --cmakedir)"
-cmake -S src/computation \
-      -B src/computation/build \
-      -Dpybind11_DIR="$PYBIND11_DIR" \
-      -DPython_EXECUTABLE="$UV_PYTHON"
-
+cmake -S src/computation -B src/computation/build \
+  -Dpybind11_DIR="$PYBIND11_DIR" \
+  -DPython_EXECUTABLE="$PWD/.venv/bin/python"
 cmake --build src/computation/build
 ```
 
-## Running the notebooks
+## Mathematical conventions
 
-Open the notebooks under `src/` with Jupyter:
+Figures 1–5 use `pgot.entropic_partial_ot`, the extended dummy-point problem
+(3.1). The real-real cost is `M - 2*Lambda`, the extended marginals are
+`(a, 1)` and `(b, 1)`, and entropy is applied to the full extended coupling.
+Therefore `Lambda` is exactly the paper's `lambda`, without rescaling.
 
-```bash
-uv run jupyter lab src/
+For Figures 6–7, point and component costs have different normalization
+scales. The notebook uses
+
+```text
+Lambda_solver = lambda_tilde * gw_mean_distortion(C1, C2, balanced_coupling)
 ```
+
+The paper's point-level `lambda=0.01` fixes `lambda_tilde`. The canonical
+inputs are `0.010000` at point level and `0.013249` at component level; PGW
+and pMGW both transport `300/310` mass. Reducing the coupling from `300×310`
+to `6×7` is a solver-dimensionality result, not an end-to-end speed claim at
+`N=300`, because GMM fitting also takes time.
 
 ## Reproducibility
 
-The figures are produced by pipelines that sample point clouds and fit
-Gaussian mixtures. Both steps are stochastic, so without a fixed seed every
-run draws different data and `sklearn`'s `GaussianMixture` converges to a
-different local optimum — the figures then change from one run to the next.
+`.python-version`, exact direct requirements in `pyproject.toml`, and
+`uv.lock` fix the environment. Notebook sampling uses explicit local NumPy
+generators; Figures 6–7 use separate generators for source, target, and noise.
+New stochastic APIs should accept `rng=`, and new GMM fits should accept
+`random_state=`.
 
-Two things are pinned so that re-running a notebook reproduces its figures
-exactly:
-
-- **Random draws.** Every stochastic step in `pgot` takes its numbers from a
-  package-level generator seeded with `pgot.DEFAULT_SEED` (42), and each
-  `GaussianMixture` fit is given that seed as its `random_state`. Calls stay
-  statistically independent within a session while the session as a whole
-  replays identically.
-- **Figure metadata.** Matplotlib stamps the current time into EPS, PDF, and
-  SVG files, so saving the same figure twice yields different bytes. Setting
-  `SOURCE_DATE_EPOCH` replaces that stamp with a fixed date.
-
-Each notebook does both in its first cell:
-
-```python
-from pgot import set_reproducible
-
-set_reproducible()
-```
-
-Besides seeding `pgot` itself, `set_reproducible()` seeds the global
-`numpy.random`, `random`, and PyTorch generators, so the `np.random.*` calls
-made directly in the notebooks are covered too. Run it before any sampling.
-
-To vary the experiment deliberately, pass a different seed —
-`set_reproducible(seed=7)` — or override it per call: the entry points
-(`pMGW2_coup`, `MGW2_coup`, `MEW2_coup`, `compute_T_X_to_Z`,
-`compute_T_X_to_Z_C`, …) accept `random_state` for the mixture fits, and the
-sampling helpers (`sample_from_gmm`, `GaussianMixture.sample`, `T_rand`, …)
-accept `rng`.
-
-## Building the documentation site (for developers)
-
-The site is built with [Quarto](https://quarto.org/) and deployed on Netlify (see `netlify.toml`). To preview locally:
+Rebuild and execute all notebooks:
 
 ```bash
-export QUARTO_PYTHON=$(pwd)/.venv/bin/python
-quarto preview docs
+MPLCONFIGDIR=/tmp/matplotlib uv run python tools/build_notebooks.py
+MPLCONFIGDIR=/tmp/matplotlib NUMBA_CACHE_DIR=/tmp/numba \
+  uv run python tools/execute_notebooks.py
 ```
 
-Notebooks to be published on the site go under `docs/notebook/`.
+Run regressions:
+
+```bash
+MPLCONFIGDIR=/tmp/matplotlib NUMBA_CACHE_DIR=/tmp/numba \
+  uv run python -m unittest discover -s tests -v
+```
+
+Build the Quarto site:
+
+```bash
+export QUARTO_PYTHON="$PWD/.venv/bin/python"
+quarto render docs
+```

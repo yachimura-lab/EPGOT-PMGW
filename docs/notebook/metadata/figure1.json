@@ -1,0 +1,116 @@
+{
+  "environment": {
+    "implementation": "CPython",
+    "packages": {
+      "POT": "0.9.7",
+      "matplotlib": "3.11.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0"
+    },
+    "platform": "Linux-6.18.39-79.141.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "python": "3.13.15"
+  },
+  "figure": 1,
+  "generated_at": "2000-01-01T00:00:00+00:00",
+  "inputs": {
+    "cost": "squared Gaussian W2 divided by its cross-matrix maximum",
+    "source": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "34a19f4889c3951312e49fe236dcab87934d7bd6ad5cfeb27320ff57beb94508",
+        "shape": [
+          2,
+          2,
+          2
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "cf26ce7fcdf6e810a97a1a8fa55937428497a32018c73d317dbf4dcd03061c99",
+        "shape": [
+          2,
+          2
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "d5626176b54c5c2def7687f6801dfb62b197fb6f322cd6ea213b00586506c515",
+        "shape": [
+          2
+        ]
+      }
+    },
+    "target": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "9c6ba4da6b530b6e4fa1e07789a9e685f042cae6d1799ea20d199a3861e744d3",
+        "shape": [
+          3,
+          2,
+          2
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "c5bd0474205f3948347250da2b6d80ad8a41b91676ba0533e965eecc0a5f61ab",
+        "shape": [
+          3,
+          2
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "91ce3f57bc874baf065bdebfd406bbabdcb39718dbb76104ac527b6a22c1d4c7",
+        "shape": [
+          3
+        ]
+      }
+    }
+  },
+  "notes": "Known GMMs; no sampling or fitting.",
+  "outputs": [
+    {
+      "bytes": 41006,
+      "path": "outputs/figure1.pdf",
+      "sha256": "a60d4238e056ccdc56df5fe61199686c0e21d18b4bfc111a7ba74197e9eb4bcf"
+    }
+  ],
+  "panels": [
+    {
+      "column_residual": 2.3738788712535097e-11,
+      "converged": true,
+      "cost_normalization_scale": 445.2540510775958,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "b4d60f68cfc725164b6da6d0e01b326c5617afaa6dd2d2af29625cf09a21283b",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.01,
+      "fallback_iterations": 0,
+      "fallback_used": false,
+      "iterations": 110,
+      "matched_mass": 0.9000013370690297,
+      "paper_lambda": 0.3,
+      "residual_tolerance": 1e-09,
+      "row_residual": 1.1102230246251565e-16,
+      "runtime_seconds": 0.0018465809989720583,
+      "solve_id": "a82e4c1de2d943497888c787f014ab0ba118a3671b0a7d75ca976fe7f20e7a17",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.3
+    }
+  ],
+  "schema_version": 1,
+  "seeds": {
+    "fit": null,
+    "sampling": null
+  },
+  "source": {
+    "commit": "f22a88de38369bd90e3cb05474c67cba2928463a",
+    "dirty": false,
+    "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
+  }
+}

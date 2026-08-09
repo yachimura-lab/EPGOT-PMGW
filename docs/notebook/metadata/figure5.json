@@ -1,0 +1,196 @@
+{
+  "environment": {
+    "implementation": "CPython",
+    "packages": {
+      "POT": "0.9.7",
+      "matplotlib": "3.11.0",
+      "numpy": "2.4.6",
+      "scikit-learn": "1.9.0",
+      "scipy": "1.18.0"
+    },
+    "platform": "Linux-6.18.39-79.141.amzn2023.x86_64-x86_64-with-glibc2.34",
+    "python": "3.13.15"
+  },
+  "figure": 5,
+  "generated_at": "2000-01-01T00:00:00+00:00",
+  "inputs": {
+    "source_evaluation_points": {
+      "dtype": "float64",
+      "sha256": "b4148bfcbb2f389f90a17ac53ac99eb73842a368d066c344ab8aef9863927167",
+      "shape": [
+        2000,
+        2
+      ]
+    },
+    "source_gmm": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "34a19f4889c3951312e49fe236dcab87934d7bd6ad5cfeb27320ff57beb94508",
+        "shape": [
+          2,
+          2,
+          2
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "cf26ce7fcdf6e810a97a1a8fa55937428497a32018c73d317dbf4dcd03061c99",
+        "shape": [
+          2,
+          2
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "d5626176b54c5c2def7687f6801dfb62b197fb6f322cd6ea213b00586506c515",
+        "shape": [
+          2
+        ]
+      }
+    },
+    "target_gmm": {
+      "covariances": {
+        "dtype": "float64",
+        "sha256": "9c6ba4da6b530b6e4fa1e07789a9e685f042cae6d1799ea20d199a3861e744d3",
+        "shape": [
+          3,
+          2,
+          2
+        ]
+      },
+      "means": {
+        "dtype": "float64",
+        "sha256": "c5bd0474205f3948347250da2b6d80ad8a41b91676ba0533e965eecc0a5f61ab",
+        "shape": [
+          3,
+          2
+        ]
+      },
+      "weights": {
+        "dtype": "float64",
+        "sha256": "91ce3f57bc874baf065bdebfd406bbabdcb39718dbb76104ac527b6a22c1d4c7",
+        "shape": [
+          3
+        ]
+      }
+    },
+    "target_plot_points": {
+      "dtype": "float64",
+      "sha256": "c670d58318a52c073bc9160f786a30f8906b40c034401198788d8d8776d1e3de",
+      "shape": [
+        2000,
+        2
+      ]
+    },
+    "times": [
+      0.2,
+      0.4,
+      0.6,
+      0.8,
+      1.0
+    ]
+  },
+  "notes": "Known GMM parameters; canonical dummy-point EPOT and matched-density map (6.2).",
+  "outputs": [
+    {
+      "bytes": 926960,
+      "path": "outputs/figure5.pdf",
+      "sha256": "31ffa223badcdb221b349bf1e27e87c5df1187ef2371e84c7047f9a73931336b"
+    }
+  ],
+  "panels": [
+    {
+      "column_residual": 3.1899866081985806e-10,
+      "converged": true,
+      "cost_matrix": {
+        "dtype": "float64",
+        "sha256": "9d4d86e88cf3a8d59a663f2a8cb219569cbc2a67c919d1b7eb74070078934d2d",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "cost_normalization_scale": 445.2540510775959,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "da67381e0e48dfc9f6152966d9541ae61730db150876476c0dd70d560f13d846",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "fallback_iterations": 0,
+      "fallback_used": false,
+      "iterations": 110,
+      "mapped": {
+        "dtype": "float64",
+        "sha256": "a7b510fdd1eae0b0c7b5998adbb52d93d1ecef68bac7ed94bd5e843df3902764",
+        "shape": [
+          2000,
+          2
+        ]
+      },
+      "matched_mass": 0.8875741736863674,
+      "paper_lambda": 0.25,
+      "residual_tolerance": 1e-08,
+      "row_residual": 2.220446049250313e-16,
+      "runtime_seconds": 0.0019169739971403033,
+      "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.25
+    },
+    {
+      "column_residual": 8.089877656658473e-10,
+      "converged": true,
+      "cost_matrix": {
+        "dtype": "float64",
+        "sha256": "9d4d86e88cf3a8d59a663f2a8cb219569cbc2a67c919d1b7eb74070078934d2d",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "cost_normalization_scale": 445.2540510775959,
+      "coupling": {
+        "dtype": "float64",
+        "sha256": "3eb3a767ea589e6c89215b78734e99094ddcabcee01b2dabd304823ee6410654",
+        "shape": [
+          2,
+          3
+        ]
+      },
+      "epsilon": 0.03,
+      "fallback_iterations": 0,
+      "fallback_used": false,
+      "iterations": 710,
+      "mapped": {
+        "dtype": "float64",
+        "sha256": "f92b364a77cecf000499437bd98bbc6c9361ca4303272d9eecc444a377bf5f02",
+        "shape": [
+          2000,
+          2
+        ]
+      },
+      "matched_mass": 0.9937141257319839,
+      "paper_lambda": 0.5,
+      "residual_tolerance": 1e-08,
+      "row_residual": 5.551115123125783e-17,
+      "runtime_seconds": 0.00777896901126951,
+      "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
+      "solver": "POT sinkhorn",
+      "solver_lambda": 0.5
+    }
+  ],
+  "schema_version": 1,
+  "seeds": {
+    "fit": null,
+    "source_sampling": 52,
+    "target_sampling": 53
+  },
+  "source": {
+    "commit": "f22a88de38369bd90e3cb05474c67cba2928463a",
+    "dirty": false,
+    "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
+  }
+}

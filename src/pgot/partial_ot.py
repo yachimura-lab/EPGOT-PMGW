@@ -1,6 +1,7 @@
 """Partial optimal transport helpers used by the notebook experiments."""
 
 import warnings
+from time import perf_counter
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,6 +9,7 @@ import ot
 import scipy.stats as sps
 from matplotlib.colors import LogNorm
 from scipy.linalg import det, inv, sqrtm
+from scipy.optimize import minimize
 from sklearn.mixture import GaussianMixture as skGaussianMixture
 
 from .gaussian import GaussianMixture
@@ -31,6 +33,8 @@ def entropic_partial_ot(
     numItermax=1000,
     stopThr=1e-9,
     remove_dummy=True,
+    method="sinkhorn",
+    log=False,
 ):
     """Solve the entropic partial OT problem (3.1) of the paper.
 
@@ -56,21 +60,122 @@ def entropic_partial_ot(
     M_ext = np.zeros((n + 1, m + 1))
     M_ext[:n, :m] = M
 
-    gamma_ext = ot.sinkhorn(
+    started = perf_counter()
+    gamma_ext, sinkhorn_log = ot.sinkhorn(
         a_ext,
         b_ext,
         M_ext,
         reg=reg,
-        method="sinkhorn",
+        method=method,
         numItermax=numItermax,
         stopThr=stopThr,
         verbose=False,
-        log=False,
-        warn=True,
+        log=True,
+        # POT's warning does not expose the residual or let callers recover.
+        # We inspect the marginals below and refine the same convex problem
+        # when Sinkhorn stalls, so emitting the generic warning here would be
+        # both noisy and less informative than the returned diagnostics.
+        warn=False,
     )
-    if remove_dummy:
-        return gamma_ext[:-1, :-1]
-    return gamma_ext
+
+    row_residual = float(np.max(np.abs(gamma_ext.sum(axis=1) - a_ext)))
+    col_residual = float(np.max(np.abs(gamma_ext.sum(axis=0) - b_ext)))
+    residual_tolerance = max(10.0 * stopThr, 1e-9)
+    fallback_used = max(row_residual, col_residual) > residual_tolerance
+    fallback_iterations = 0
+
+    if fallback_used:
+        gamma_ext, fallback_iterations = _refine_entropic_transport(
+            a_ext,
+            b_ext,
+            M_ext,
+            reg,
+            gamma_ext,
+            tol=stopThr,
+        )
+        row_residual = float(np.max(np.abs(gamma_ext.sum(axis=1) - a_ext)))
+        col_residual = float(np.max(np.abs(gamma_ext.sum(axis=0) - b_ext)))
+
+    result = gamma_ext[:-1, :-1] if remove_dummy else gamma_ext
+    if not log:
+        return result
+
+    iterations = sinkhorn_log.get("niter", sinkhorn_log.get("n_iter"))
+    return result, {
+        "solver": (
+            f"POT {method} + SciPy SLSQP refinement"
+            if fallback_used
+            else f"POT {method}"
+        ),
+        "iterations": None if iterations is None else int(iterations),
+        "fallback_used": fallback_used,
+        "fallback_iterations": int(fallback_iterations),
+        "row_residual": row_residual,
+        "column_residual": col_residual,
+        "residual_tolerance": residual_tolerance,
+        "converged": max(row_residual, col_residual) <= residual_tolerance,
+        "runtime_seconds": perf_counter() - started,
+        "matched_mass": float(gamma_ext[:-1, :-1].sum()),
+    }
+
+
+def _refine_entropic_transport(a, b, cost, reg, initial, tol):
+    """Refine a small balanced entropic OT plan in the primal.
+
+    The dummy-point formulation can become nearly degenerate when a real
+    cost is close to ``2 * lambda``. Matrix scaling then converges extremely
+    slowly even for a 3-by-4 problem. SLSQP solves the *same* strictly convex
+    entropic objective under exact marginal constraints and is used only
+    after the Sinkhorn residual fails the declared tolerance.
+    """
+    n, m = cost.shape
+    if n * m > 10_000:
+        raise RuntimeError(
+            "Sinkhorn did not reach the marginal tolerance and the exact "
+            "refinement is intentionally limited to 10,000 variables."
+        )
+
+    constraints = []
+    for i in range(n):
+        row = np.zeros((n, m))
+        row[i, :] = 1.0
+        constraints.append(row.ravel())
+    # The last column equality is implied by all row equalities and the
+    # preceding columns. Dropping it keeps the constraint matrix full rank.
+    for j in range(m - 1):
+        column = np.zeros((n, m))
+        column[:, j] = 1.0
+        constraints.append(column.ravel())
+    A_eq = np.asarray(constraints)
+    b_eq = np.concatenate([a, b[:-1]])
+    lower = 1e-15
+
+    def objective(x):
+        return float(x @ cost.ravel() + reg * np.sum(x * np.log(x) - x))
+
+    def gradient(x):
+        return cost.ravel() + reg * np.log(x)
+
+    equality = {
+        "type": "eq",
+        "fun": lambda x: A_eq @ x - b_eq,
+        "jac": lambda x: A_eq,
+    }
+    optimized = minimize(
+        objective,
+        np.maximum(np.asarray(initial, dtype=float).ravel(), lower),
+        jac=gradient,
+        method="SLSQP",
+        bounds=[(lower, None)] * (n * m),
+        constraints=equality,
+        options={"ftol": min(max(tol * 0.1, 1e-14), 1e-12), "maxiter": 10_000},
+    )
+    if not optimized.success:
+        raise RuntimeError(
+            "Entropic OT refinement failed after Sinkhorn stalled: "
+            f"{optimized.message}"
+        )
+    return optimized.x.reshape(n, m), optimized.nit
 
 
 def densite_theorique2d(mu, Sigma, alpha, x):
@@ -98,6 +203,10 @@ def display_gmm(gmm, n=200, ax=0, bx=1, ay=0, by=1, cmap="gnuplot", axis=None):
     X, Y = np.meshgrid(x, y)
     points = np.column_stack([X.ravel(), Y.ravel()])
     Z = densite_theorique2d(mu, covariance, pi, points).reshape(X.shape)
+    # LogNorm masks exact underflow zeros and otherwise emits a warning.
+    # Clipping at the smallest positive float is visually identical because
+    # the contour levels start three decades below the density maximum.
+    Z = np.maximum(Z, np.finfo(float).tiny)
 
     Zmax = Z.max()
     levels = np.logspace(np.log10(Zmax * 1e-3), np.log10(Zmax), 8)
@@ -262,6 +371,7 @@ def entropic_partial_displacement_interpolation(
     t,
     epsilon=1e-2,
     Lambda=None,
+    coupling=None,
     log=False,
 ):
     """Return the entropic partial displacement interpolation (4.18).
@@ -274,9 +384,16 @@ def entropic_partial_displacement_interpolation(
 
     Returns ``(weights, means, covs)``, with ``weights.sum() == Z_lambda``.
     """
-    M = _cross_gaussian_cost_gmm(mu, nu)
-    M = M / np.max(M)
-    gamma = _epot_component_coupling(mu.weights, nu.weights, M, Lambda, epsilon)
+    if coupling is None:
+        gamma, solve_info = entropic_partial_coupling(
+            mu, nu, epsilon=epsilon, Lambda=Lambda, log=True
+        )
+    else:
+        gamma = np.asarray(coupling, dtype=float)
+        solve_info = {
+            "solver": "reused coupling",
+            "matched_mass": float(gamma.sum()),
+        }
 
     weights, means, covs = [], [], []
     for k in range(mu.K):
@@ -291,8 +408,43 @@ def entropic_partial_displacement_interpolation(
     weights = np.asarray(weights, dtype=float)
     result = (weights, np.asarray(means), np.asarray(covs))
     if log:
-        return result, {"matched_mass": float(gamma.sum()), "coupling": gamma}
+        return result, {**solve_info, "coupling": gamma}
     return result
+
+
+def entropic_partial_coupling(mu, nu, epsilon=1e-2, Lambda=None, log=False):
+    """Solve the paper's component-level EPOT problem once.
+
+    This separates cost construction and the solve from interpolation or
+    barycentric plotting. Callers that render several values of ``t`` can
+    pass the returned coupling to
+    :func:`entropic_partial_displacement_interpolation` instead of silently
+    solving the identical problem once per panel.
+    """
+    raw_cost = _cross_gaussian_cost_gmm(mu, nu)
+    cost_scale = float(np.max(raw_cost))
+    if cost_scale <= 0.0:
+        raise ValueError("The cross-mixture Gaussian cost has zero scale.")
+    normalized_cost = raw_cost / cost_scale
+    gamma, info = _epot_component_coupling(
+        mu.weights,
+        nu.weights,
+        normalized_cost,
+        Lambda,
+        epsilon,
+        log=True,
+    )
+    if not log:
+        return gamma
+    return gamma, {
+        **info,
+        "coupling": gamma,
+        "cost_matrix": normalized_cost,
+        "cost_normalization_scale": cost_scale,
+        "paper_lambda": float(np.max(normalized_cost) if Lambda is None else Lambda),
+        "solver_lambda": float(np.max(normalized_cost) if Lambda is None else Lambda),
+        "epsilon": float(epsilon),
+    }
 
 
 def submixture_pdf(X, weights, means, covs):
@@ -317,6 +469,7 @@ def entropic_partial_barycentric_map(
     nu,
     epsilon=1e-2,
     Lambda=None,
+    coupling=None,
     log=False,
 ):
     """Evaluate the entropic partial barycentric projection map (6.2).
@@ -332,11 +485,16 @@ def entropic_partial_barycentric_map(
     X = np.asarray(X, dtype=float)
     d = X.shape[1]
 
-    M = _cross_gaussian_cost_gmm(mu, nu)
-    M = M / np.max(M)
-    gamma = _epot_component_coupling(
-        mu.weights, nu.weights, M, Lambda, epsilon, nb_dummies=1
-    )
+    if coupling is None:
+        gamma, solve_info = entropic_partial_coupling(
+            mu, nu, epsilon=epsilon, Lambda=Lambda, log=True
+        )
+    else:
+        gamma = np.asarray(coupling, dtype=float)
+        solve_info = {
+            "solver": "reused coupling",
+            "matched_mass": float(gamma.sum()),
+        }
 
     A = {
         (k, l): compute_monge_map_matrix(mu.comp_cov[k], nu.comp_cov[l])
@@ -357,11 +515,19 @@ def entropic_partial_barycentric_map(
 
     Z = numerator / (denominator[:, None] + 1e-300)
     if log:
-        return Z, {"matched_mass": float(gamma.sum()), "coupling": gamma}
+        return Z, {**solve_info, "coupling": gamma}
     return Z
 
 
-def _epot_component_coupling(a, b, M, Lambda, epsilon, nb_dummies=1):
+def _epot_component_coupling(
+    a,
+    b,
+    M,
+    Lambda,
+    epsilon,
+    nb_dummies=1,
+    log=False,
+):
     """Solve (3.1) between mixture components on a normalized cost matrix.
 
     ``Lambda`` is the paper's ``lambda``. ``None`` selects the balanced
@@ -376,7 +542,14 @@ def _epot_component_coupling(a, b, M, Lambda, epsilon, nb_dummies=1):
         )
     if Lambda is None:
         Lambda = float(np.max(M))
-    return entropic_partial_ot(a, b, M, Lambda=Lambda, reg=epsilon)
+    return entropic_partial_ot(
+        a,
+        b,
+        M,
+        Lambda=Lambda,
+        reg=epsilon,
+        log=log,
+    )
 
 
 def compute_monge_map_matrix(CovK, CovL):
@@ -398,15 +571,20 @@ def compute_T_X_to_Z(
     random_state=DEFAULT_SEED,
     log=False,
 ):
-    """Compute a partial-OT barycentric projection with the full-mixture denominator.
+    """Compute the partial-OT barycentric projection map (6.2).
 
     ``Lambda`` is the paper's ``lambda`` in (3.1)/(4.4), on the scale of the
     normalized cost matrix (7.1).
 
-    Note that the denominator here is the *full* mixture density
-    ``sum_k a_k p_k(x)``, which is the balanced form (6.1) rather than the
-    partial form (6.2). Prefer :func:`compute_T_X_to_Z_C` for Figure 5.
+    This compatibility entry point now uses the matched density
+    ``sum_kl omega_kl p_k(x)`` in the denominator, exactly as (6.2)
+    requires. It is equivalent to :func:`compute_T_X_to_Z_C`.
     """
+    if nb_dummies != 1:
+        raise ValueError(
+            "The paper's (3.1) uses exactly one dummy point; "
+            f"nb_dummies={nb_dummies} is not supported."
+        )
     mixX, mixY = _fit_figure5_mixtures(
         X,
         Y,
@@ -414,49 +592,16 @@ def compute_T_X_to_Z(
         n_components_Y,
         random_state=random_state,
     )
-    a = mixX.weights_
-    b = mixY.weights_
-    Kx = len(a)
-    Ky = len(b)
-
-    M = _cross_gaussian_cost(mixX, mixY)
-    M = M / np.max(M)
-    gamma = _epot_component_coupling(a, b, M, Lambda, epsilon, nb_dummies)
-
-    Z = np.zeros_like(X)
-    d = X.shape[1]
-    for i, x in enumerate(X):
-        p = np.array(
-            [
-                np.exp(
-                    -0.5
-                    * (
-                        (x - mixX.means_[k])
-                        @ np.linalg.inv(mixX.covariances_[k])
-                        @ (x - mixX.means_[k])
-                    )
-                )
-                / np.sqrt((2 * np.pi) ** d * np.linalg.det(mixX.covariances_[k]))
-                for k in range(Kx)
-            ]
-        )
-        denom = np.sum(a * p) + 1e-300
-        pi_x = (a * p) / denom
-        Tb = np.zeros_like(x)
-        for k in range(Kx):
-            if a[k] < 1e-15:
-                continue
-            for l in range(Ky):
-                map_matrix = compute_monge_map_matrix(
-                    mixX.covariances_[k],
-                    mixY.covariances_[l],
-                )
-                Tkl = mixY.means_[l] + map_matrix @ (x - mixX.means_[k])
-                Tb += (gamma[k, l] / a[k]) * pi_x[k] * Tkl
-        Z[i] = Tb
-    if log:
-        return Z, {"matched_mass": float(gamma.sum()), "coupling": gamma}
-    return Z
+    mu = GaussianMixture(mixX.weights_, mixX.means_, mixX.covariances_)
+    nu = GaussianMixture(mixY.weights_, mixY.means_, mixY.covariances_)
+    return entropic_partial_barycentric_map(
+        X,
+        mu,
+        nu,
+        epsilon=epsilon,
+        Lambda=Lambda,
+        log=log,
+    )
 
 
 def compute_T_X_to_Z_C(

@@ -196,26 +196,61 @@ def grad(P, weights, mu, nu):
     )
 
 
-def proj_gradient_descent(P, weights, mu, nu, alpha, n_iter=150):
-    """Run projected gradient descent on the Stiefel manifold."""
-    loss = [
+def alignment_objective(P, weights, mu, nu):
+    """Weighted Gaussian alignment objective of (6.7).
+
+    ``sum_kl w_kl W2^2(mu_k, P # nu_l)``, including the mean term. This is
+    the quantity :func:`grad` differentiates, so it is what a descent step
+    must decrease.
+    """
+    return float(
         sum(
             weights[k, l]
-            * GaussianW2(0, 0, mu.comp_cov[k], P @ nu.comp_cov[l] @ P.T)
+            * GaussianW2(
+                mu.comp_mean[k],
+                P @ nu.comp_mean[l],
+                mu.comp_cov[k],
+                P @ nu.comp_cov[l] @ P.T,
+            )
             for k in range(mu.K)
             for l in range(nu.K)
         )
-    ]
+    )
+
+
+def proj_gradient_descent(
+    P,
+    weights,
+    mu,
+    nu,
+    alpha,
+    n_iter=150,
+    max_backtrack=20,
+):
+    """Run projected gradient descent on the Stiefel manifold.
+
+    Each step is backtracked until it decreases :func:`alignment_objective`,
+    so the returned matrix is never worse than the initialization. A fixed
+    step is not safe here: with ``alpha=1`` the iteration can leave the
+    objective an order of magnitude above where it started.
+    """
+    current = alignment_objective(P, weights, mu, nu)
+    loss = [current]
     for _ in range(n_iter):
-        P = proj_stiefel(P - alpha * grad(P, weights, mu, nu))
-        loss.append(
-            sum(
-                weights[k, l]
-                * GaussianW2(0, 0, mu.comp_cov[k], P @ nu.comp_cov[l] @ P.T)
-                for k in range(mu.K)
-                for l in range(nu.K)
-            )
-        )
+        gradient = grad(P, weights, mu, nu)
+        step = alpha
+        candidate = None
+        for _ in range(max_backtrack):
+            trial = proj_stiefel(P - step * gradient)
+            value = alignment_objective(trial, weights, mu, nu)
+            if value <= current:
+                candidate = (trial, value)
+                break
+            step *= 0.5
+        if candidate is None:
+            break
+        P, current = candidate
+        loss.append(current)
     return P, loss
 
 
