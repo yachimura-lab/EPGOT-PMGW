@@ -625,8 +625,9 @@ def compute_T_X_to_Z_C(
     Y,
     n_components_X,
     n_components_Y,
+    *,
+    Lambda,
     epsilon=1e-2,
-    Lambda=1e-1,
     nb_dummies=1,
     random_state=DEFAULT_SEED,
     log=False,
@@ -638,8 +639,10 @@ def compute_T_X_to_Z_C(
     is normalized by the *matched* density ``sum_kl omega_kl p_k(x)``, as
     (6.2) prescribes, not by the full mixture density.
 
-    ``Lambda`` is the paper's ``lambda``, on the scale of the normalized
-    cost matrix (7.1); it is passed to the solver unchanged.
+    ``Lambda`` is keyword-only and required, as in :func:`compute_T_X_to_Z`,
+    which this function is equivalent to; it is the paper's ``lambda`` on the
+    scale of the normalized cost matrix (7.1), and is passed to the solver
+    unchanged.
 
     This fits a mixture to each point cloud. Section 7.1.5 of the paper
     instead evaluates (6.2) for the *known* mixtures GA and GB, which is

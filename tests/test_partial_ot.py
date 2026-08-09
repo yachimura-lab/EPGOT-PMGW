@@ -109,6 +109,22 @@ class PartialOTRegressionTests(unittest.TestCase):
                 self.source, self.target, epsilon=0.03, Lambda=None
             )
 
+    def test_both_figure5_entry_points_demand_the_penalty(self):
+        # compute_T_X_to_Z and compute_T_X_to_Z_C are documented as
+        # equivalent, so a default penalty on one and not the other would let
+        # the same call give two different couplings.
+        points = sample_from_gmm(
+            self.source.weights,
+            self.source.comp_mean,
+            self.source.comp_cov,
+            40,
+            rng=np.random.default_rng(0),
+        )
+        for entry_point in (compute_T_X_to_Z, compute_T_X_to_Z_C):
+            with self.subTest(entry_point=entry_point.__name__):
+                with self.assertRaises(TypeError):
+                    entry_point(points, points, 2, 2, epsilon=0.03)
+
     def test_the_dummy_node_keeps_mass_at_the_penalty_that_was_the_default(self):
         # The removed default was Lambda = max(M) = 1 on the normalized cost.
         # It leaves matched mass short of one, which is what made calling it
