@@ -11,7 +11,7 @@
 
 ## 1. 結論サマリ
 
-保存済み出力は概ね掲載図に対応するが、**Figure 2 の生成セルが存在せず、Figure 6–7 は論文記述と数値的に不一致**である。Figure 4 と Figure 5 は issue #6 の P0 で論文の定義に揃えた。
+issue #6 の P0 により Figures 4–7 は論文の定義・実験条件に揃えた。残る主な差分は **Figure 2 の生成セルが存在しない**ことと、Figure 1・3 の体裁である。
 
 | Fig | 論文の設定 | 実装の状態 | 判定 |
 |---|---|---|---|
@@ -20,8 +20,8 @@
 | 3 | λ 7値 × ε∈{0.01,0.11,0.21} | cell 6 が一致。1 panel で Sinkhorn 非収束 | **B** |
 | 4 | (4.18) の劣確率測度 | 質量 `Z_λ` を保持し全 panel 共通 density level。(4.17) は閉形式 | **B** |
 | 5 | (a) λ=0.25 / (b) λ=0.5 | 既知 GMM + (3.1) の dummy-point EPOT。composite layout のみ未対応 | **B** |
-| 6 | 半径 4・z=0、λ=0.01、barycentric→nearest | データ・λ・成分数・点対応がすべて不一致 | **A** |
-| 7 | barycentric projection map | (a) の alignment が (6.7) と異なる | **A** |
+| 6 | 半径 4・z=0、λ=0.01、barycentric→nearest | geometry・λ 換算・6/7 共有 fit・barycentric 対応を統一。PGW/pMGW とも `300/310` | **B** |
+| 7 | barycentric projection map | (6.7) を中心化して解き、Figure 6 と同一 solve から生成 | **B** |
 
 A = 論文記述と数値的に不一致（要対応）、B = 数値は妥当で体裁・欠落の問題。
 
@@ -153,135 +153,69 @@ notebook は `log=True` で受け取った matched mass を出力するため、
 
 ### 3.6 Figures 6–7 — §7.2（point-cloud matching）
 
-#### (1) データ生成が論文記述と一致しない
+#### (1) geometry を論文どおりに再構成した
 
-論文: 「source P1 は半径 4 の円周上（z=0）に平均を置く 6 成分 GMM から 300 点。target P2 は対応する 6 成分 GMM を**別の高さ**に置いて 300 点、+ noise 10 点」。
-
-`PMGW_corrected.ipynb` cell 2–7 を再実行した実測値:
+`PMGW_corrected.ipynb` は半径 4 の ring から source/target を**独立に** 300 点ずつ、別分布（球内一様）の noise を 10 点生成する。実測:
 
 | 量 | 論文 | 実測 |
 |---|---|---|
-| source ring 半径 | 4 | **9.987** |
-| source z | 0 | 0（**分散が厳密に 0**） |
-| target ring 半径 | 4（別の高さ） | **7.990** |
-| target ring 高さ | — | **25.03** |
-| noise 中心 | — | **(20.11, −0.01, 24.95)** |
-| noise 半径 | — | **0.6**（設計値。実標本の中心からの最大距離は 0.53） |
+| source ring 半径 | 4 | 4.005（z = −0.010, sd 0.191） |
+| target ring 半径 | 4（別の高さ） | 4.007（z = 10.002） |
+| noise | 10 点 | 中心 (9.97, 0.03, 10.06)、半径 0.3 |
 
-原因は cell 7 の `P1 = 2.5*P1_3d` と `P23 = 2*np.vstack([P2, P3]) + (0,0,5)`。加えて:
+論文が明示していない **target ring の高さ `h = 10` と noise の分布**（中心 `(2.5·radius, 0, h)`、半径 0.3 の球内一様）は notebook 冒頭で定数として固定し、論文にも記載する必要がある。データ種別ごとに独立した `default_rng` を使う。
 
-- **target ring は独立標本ではない**。`P23[:300, :2] == 0.8 * P1[:, :2]` が **1.8e-15** の精度で成立する（同一標本 `P_1` の affine 変換）。
-- cell 3 が生成する 2D 標本 `P1_2d` は**捨てられており**、cell 4/7 では行数だけが再利用される。
-- **source の z 分散が厳密に 0** のため共分散が z 方向に特異。6 成分 full-covariance GMM の fit が通るのは sklearn の `reg_covar=1e-6` のおかげであり、論文 §4 の「全共分散が正定値」という仮定を満たさない。
+旧実装（`42ee1ad`）は source を 2.5 倍、target を 2 倍して平行移動していたため半径が 9.987 / 7.990、target ring は source 標本の affine 像、source の z 分散は厳密に 0 だった。**再構成により z 分散が 0 でなくなり、共分散が正定値になった**ので、論文 §4 の仮定も満たすようになった。
 
-> 掲載 Figure 6 の軸範囲（x: −10…20、y: −15…15、z: 0…30）は**この scale 済みデータと整合する**。つまり掲載図は論文本文が記述する geometry ではなく、このパイプラインから生成されている。geometry を論文どおりに直せば**掲載図の外観は必ず変わる**ため、再生成と差分記録が要る。
+#### (2) penalty 換算規約
 
-#### (2) λ が論文と不一致で、成立するかは geometry に依存する
+point-level と component-level は**異なる定数でコストを正規化する**ため、同じ数値の λ が同じ意味を持たない。そこで λ を、その表現における **balanced 最適解の平均歪み** `D_match` を単位として測る:
 
-論文は partial 系で λ=0.01 と記す。実装は:
+```
+Lambda = lambda_tilde × gw_mean_distortion(C1, C2, G_balanced)
+```
 
-- point-level PGW（cell 15）: `gromov.partial_gromov_ver1(..., Lambda=0.04)`
-- pMGW（cell 10/11）: `pMGW2_coup(..., Lambda=0.10)` → 同じ `partial_gromov_ver1` へ
+`lambda_tilde` は無次元で両手法が共有する。論文の λ = 0.01 を point-level の値として固定すると `lambda_tilde = 0.9199` となり、
 
-§2 の通り `partial_gromov_ver1` の `Lambda` は**すでに論文 (5.4) の λ そのもの**なので、規約の違いでは説明できない。
+| 表現 | `D_match` | solver への `Lambda` |
+|---|---|---|
+| point-level（二乗距離/max） | 0.010871 | **0.010000**（= 論文値） |
+| component-level（W₂²/max, 6/7 fit） | 0.014403 | **0.013249** |
 
-**λ=0.01 が成立するかは geometry に依存する。** 現行の scale 済み geometry と、論文どおりに直した geometry（半径 4 の ring から source 300 点、高さ h の対応 ring から**独立に** 300 点、別分布の noise 10 点）で matched mass を比較した:
+この換算で **PGW・pMGW とも matched mass が厳密に `300/310 = 0.9677419`** になる。4 種の seed で確認済み。
 
-| geometry | 手法 | λ=0.01 | λ = コードの値 |
+`D_match` は square loss の恒等式で `O(n²)` で計算でき、`gw_mean_distortion` / `partial_gw_penalty` として公開している。
+
+#### (3) 比較条件の統一
+
+- source 6 / target 7 成分を**一度だけ** fit し、`components, weights, pairwise W2 matrices` を balanced/partial の両 solver へ渡す（`MGW2_coup` / `pMGW2_coup` の `mu=`, `nu=`, `C1=`, `C2=`）
+- balanced MGW の alignment を **full mixture mean で中心化**してから解く。(6.7) は中心化した成分上で定義されており、balanced では (6.6) の matched mean が全混合平均に一致する
+- 手法ごとに **1 回だけ solve** し、Figure 7 は raw barycentric map、Figure 6 は同じ map の nearest-neighbor 版として作る（`return_both=True`）
+- raw GW/PGW も `argmax` ではなく **barycentric projection + nearest-target** に統一。partial では質量 0 の source 行を描かない
+
+結果:
+
+| 手法 | matched mass | 描画した source 点 | noise へ着地 |
 |---|---|---|---|
-| 現行（半径 10 / 8、affine 変換） | point-level PGW | **0.0000** | 0.9677（λ=0.04） |
-| 現行 | pMGW | `ValueError: Z_lambda = 0.0` | 0.9677（λ=0.10） |
-| 論文どおり（半径 4、独立標本） | point-level PGW | **0.9677419** ✅ | 0.9677419（λ=0.04） |
-| 論文どおり | pMGW | **0.0000000** ❌ | 0.9677419（λ=0.10） |
+| GW2 | 1.0000000 | 300/300 | **10** |
+| PGW2 | 0.9677419 | 294/300 | 0 |
+| MGW2 | 1.0000000 | 300/300 | 0 |
+| pMGW2 | 0.9677419 | 300/300 | 0 |
 
-- **point-level PGW** は、geometry を論文に戻せば λ=0.01 で `300/310 = 0.9677419` を輸送する（h = 8 / 10 / 12 のいずれでも同じ）。**geometry と penalty は一体で直す必要がある。**
-- **pMGW では、geometry を直しても λ=0.01 では matched mass が 0 のままである。** 閾値を走査すると:
+balanced GW だけが noise へ 10 本の対応を引き、partial GW は 6 点を未マッチとして描かない。論文の主張どおりである。
 
-| 正規化スケール | λ=0.005 | 0.01 | 0.02 | 0.04 以上 |
-|---|---|---|---|---|
-| point-level（二乗距離/max） | 0.9677419 | 0.9677419 | 0.9677419 | 0.9677419 |
-| component-level（W₂²/max, 6/7 fit） | — | **0.0000000** | 0.9677419 | 0.9677419 |
+> **論文の記述と合わない点**: 論文は balanced *mixture* GW についても「outlier が transport plan に影響し spurious correspondence を生む」と述べるが、**MGW2 は noise へ 1 本も対応を引かない**。7 成分 fit では noise が独立成分になり、barycentric 平均がその寄与を薄めるためである。MGW2 の劣化は noise への対応ではなく **ring 対応の交差**として現れる。§7.2 の記述はこの観察に合わせて直す必要がある。
 
-閾値を超えれば両者とも厳密に `300/310` で頭打ちになる（target 側の 300 点分の質量が上限）ので、**λ の正確な値ではなく「閾値を超えているか」だけが効く**。閾値が 2〜4 倍ずれるのは正規化スケールが違うためで、point-level は二乗ユークリッド距離/最大値、component-level は W₂²/最大値である。
+#### (4) alignment の発散（[#15](https://github.com/yachimura-lab/EPGOT-PMGW/issues/15)）
 
-**したがって、論文の単一の λ=0.01 を両 solver にそのまま書くことはできない。** 論文の λ から各 solver input への換算規約を数式で固定し、論文とコードの双方に記載する必要がある。
+Stiefel 上の projected gradient descent が既定ステップ幅で目的関数を悪化させていた。**Figures 6–7 の実データでも発生**しており、balanced MGW で 1.829721 → 19.239575、partial pMGW で 0.006050 → 14.348159 と、初期値より大幅に悪い `P` が使われていた。
 
-#### (3) GMM 成分数が非対称
+各ステップを **目的関数が減るまで backtracking** するよう修正した。あわせて `proj_gradient_descent` が記録していた loss を、共分散項のみから (6.7) の完全な目的関数（`alignment_objective`）へ直した。修正後は両者とも単調で、この data では初期値 `P0 = proj_stiefel(Σ γ_kl m_k m_lᵀ)` が既に最適であり `P0` がそのまま返る。
 
-- balanced MGW（cell 12/13）: `MGW2_coup(n_components=6)` → **source 6 / target 6**
-- partial pMGW（cell 10/11）: **source 6 / target 7**
+#### (5) 残る差分
 
-Figure 6(c) と 6(d) の差には「partial 化」と「target 成分数 6→7」の両方が混入する。
-
-#### (4) balanced 側の alignment が (6.7) と異なる
-
-論文 (6.7) は**中心化した成分**上で Stiefel 最適化を行う（(6.6) の matched means で中心化、balanced なら全混合平均に一致）。
-
-- `pMGW2_coup` は `matched_statistics` → `gmm_transform(mu, b=-m0)` で中心化してから最適化する ✅
-- `MGW2_coup` は **中心化しない `mu`, `nu` のまま** `proj_gradient_descent` を回し、中心化は後段の `T_mean` 内でのみ行う ❌（`mgw.py:144-151`, `gaussian.py:185-196`）
-
-実測すると alignment 行列は有意に異なる:
-
-```
-||P_uncentered − P_centered||_F = 0.7618
-diag(P_uncentered) = [0.9917, 0.9921, 0.9996]
-diag(P_centered)   = [0.8569, 0.9818, 0.8702]
-```
-
-したがって **Figure 6(c) / 7(a) は (6.7) を実装していない**。これは (3) とは独立した第 2 の比較条件の非対称性である。
-
-#### (5) Figure 6(a),(b) は barycentric projection ではない
-
-論文は Figure 6 を「barycentric projection map が誘導する nearest-point correspondence」と説明するが、point-level の 2 panel は coupling 行の argmax を直接描く。
-
-```python
-j = np.argmax(G[i, :])          # cell 14 (GW), cell 15 (PGW)
-```
-
-これは maximum-coupling assignment であり barycentric projection とは一般に異なる。実際に barycentric projection + `NearestNeighbors` を使っているのは (c), (d) のみ。
-
-また 2 panel で描画閾値が異なる: GW は `G[i,j] > 1e-5`、PGW は `G_partial[i,j] > 0.1/n1`（= 3.33e-4）。
-
-#### (6) point-level GW の `epsilon` は無効
-
-```python
-G = ot.gromov_wasserstein(C1, C23, p, q, 'square_loss', epsilon=5e-3)   # cell 14
-```
-
-POT 0.9.7 の `ot.gromov_wasserstein` のシグネチャに `epsilon` は存在せず、`**kwargs` に吸収される。実測で
-
-```
-max|G(epsilon=5e-3) − G(no epsilon)| = 0.000e+00
-```
-
-**完全に無効**。結果として cell 14 は (2.5) の非正則化 balanced GW を計算しており、これは論文の意図と一致する。誤解を招く引数を削除するだけでよい（図の再生成は不要）。
-
-#### (7) Figure 6 と 7 は別 solve だが、結果は一致する
-
-`points=True` / `points=False` で `pMGW2_coup` / `MGW2_coup` を 2 回呼ぶため、GMM fit・coupling・alignment が再計算される。ただし `random_state=DEFAULT_SEED` 固定かつ両 solver が決定的なため、**実測では完全に一致する**:
-
-```
-pMGW: idx(別々) == idx(1回solve)? True ; max|map差| = 0.00e+00
-MGW : idx(別々) == idx(1回solve)? True ; max|map差| = 0.00e+00
-```
-
-**Figure 6(c)(d) と 7(a)(b) は同一の map から作られている。** 両関数は `return_both=True` を既に備えているので、それに切り替えるのは実行時間と堅牢性の改善であって、図の正しさの修正ではない。
-
-#### (8) 計算量の主張
-
-coupling 次元は 300×310 → 6×7 に縮小し、**solver 単体では大幅に速い**。しかし component 側は GMM fit のコストを伴う:
-
-| 段階 | 時間 |
-|---|---|
-| point-level GW solver (300×310) | 101.9 ms |
-| point-level PGW solver (300×310) | 92.4 ms |
-| component pMGW solver (6×7) | **0.4 ms**（約 230×） |
-| component 側が必要とする GMM fit | 96.6 ms |
-| **component 経路 合計** | **97.0 ms**（vs point-level PGW 92.4 ms） |
-
-N=300 のこの例では **end-to-end の高速化は示せていない**。「coupling problem の次元を削減する」という主張に限定するか、N を増やした solver-only の scaling benchmark を追加するのが妥当。
-
----
+- `ot.gromov_wasserstein(..., epsilon=5e-3)` の削除（P1）。POT 0.9.7 では `**kwargs` に吸収され効果は厳密に 0
+- 計算量の主張（P1）。coupling 次元は 300×310 → 6×7 に縮むが、component 側は GMM fit のコストを伴い N=300 では end-to-end の高速化を示せない
 
 ## 4. ノートブック ↔ 掲載図 の対応
 
@@ -339,7 +273,7 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 | §4.3 | Fig 6(a),(b) は argmax であり barycentric projection ではない | ✅ 支持。描画閾値も 2 panel で不一致 |
 | §4.4 | Fig 6 と 7 を 1 回の solve から作る | ⚠️ 格下げ（上記 #7） |
 | §4.5 | `epsilon=5e-3` は標準 GW の entropy 正則化指定ではない | ✅ **支持（確定）**。`**kwargs` に吸収され効果は厳密に 0 |
-| §4.6 | 小規模例で end-to-end 高速化は示されていない | ✅ **支持（定量化）**（§3.6-8） |
+| §4.6 | 小規模例で end-to-end 高速化は示されていない | ✅ **支持（定量化）**（§3.6-5） |
 
 ### 共通の再現性修正（同 PDF §5）
 
@@ -362,26 +296,24 @@ issue #6 の方針「**原則として論文を正とし、source code / noteboo
 
 - **Figure 5 の solver と λ** — `compute_T_X_to_Z_C` を `entropic_partial_ot` に差し替え、同時に cell 5 の `Lambda = 2 * Lambda` を廃止して (a)(b) を再生成。`partial_wasserstein_lagrange_entropic` は deprecate。あわせて (6.2) の分子だけに掛かっていた `gamma>1e-10` の閾値を除去。
 - **Figure 4 の (4.18) 描画** — 再正規化と `W>1e-5` 閾値を撤去して質量 `Z_λ` を保持し、全 panel 共通 density level に変更。(4.17) は閉形式に置き換え、`cpp_engine` 依存を解消（§3.4）。
+- **Figures 6–7** — geometry を半径 4 の独立標本へ再構成、λ 換算規約を `D_match` 基準で固定、6/7 成分の fit と cost を共有、balanced alignment を中心化、全手法を barycentric projection + nearest に統一、手法ごとに 1 回だけ solve（§3.6）。あわせて alignment の発散を backtracking で解消（[#15](https://github.com/yachimura-lab/EPGOT-PMGW/issues/15)）。
 - **Figure 5 の fit 共有** — §7.1.5 どおり既知 GMM を使う `entropic_partial_barycentric_map` を追加し、notebook をそれに切り替え。両 λ が同一の component parameters / cost を共有する。`compute_T_X_to_Z_C` は fit する薄い wrapper として残した（§3.5-1）。
 
 ### P0（数学的意味・比較条件）
 
-1. **Figures 6–7 の geometry** — 半径 4 の ring から source/target を**独立に** 300 点ずつ、別分布の noise 10 点。これにより point-level PGW は論文どおり λ=0.01 で `300/310` を達成する（§3.6-2）。
-2. **penalty 換算規約の明示** — pMGW は component-level の正規化スケールでは λ=0.01 で matched mass 0 になるため、**論文の λ から各 solver input への換算を数式で固定**し、論文側にもその換算を記載する。閾値を超えれば両者とも `300/310` で頭打ちになる（§3.6-2）。
-3. **Figures 6–7 の比較条件** — source 6 / target 7 成分を 1 回だけ fit して MGW/pMGW で共有。balanced MGW の alignment を full-mean centered mixtures で計算（§3.6-4）。raw GW/PGW を barycentric projection + nearest-target に統一し、unmatched row は描かない（§3.6-5）。手法ごとに 1 回だけ solve し、Figure 7 = raw map、Figure 6 = その nearest-neighbor 版とする（§3.6-7）。
 
 ### P1（Figure と主張）
 
-4. **Figure 2** — 1×5 の描画セルを追加（数値は現行コードで再現済み、§3.2）。**Figure 1** — weight の連続 colormap + 横 colorbar に戻し、label/legend を外す。
-5. **Figure 3** — 非収束 panel の再計算と residual の保存、colorbar 上限の明示、cell 7/8 の出力名衝突の解消（§3.3）。
-6. **point-level GW** — 無効な `epsilon=5e-3` を削除（図の再生成は不要、§3.6-6）。
-7. **composite layout** — Figures 5–7 の掲載図と同じ組版を notebook から直接保存する（§4）。
-8. **計算量の主張** — coupling dimension 削減に限定するか、N を増やした solver-only benchmark を追加（§3.6-8）。
+1. **Figure 2** — 1×5 の描画セルを追加（数値は現行コードで再現済み、§3.2）。**Figure 1** — weight の連続 colormap + 横 colorbar に戻し、label/legend を外す。
+2. **Figure 3** — 非収束 panel の再計算と residual の保存、colorbar 上限の明示、cell 7/8 の出力名衝突の解消（§3.3）。
+3. **point-level GW** — 無効な `epsilon=5e-3` を削除（図の再生成は不要、§3.6-5）。
+4. **composite layout** — Figure 5 の (a)/(b) 2 段組を notebook から保存する（Figures 6–7 は対応済み、§4）。
+5. **計算量の主張** — coupling dimension 削減に限定するか、N を増やした solver-only benchmark を追加（§3.6-5）。
 
 ### その他
 
-9. `compute_T_X_to_Z` の分母が (6.2) ではなく全混合密度である点を是正するか、公開 API から外す（§3.5-2）。
-10. 再生成により掲載 PDF と外観が変わるため、issue #6 の方針 7・8 に従い差分を [#8](https://github.com/yachimura-lab/EPGOT-PMGW/issues/8) に記録する。
+6. `compute_T_X_to_Z` の分母が (6.2) ではなく全混合密度である点を是正するか、公開 API から外す（§3.5-2）。
+7. 再生成により掲載 PDF と外観が変わるため、issue #6 の方針 7・8 に従い差分を [#8](https://github.com/yachimura-lab/EPGOT-PMGW/issues/8) に記録する。
 
 ---
 
