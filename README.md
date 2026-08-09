@@ -29,7 +29,6 @@ parameters, matched mass, residuals, runtime, solve ID, and output SHA-256.
 ```text
 .
 ├── src/pgot/                 # Algorithms and canonical figure pipelines
-├── src/computation/          # Legacy C++ engine (C++17, pybind11, Eigen)
 ├── docs/notebook/            # Executed notebooks, manifest, sidecars
 ├── tests/                    # Mathematical/reproducibility regressions
 ├── tools/build_notebooks.py  # Rebuild concise notebook source cells
@@ -41,23 +40,11 @@ parameters, matched mass, residuals, runtime, solve ID, and output SHA-256.
 ## Setup
 
 Requirements are Python 3.13.15, `uv`, and the checked-out PGW_Metric
-submodule. The C++ engine is optional because canonical notebooks use the
-Python implementation.
+submodule.
 
 ```bash
 git submodule update --init --recursive
 uv sync --frozen
-```
-
-To build the legacy C++ engine, install Eigen 3.3.9 and use the pinned
-pybind11 3.0.4 from the Python environment:
-
-```bash
-PYBIND11_DIR="$(uv run python -m pybind11 --cmakedir)"
-cmake -S src/computation -B src/computation/build \
-  -Dpybind11_DIR="$PYBIND11_DIR" \
-  -DPython_EXECUTABLE="$PWD/.venv/bin/python"
-cmake --build src/computation/build
 ```
 
 ## Mathematical conventions
