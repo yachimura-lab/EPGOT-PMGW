@@ -1,0 +1,162 @@
+[
+  {
+    "file": "fig01_coupling_lambda0.3.png",
+    "notebook": "figure1_2_3",
+    "cell": 5,
+    "bytes": 27555,
+    "sha256_12": "ef471a41cfe9",
+    "caption": "Paper Figure 1 — λ=0.3, ε=0.01"
+  },
+  {
+    "file": "fig03_lambda_eps_sweep.png",
+    "notebook": "figure1_2_3",
+    "cell": 6,
+    "bytes": 308378,
+    "sha256_12": "055f2fe291e5",
+    "caption": "Paper Figure 3 — λ7 × ε3 sweep"
+  },
+  {
+    "file": "fig04_displacement_interpolation.png",
+    "notebook": "figure4",
+    "cell": 4,
+    "bytes": 134541,
+    "sha256_12": "925cb0873346",
+    "caption": "Paper Figure 4 — displacement interpolation"
+  },
+  {
+    "file": "fig05a_lambda0.25.png",
+    "notebook": "figure5",
+    "cell": 4,
+    "bytes": 76362,
+    "sha256_12": "4148b9ebd2ca",
+    "caption": "Paper Figure 5(a) — 表示 λ=0.25"
+  },
+  {
+    "file": "fig05b_lambda0.5.png",
+    "notebook": "figure5",
+    "cell": 6,
+    "bytes": 76138,
+    "sha256_12": "e485319679a2",
+    "caption": "Paper Figure 5(b) — 表示 λ=0.5"
+  },
+  {
+    "file": "fig06a_balanced_gw.png",
+    "notebook": "PMGW_corrected",
+    "cell": 14,
+    "bytes": 212009,
+    "sha256_12": "5965302cdb49",
+    "caption": "Paper Figure 6(a) — Balanced GW"
+  },
+  {
+    "file": "fig06b_partial_gw.png",
+    "notebook": "PMGW_corrected",
+    "cell": 15,
+    "bytes": 202209,
+    "sha256_12": "775a730c9fc7",
+    "caption": "Paper Figure 6(b) — Partial GW"
+  },
+  {
+    "file": "fig06c_balanced_mgw.png",
+    "notebook": "PMGW_corrected",
+    "cell": 12,
+    "bytes": 211497,
+    "sha256_12": "351fb28d506f",
+    "caption": "Paper Figure 6(c) — Balanced mixture GW"
+  },
+  {
+    "file": "fig06d_partial_mgw.png",
+    "notebook": "PMGW_corrected",
+    "cell": 10,
+    "bytes": 163823,
+    "sha256_12": "a8d09044e705",
+    "caption": "Paper Figure 6(d) — Partial mixture GW"
+  },
+  {
+    "file": "fig07a_mgw_barycentric.png",
+    "notebook": "PMGW_corrected",
+    "cell": 13,
+    "bytes": 233522,
+    "sha256_12": "269d74bd3223",
+    "caption": "Paper Figure 7(a) — MGW barycentric map"
+  },
+  {
+    "file": "fig07b_pmgw_barycentric.png",
+    "notebook": "PMGW_corrected",
+    "cell": 11,
+    "bytes": 167454,
+    "sha256_12": "b9e79776dfc0",
+    "caption": "Paper Figure 7(b) — pMGW barycentric map"
+  },
+  {
+    "file": "aux_gmm_A_and_B.png",
+    "notebook": "figure1_2_3",
+    "cell": 3,
+    "bytes": 23255,
+    "sha256_12": "25188a44fccf",
+    "caption": "論文外 — GMM A/B 単体図 (GMMs.eps)"
+  },
+  {
+    "file": "aux_sweep_6x7.png",
+    "notebook": "figure1_2_3",
+    "cell": 7,
+    "bytes": 1122832,
+    "sha256_12": "be6dd048ac1a",
+    "caption": "論文外 — 代替 sweep 6×7"
+  },
+  {
+    "file": "aux_sweep_5x5.png",
+    "notebook": "figure1_2_3",
+    "cell": 8,
+    "bytes": 520623,
+    "sha256_12": "94b34ae46aff",
+    "caption": "論文外 — 代替 sweep 5×5 (同名で上書き)"
+  },
+  {
+    "file": "aux_fig5_samples.png",
+    "notebook": "figure5",
+    "cell": 3,
+    "bytes": 34165,
+    "sha256_12": "d4c1bab09af1",
+    "caption": "論文外 — X/Y サンプル散布"
+  },
+  {
+    "file": "aux_fig5a_Tb_scatter.png",
+    "notebook": "figure5",
+    "cell": 4,
+    "bytes": 46225,
+    "sha256_12": "849846843baf",
+    "caption": "論文外 — T_b 散布 (λ表示 0.25)"
+  },
+  {
+    "file": "aux_fig5b_Tb_scatter.png",
+    "notebook": "figure5",
+    "cell": 5,
+    "bytes": 48036,
+    "sha256_12": "2a28507bd3e3",
+    "caption": "論文外 — T_b 散布 (λ表示 0.5)"
+  },
+  {
+    "file": "aux_pmgw_P1_3d.png",
+    "notebook": "PMGW_corrected",
+    "cell": 2,
+    "bytes": 78190,
+    "sha256_12": "800bfca21914",
+    "caption": "論文外 — P1 (3D, 半径4)"
+  },
+  {
+    "file": "aux_pmgw_P1_2d.png",
+    "notebook": "PMGW_corrected",
+    "cell": 3,
+    "bytes": 36567,
+    "sha256_12": "63100290f618",
+    "caption": "論文外 — 2D 再標本 (後段で破棄)"
+  },
+  {
+    "file": "aux_pmgw_P1_embed.png",
+    "notebook": "PMGW_corrected",
+    "cell": 5,
+    "bytes": 60631,
+    "sha256_12": "5fafe14b5bcf",
+    "caption": "論文外 — P1_3d (z=0 埋め込み)"
+  }
+]
