@@ -532,18 +532,19 @@ from pgot import (
 )
 
 # ---------------------------------------------------------------
-# Section 7.2 point clouds. The paper fixes the ring radius, the
-# sample sizes and the number of noise points; it does not state the
-# target height or the noise distribution, so both are pinned here.
+# Section 7.2 point clouds. The source ring lies in the plane z = 0
+# and the target ring is its translate into z = HEIGHT. The target
+# additionally carries a cluster of noise points, which the balanced
+# methods have to match and the partial methods may leave unmatched.
 # ---------------------------------------------------------------
 COMPONENTS = 6            # six equally weighted components per ring
 POINTS = 300              # points sampled from each ring
-SIGMA = 0.2               # component standard deviation
+SIGMA = 0.2               # component standard deviation, covariance 0.04 I_3
 RADIUS = 4.0              # ring radius, identical for source and target
-HEIGHT = 10.0             # not stated in the paper
+HEIGHT = 10.0             # the target ring lies in the plane z = HEIGHT
 NOISE_POINTS = 10         # outlying points added to the target
-NOISE_CENTRE = np.array([2.5 * RADIUS, 0.0, HEIGHT])  # not stated in the paper
-NOISE_RADIUS = 0.3        # not stated in the paper
+NOISE_CENTRE = np.array([2.5 * RADIUS, 0.0, HEIGHT])  # centre of the noise ball
+NOISE_RADIUS = 0.3        # radius of that ball
 
 # Independent generators: the source and the target ring must be separate
 # samples, not an affine image of one another.
