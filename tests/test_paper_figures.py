@@ -63,8 +63,8 @@ def solved_point_clouds():
     component_source = gaussian_cost_matrix(source_gmm)
     component_target = gaussian_cost_matrix(target_gmm)
     component_scale = float(max(component_source.max(), component_target.max()))
-    point_source = ot.dist(data["source"], data["source"])
-    point_target = ot.dist(data["target"], data["target"])
+    point_source = ot.dist(data["source"], data["source"], metric="sqeuclidean")
+    point_target = ot.dist(data["target"], data["target"], metric="sqeuclidean")
     point_scale = float(max(point_source.max(), point_target.max()))
     problem = {
         **data,

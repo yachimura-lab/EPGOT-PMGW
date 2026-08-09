@@ -383,21 +383,39 @@ def _draw_correspondences(axis, data, targets, title, source_mask=None):
     _equal_3d_axes(axis, np.vstack([source, target]))
 
 
+# Panel titles spell the method out. The sidecars keep the short GW2/PGW2/
+# MGW2/pMGW2 keys as solve identifiers, but a reader of the figure has only
+# the title, and "pMGW2" does not say which of the four cells of the
+# balanced/partial by point/mixture comparison a panel is.
+BALANCED_GW = "Balanced GW"
+PARTIAL_GW = "Partial GW"
+BALANCED_MIXTURE_GW = "Balanced mixture GW"
+PARTIAL_MIXTURE_GW = "Partial mixture GW"
+
+
 def make_figure6(data, solved):
     """Nearest-target assignments derived from the four barycentric maps."""
     target = data["target"]
     fig, axes = plt.subplots(2, 2, figsize=(14, 14), subplot_kw={"projection": "3d"})
     _draw_correspondences(
-        axes[0, 0], data, target[solved["index_gw"]], "(a) GW2", solved["mask_gw"]
+        axes[0, 0],
+        data,
+        target[solved["index_gw"]],
+        f"(a) {BALANCED_GW}",
+        solved["mask_gw"],
     )
     _draw_correspondences(
-        axes[0, 1], data, target[solved["index_pgw"]], "(b) PGW2", solved["mask_pgw"]
+        axes[0, 1],
+        data,
+        target[solved["index_pgw"]],
+        f"(b) {PARTIAL_GW}",
+        solved["mask_pgw"],
     )
     _draw_correspondences(
-        axes[1, 0], data, target[solved["index_mgw"]], "(c) MGW2"
+        axes[1, 0], data, target[solved["index_mgw"]], f"(c) {BALANCED_MIXTURE_GW}"
     )
     _draw_correspondences(
-        axes[1, 1], data, target[solved["index_pmgw"]], "(d) pMGW2"
+        axes[1, 1], data, target[solved["index_pmgw"]], f"(d) {PARTIAL_MIXTURE_GW}"
     )
     fig.tight_layout()
     return fig
@@ -406,7 +424,11 @@ def make_figure6(data, solved):
 def make_figure7(data, solved):
     """Raw mixture barycentric maps from the same MGW/pMGW solves as Figure 6."""
     fig, axes = plt.subplots(1, 2, figsize=(14, 7), subplot_kw={"projection": "3d"})
-    _draw_correspondences(axes[0], data, solved["map_mgw"], "(a) MGW2")
-    _draw_correspondences(axes[1], data, solved["map_pmgw"], "(b) pMGW2")
+    _draw_correspondences(
+        axes[0], data, solved["map_mgw"], f"(a) {BALANCED_MIXTURE_GW}"
+    )
+    _draw_correspondences(
+        axes[1], data, solved["map_pmgw"], f"(b) {PARTIAL_MIXTURE_GW}"
+    )
     fig.tight_layout()
     return fig

@@ -623,8 +623,14 @@ target_gmm = fit_mixture(figure67_data["target"], TARGET_COMPONENTS)
 component_source = gaussian_cost_matrix(source_gmm)
 component_target = gaussian_cost_matrix(target_gmm)
 component_scale = float(max(component_source.max(), component_target.max()))
-point_source = ot.dist(figure67_data["source"], figure67_data["source"])
-point_target = ot.dist(figure67_data["target"], figure67_data["target"])
+# metric="sqeuclidean" is POT's default; naming it keeps the notebook
+# explicit that these are the intra-space squared-distance matrices.
+point_source = ot.dist(
+    figure67_data["source"], figure67_data["source"], metric="sqeuclidean"
+)
+point_target = ot.dist(
+    figure67_data["target"], figure67_data["target"], metric="sqeuclidean"
+)
 point_scale = float(max(point_source.max(), point_target.max()))
 
 figure67_problem = {

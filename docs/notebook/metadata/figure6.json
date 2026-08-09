@@ -96,9 +96,9 @@
   "notes": "All four methods use barycentric projections before nearest assignment.",
   "outputs": [
     {
-      "bytes": 453670,
+      "bytes": 455908,
       "path": "outputs/figure6.pdf",
-      "sha256": "b72d72abcd30795e36d241f64397efedea12a62fdcb5902eea18ae0c5d2c9b21"
+      "sha256": "24229890f10b66e03ec58af199040e018cd230b2b3e73531925ae80a12418cac"
     }
   ],
   "panels": [
@@ -120,7 +120,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 6.505213034913027e-17,
-      "runtime_seconds": 0.29309254699910525,
+      "runtime_seconds": 0.2106218310073018,
       "solve_id": "aaf07168ac29f59367f46fd8ec67b824382aa08190f2227ce1b046ab895b03eb",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -143,7 +143,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.07065318198874593,
+      "runtime_seconds": 0.07706783499452285,
       "solve_id": "0d6f12818e72883420570d9666084640b6c5c9dd56eedb90c4b053fd547c9641",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -166,7 +166,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.10857614999986254,
+      "runtime_seconds": 0.10451973100134637,
       "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -189,7 +189,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.14736342430114746,
+      "runtime_seconds": 0.14890503883361816,
       "solve_id": "a2b3f272ea072409519b4bc40def14cc16038ba16d29e5c92b6e3cc2ca46e7dd",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -203,7 +203,7 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "235dc9187f181f52ce1ad7066ba8e6abb007b75e",
+    "commit": "e9adfa2a7d8bbf2d7f3212974a9b52de608535b9",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }
