@@ -422,7 +422,11 @@ def make_figure6(data, solved):
 
 
 def make_figure7(data, solved):
-    """Raw mixture barycentric maps from the same MGW/pMGW solves as Figure 6."""
+    """Raw mixture barycentric maps from the same solves as Figure 6.
+
+    The two panels are the balanced and the partial mixture GW maps, named
+    as in Figure 6 so the same method is called the same thing in both.
+    """
     fig, axes = plt.subplots(1, 2, figsize=(14, 7), subplot_kw={"projection": "3d"})
     _draw_correspondences(
         axes[0], data, solved["map_mgw"], f"(a) {BALANCED_MIXTURE_GW}"

@@ -120,7 +120,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 6.505213034913027e-17,
-      "runtime_seconds": 0.2106218310073018,
+      "runtime_seconds": 0.19888762799382675,
       "solve_id": "aaf07168ac29f59367f46fd8ec67b824382aa08190f2227ce1b046ab895b03eb",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -143,7 +143,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.07706783499452285,
+      "runtime_seconds": 0.06781603500712663,
       "solve_id": "0d6f12818e72883420570d9666084640b6c5c9dd56eedb90c4b053fd547c9641",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -166,7 +166,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.10451973100134637,
+      "runtime_seconds": 0.10461906499403995,
       "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -189,7 +189,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.14890503883361816,
+      "runtime_seconds": 0.15224957466125488,
       "solve_id": "a2b3f272ea072409519b4bc40def14cc16038ba16d29e5c92b6e3cc2ca46e7dd",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -203,7 +203,7 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "e9adfa2a7d8bbf2d7f3212974a9b52de608535b9",
+    "commit": "994d19d548dd8093ea0a314379a032a4a41430bf",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }

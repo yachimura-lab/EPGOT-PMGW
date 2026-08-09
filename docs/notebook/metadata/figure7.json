@@ -93,7 +93,7 @@
       ]
     }
   },
-  "notes": "solve_id values are identical to the MGW2/pMGW2 panels in Figure 6.",
+  "notes": "solve_id values are identical to the balanced and partial mixture GW panels in Figure 6.",
   "outputs": [
     {
       "bytes": 254795,
@@ -120,7 +120,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.10451973100134637,
+      "runtime_seconds": 0.10461906499403995,
       "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -143,7 +143,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.14890503883361816,
+      "runtime_seconds": 0.15224957466125488,
       "solve_id": "a2b3f272ea072409519b4bc40def14cc16038ba16d29e5c92b6e3cc2ca46e7dd",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -157,7 +157,7 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "e9adfa2a7d8bbf2d7f3212974a9b52de608535b9",
+    "commit": "994d19d548dd8093ea0a314379a032a4a41430bf",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }

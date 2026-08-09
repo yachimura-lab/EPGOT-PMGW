@@ -838,7 +838,7 @@ write_figure_sidecar(
 plt.show()
 '''),
         ("markdown", r'''
-## Figure 7 — raw maps from the same MGW2 and pMGW2 solves
+## Figure 7 — raw maps from the same balanced and partial mixture GW solves
 '''),
         ("code", r'''
 figure7 = make_figure7(figure67_data, figure67_solved)
@@ -859,7 +859,10 @@ write_figure_sidecar(
         "noise_sampling": DEFAULT_SEED + 2,
         "fit": DEFAULT_SEED,
     },
-    notes="solve_id values are identical to the MGW2/pMGW2 panels in Figure 6.",
+    notes=(
+        "solve_id values are identical to the balanced and partial mixture "
+        "GW panels in Figure 6."
+    ),
 )
 plt.show()
 '''),
