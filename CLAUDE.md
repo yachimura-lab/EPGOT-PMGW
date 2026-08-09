@@ -10,7 +10,7 @@ Note the naming split: the repo/site is `EPGOT-pMGW`, the Python package is `pgo
 
 ## Setup
 
-Three things must be in place before anything imports, in this order:
+Two things must be in place before anything imports, in this order:
 
 ```bash
 # 1. Vendored solver (see below) — sparse checkout, NOT `git submodule update --init`
@@ -21,22 +21,14 @@ git -C vendor/PGW_Metric checkout --detach 8a9002e14d6b17decf35e603e9a9e42aa8465
 
 # 2. Python env (installs the root project editable, which puts `src/` on sys.path)
 uv sync
-
-# 3. C++ engine — only needed for the legacy src/algorithm/*.py scripts
-sudo dnf install -y eigen3-devel   # or the distro equivalent
-rm -rf src/computation/build
-cmake -S src/computation -B src/computation/build \
-      -Dpybind11_DIR="$(uv run python -m pybind11 --cmakedir)" \
-      -DPython_EXECUTABLE="$(uv run python -c 'import sys; print(sys.executable)')"
-cmake --build src/computation/build
 ```
 
 `vendor/PGW_Metric` is a submodule of an ~832 MB upstream repo; the sparse checkout above fetches only `lib/`. A plain `git submodule update --init` works but downloads everything.
 
-Smoke test that all three landed:
+Smoke test that both landed:
 
 ```bash
-uv run python -c "import pgot; from lib import gromov"   # add cpp_engine only for src/algorithm/
+uv run python -c "import pgot; from lib import gromov"
 ```
 
 ## Common commands
@@ -70,10 +62,6 @@ What makes the *partial* case different, and where bugs tend to hide: the coupli
 
 `pgot.partial_mgw` does `from lib import gromov` and calls `gromov.partial_gromov_ver1`. That `lib` comes from the vendored PGW_Metric checkout, force-included into a wheel by `vendor/pyproject.toml`. Because `__init__.py` imports `partial_mgw`, **`import pgot` fails outright if the submodule is empty** — that is the usual cause of an import error in a fresh clone.
 
-### `src/computation/` — `cpp_engine`
-
-Eigen + pybind11 reimplementation of three hot routines (`GaussianW2`, `GaussianBarycenterW2`, `entropic_partial_ot`), now used only by the legacy `src/algorithm/*.py` scripts. `figure4.ipynb` moved to the `pgot` implementations, so no notebook needs this build. It is a **parallel implementation, not a binding of the Python code** — changing the math in `pgot/gaussian.py` or `pgot/partial_ot.py` means changing `engine.cpp` too, or the two silently disagree. CMake writes the `.so` directly into `src/` (not into `build/`), which is importable because the editable install of the root project puts `src/` on `sys.path`. `.so` files are gitignored, so the build is per-machine.
-
 ### Reproducibility contract
 
 Every notebook's first cell is `from pgot import set_reproducible; set_reproducible()`, and it must stay first — figures change if any sampling happens before it. `reproducibility.py` seeds a package-level generator (`DEFAULT_SEED = 42`) that every stochastic function reaches through `get_rng(rng)`, plus the process-global `numpy.random` / `random` / `torch` generators the notebooks use directly, and pins `SOURCE_DATE_EPOCH` so saved EPS/PDF/SVG bytes don't differ only by timestamp. New stochastic code must draw from `get_rng(rng)` and accept an `rng=` override; new mixture fits must thread `random_state=DEFAULT_SEED`.
@@ -81,10 +69,6 @@ Every notebook's first cell is `from pgot import set_reproducible; set_reproduci
 ### `docs/` — the published site
 
 Quarto renders `docs/notebook/*.ipynb` into the sidebar automatically (`_quarto.yml`). Notebooks that already carry outputs are published as-is rather than re-executed, so **committed outputs are what readers see** — after changing library code, re-run the affected notebooks and commit them with their outputs. `docs/index.qmd` is currently empty.
-
-### Legacy directories
-
-`forward/` (original delivered notebooks and a duplicate `computation/`) and `src/algorithm/` (standalone scripts, some with hardcoded absolute paths like `/home/arnold/...`) predate the `pgot` package. Nothing in `pgot` or `docs/notebook` imports them; they are kept for reference. Don't extend them — port to `pgot` + `docs/notebook` instead.
 
 ## Note on the README
 

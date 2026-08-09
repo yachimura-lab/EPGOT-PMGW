@@ -156,9 +156,6 @@ parameter の静的 single source は `FIGURE_PARAMETERS` と `figure_manifest.j
 - POT: 0.9.7
 - scikit-learn: 1.9.0
 - Matplotlib: 3.11.0
-- pybind11: 3.0.4
-- CMake minimum: 3.22.2
-- Eigen: 3.3.9 exact
 - uv: 0.12.3
 - Quarto: 1.10.18 + tarball SHA-256 verification
 
@@ -215,6 +212,5 @@ issue #8 の比較本文は final branch/PR の commit URL で `after-issue6` �
 
 ## 8. 分離した技術課題
 
-- [#14](https://github.com/yachimura-lab/EPGOT-PMGW/issues/14): legacy `cpp_engine` と Python EPOT の収束判定不一致
 - [#15](https://github.com/yachimura-lab/EPGOT-PMGW/issues/15): Stiefel PGD の発散（canonical pipeline では backtracking により解消済み）
 - [#18](https://github.com/yachimura-lab/EPGOT-PMGW/issues/18): 論文 §7.2 の未記載条件・penalty 換算・balanced MGW の記述修正
