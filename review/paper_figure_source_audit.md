@@ -19,7 +19,7 @@
 | 2 | λ∈{0,0.125,0.25,0.375,0.5}, ε=0.01 | **生成セルなし**。ただし数値は現行コードで完全に再現する | **B**（描画欠落・数値は健全） |
 | 3 | λ 7値 × ε∈{0.01,0.11,0.21} | cell 6 が一致。1 panel で Sinkhorn 非収束 | **B** |
 | 4 | (4.18) の劣確率測度 | 総和 1 へ再正規化 **＋** panel ごとに density level 自動調整 | **A**（描いている対象が違う） |
-| 5 | (a) λ=0.25 / (b) λ=0.5 | (3.1) の dummy-point EPOT を使い matched mass は論文値と一致。fit 共有と composite layout が未対応 | **B** |
+| 5 | (a) λ=0.25 / (b) λ=0.5 | 既知 GMM + (3.1) の dummy-point EPOT。composite layout のみ未対応 | **B** |
 | 6 | 半径 4・z=0、λ=0.01、barycentric→nearest | データ・λ・成分数・点対応がすべて不一致 | **A** |
 | 7 | barycentric projection map | (a) の alignment が (6.7) と異なる | **A** |
 
@@ -136,12 +136,12 @@ levels = np.logspace(np.log10(z_max * 1e-3), np.log10(z_max), 7)
 
 #### (1) solver と λ は (3.1) に一致している
 
-`compute_T_X_to_Z` / `compute_T_X_to_Z_C` は `entropic_partial_ot`、すなわち (3.1) の dummy-point EPOT を呼ぶ。`Lambda` は論文の λ をそのまま受け取り、notebook の両 cell とも素の λ を渡す。matched mass は論文値と一致する（2000 サンプル → 2/3 成分 fit、ε=0.03）:
+notebook は §7.1 の**既知の GMM `GA` / `GB` をそのまま** `entropic_partial_barycentric_map` に渡す。sample は (6.2) の評価点と散布図の重ね描きにのみ使い、再 fit は行わない。component parameters と cost matrix は両 λ で同一である。solver は `entropic_partial_ot`、すなわち (3.1) の dummy-point EPOT で、`Lambda` は論文の λ をそのまま受け取る:
 
 | panel | 表示 λ | solver への入力 | matched mass |
 |---|---|---|---|
-| Figure 5(a) | 0.25 | 0.25 | **0.8847946** |
-| Figure 5(b) | 0.5 | 0.5 | **0.9932484** |
+| Figure 5(a) | 0.25 | 0.25 | **0.8875742** |
+| Figure 5(b) | 0.5 | 0.5 | **0.9937141** |
 
 notebook は `log=True` で受け取った matched mass を出力するため、掲載値・solver 入力・出力の三者が突き合わせられる。
 
@@ -152,7 +152,6 @@ notebook は `log=True` で受け取った matched mass を出力するため、
 #### (2) 残る差分
 
 - **`compute_T_X_to_Z`（もう一方の公開関数）は (6.2) ではない**。分母が `np.sum(a * p)`、すなわち**全混合密度 `Σ_k a_k p_k(x)`** であり、(6.2) の matched density `Σ_kl ω_kl p_k(x)` ではない。これは (6.1) の balanced 版の分母。`figure5.ipynb` は使っていないが `__init__.py` から公開されている。docstring に注意書きを入れてあるが、是正または非公開化が要る。
-- λ ごとに GMM を fit し直す。`random_state=DEFAULT_SEED` 固定かつ `X, Y` 同一なので **fit 結果は完全に同一**であり比較条件の不公平は生じないが、同一 fit であることが API 上保証されていない（issue #6 P0-4）。
 - cell 6 は cell 5 の `Z`, `Lambda`, `xmin/xmax` に依存する。セル実行順への依存。
 - 掲載図の (a)/(b) 2 段組を保存するセルがない（§4）。
 
@@ -337,7 +336,7 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 | §2 Fig 4 | `W[i,j] > 1e-5` の閾値は (4.18) にない | ✅ 支持 |
 | §2 Fig 4 | 反復 barycenter ではなく (4.17) の閉形式を使う | ✅ 支持 |
 | §3 Fig 5 | `Lambda=Lambda` に直して Fig 5(b) を再生成 | ❌ **単独では逆効果**。倍化のみ外すと (b) は 1.0000→0.8989 と論文値 0.9932 から離れる。`1834ea2` では solver を `entropic_partial_ot` に差し替えたうえで倍化を外し、(a)(b) 両方を再生成した（§3.5-1） |
-| §3 Fig 5 | λ ごとに GMM を fit し直す構造 | ⚠️ **事実だが影響なし**。`random_state` 固定で fit は同一（冗長計算のみ）。API 上の共有保証は未対応（§3.5-2） |
+| §3 Fig 5 | λ ごとに GMM を fit し直す構造 | ✅ **解消**。notebook は既知 GMM を直接使い、両 λ で同一の component parameters / cost を共有する（§3.5-1） |
 | §4.1 | source 半径 10 / z 分散 0、target 半径 8・高さ 25、noise (20,0,25)・半径 0.6、target は affine 変換 | ✅ **全項目を実測で確認**（§3.6-1） |
 | §4.2 | λ_PGW=0.04, λ_pMGW=0.10 が論文の 0.01 と不一致 | ✅ **支持（強化）**。両者とも係数規約は (5.4) と同一だが正規化スケールが異なる。λ=0.01 が効かないのは geometry 由来（§3.6-2） |
 | §4.2 | balanced 6/6 vs partial 6/7 で条件が不公平 | ✅ 支持 |
@@ -365,7 +364,8 @@ issue #6 の方針「**原則として論文を正とし、source code / noteboo
 
 ### 解消済み（`1834ea2`）
 
-- **Figure 5 の solver と λ** — `compute_T_X_to_Z_C` を `entropic_partial_ot` に差し替え、同時に cell 5 の `Lambda = 2 * Lambda` を廃止して (a)(b) を再生成。`partial_wasserstein_lagrange_entropic` は deprecate。matched mass は論文値に一致（§3.5-1）。あわせて (6.2) の分子だけに掛かっていた `gamma>1e-10` の閾値を除去。
+- **Figure 5 の solver と λ** — `compute_T_X_to_Z_C` を `entropic_partial_ot` に差し替え、同時に cell 5 の `Lambda = 2 * Lambda` を廃止して (a)(b) を再生成。`partial_wasserstein_lagrange_entropic` は deprecate。あわせて (6.2) の分子だけに掛かっていた `gamma>1e-10` の閾値を除去。
+- **Figure 5 の fit 共有** — §7.1.5 どおり既知 GMM を使う `entropic_partial_barycentric_map` を追加し、notebook をそれに切り替え。両 λ が同一の component parameters / cost を共有する。`compute_T_X_to_Z_C` は fit する薄い wrapper として残した（§3.5-1）。
 
 ### P0（数学的意味・比較条件）
 
