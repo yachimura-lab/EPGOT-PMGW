@@ -8,6 +8,7 @@ matplotlib.use("Agg")
 
 import ot
 import pgot.mgw as pgot_mgw
+from lib import gromov
 from pgot import paper_figures
 
 from paper_setup import (
@@ -32,7 +33,6 @@ from pgot import (
     make_figure1,
     make_figure2,
     make_figure3,
-    partial_gw_penalty,
     solve_epot_panels,
     solve_point_cloud_matching,
 )
@@ -95,23 +95,8 @@ def solved_point_clouds():
         C1=problem["component_source_cost_normalized"],
         C2=problem["component_target_cost_normalized"],
     )
-    lambda_tilde = PAPER_LAMBDA / gw_mean_distortion(
-        problem["point_source_cost_normalized"],
-        problem["point_target_cost_normalized"],
-        coupling_gw,
-    )
-    lambda_point = partial_gw_penalty(
-        lambda_tilde,
-        problem["point_source_cost_normalized"],
-        problem["point_target_cost_normalized"],
-        coupling_gw,
-    )
-    lambda_component = partial_gw_penalty(
-        lambda_tilde,
-        problem["component_source_cost_normalized"],
-        problem["component_target_cost_normalized"],
-        coupling_mgw,
-    )
+    lambda_point = PAPER_LAMBDA
+    lambda_component = PAPER_LAMBDA
     solved = solve_point_cloud_matching(
         problem,
         coupling_gw=coupling_gw,
@@ -120,9 +105,9 @@ def solved_point_clouds():
         lambda_component=lambda_component,
         method_parameters={
             "paper_lambda": PAPER_LAMBDA,
-            "lambda_tilde": lambda_tilde,
             "point_solver_lambda": lambda_point,
             "component_solver_lambda": lambda_component,
+            "partial_init": "balanced coupling of the same representation",
         },
         runtime_gw=0.0,
         runtime_mgw_coupling=0.0,
@@ -187,7 +172,36 @@ class Figure67RegressionTests(unittest.TestCase):
         self.assertAlmostEqual(self.solved["coupling_pgw"].sum(), expected, places=12)
         self.assertAlmostEqual(self.solved["coupling_pmgw"].sum(), expected, places=12)
         self.assertAlmostEqual(self.solved["lambda_point"], 0.01, places=12)
-        self.assertAlmostEqual(self.solved["lambda_component"], 0.0132491708, places=9)
+        self.assertAlmostEqual(self.solved["lambda_component"], 0.01, places=12)
+
+    def test_component_solve_needs_the_balanced_start(self):
+        # Why solve_point_cloud_matching hands the balanced coupling to the
+        # partial solver: from the solver's own default start, the component
+        # problem stalls at the empty coupling at the paper's lambda, even
+        # though the coupling reached from the balanced start scores strictly
+        # lower. Without the start, Figure 6 and Figure 7 lose their pMGW panel.
+        C1 = self.problem["component_source_cost_normalized"]
+        C2 = self.problem["component_target_cost_normalized"]
+        stalled = gromov.partial_gromov_ver1(
+            C1,
+            C2,
+            self.problem["source_gmm"].weights,
+            self.problem["target_gmm"].weights,
+            Lambda=PAPER_LAMBDA,
+            numItermax_gw=100,
+            tol=1e-12,
+            verbose=False,
+        )
+        self.assertEqual(stalled.sum(), 0.0)
+
+        def objective(coupling):
+            mass = coupling.sum()
+            if mass <= 0.0:
+                return 0.0
+            distortion = gw_mean_distortion(C1, C2, coupling) * mass**2
+            return distortion - 2.0 * PAPER_LAMBDA * mass**2
+
+        self.assertLess(objective(self.solved["coupling_pmgw"]), objective(stalled))
 
     def test_figure6_is_the_nearest_neighbour_view_of_figure7(self):
         # Figure 7 shows map_*, Figure 6 shows index_*. If a method were solved

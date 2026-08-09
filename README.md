@@ -54,18 +54,21 @@ Figures 1–5 use `pgot.entropic_partial_ot`, the extended dummy-point problem
 `(a, 1)` and `(b, 1)`, and entropy is applied to the full extended coupling.
 Therefore `Lambda` is exactly the paper's `lambda`, without rescaling.
 
-For Figures 6–7, point and component costs have different normalization
-scales. The notebook uses
+For Figures 6–7, both partial solvers receive the paper's `lambda=0.01`
+unchanged, on cost matrices already divided by their own pair maximum. PGW
+and pMGW both transport `300/310` mass, leaving the ten noise points
+unmatched.
 
-```text
-Lambda_solver = lambda_tilde * gw_mean_distortion(C1, C2, balanced_coupling)
-```
+Partial GW is non-convex, so the Frank-Wolfe starting point is part of the
+specification. Both partial solves start from the balanced coupling of the
+same representation. From the solver's own default start — the independent
+coupling — the `6×7` component problem stalls at the empty coupling at
+`lambda=0.01`, even though the coupling reached from the balanced start
+scores a strictly better objective.
 
-The paper's point-level `lambda=0.01` fixes `lambda_tilde`. The canonical
-inputs are `0.010000` at point level and `0.013249` at component level; PGW
-and pMGW both transport `300/310` mass. Reducing the coupling from `300×310`
-to `6×7` is a solver-dimensionality result, not an end-to-end speed claim at
-`N=300`, because GMM fitting also takes time.
+Reducing the coupling from `300×310` to `6×7` is a solver-dimensionality
+result, not an end-to-end speed claim at `N=300`, because GMM fitting also
+takes time.
 
 ## Reproducibility
 

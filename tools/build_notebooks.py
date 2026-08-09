@@ -525,7 +525,6 @@ from pgot import (
     gw_mean_distortion,
     make_figure6,
     make_figure7,
-    partial_gw_penalty,
     solve_point_cloud_matching,
     write_figure_sidecar,
 )
@@ -651,16 +650,17 @@ print(
 '''),
         ("code", r'''
 # ---------------------------------------------------------------
-# Penalty conversion.
+# Penalty. Section 7.2 sets lambda = 0.01 for both partial methods, and
+# both solvers receive that number unchanged, on cost matrices that have
+# already been divided by their own pair maximum.
 #
-# The two representations normalize their costs by different constants, so
-# the same numeric lambda does not mean the same thing in both. We measure
-# lambda in units of the mean distortion of the balanced optimum:
-#
-#     Lambda = lambda_tilde * gw_mean_distortion(C1, C2, G_balanced)
-#
-# lambda_tilde is dimensionless and shared, and is fixed so that the
-# point-level penalty equals the lambda = 0.01 reported in Section 7.2.
+# Partial GW is non-convex, so the Frank-Wolfe start matters. The solver
+# default is the independent coupling, which on the 6 x 7 component
+# problem spreads every source component over the noise component too and
+# stalls at the empty coupling, even though the matching reached from the
+# balanced start scores a strictly better objective. Both partial solves
+# therefore start at the balanced coupling for the same representation,
+# which `solve_point_cloud_matching` receives below.
 # ---------------------------------------------------------------
 PAPER_LAMBDA = 0.01
 
@@ -683,17 +683,8 @@ coupling_mgw = MGW2_GM_coup(
 )
 runtime_mgw_coupling = perf_counter() - started
 
-point_distortion = gw_mean_distortion(point_source_n, point_target_n, coupling_gw)
-component_distortion = gw_mean_distortion(
-    component_source_n, component_target_n, coupling_mgw
-)
-lambda_tilde = PAPER_LAMBDA / point_distortion
-lambda_point = partial_gw_penalty(
-    lambda_tilde, point_source_n, point_target_n, coupling_gw
-)
-lambda_component = partial_gw_penalty(
-    lambda_tilde, component_source_n, component_target_n, coupling_mgw
-)
+lambda_point = PAPER_LAMBDA
+lambda_component = PAPER_LAMBDA
 
 figure67_solved = solve_point_cloud_matching(
     figure67_problem,
@@ -701,20 +692,25 @@ figure67_solved = solve_point_cloud_matching(
     coupling_mgw=coupling_mgw,
     lambda_point=lambda_point,
     lambda_component=lambda_component,
-    # These four keys feed the solve identifiers; keep them stable so that a
+    # These keys feed the solve identifiers; keep them stable so that a
     # refactor does not silently change the recorded provenance.
     method_parameters={
         "paper_lambda": PAPER_LAMBDA,
-        "lambda_tilde": lambda_tilde,
         "point_solver_lambda": lambda_point,
         "component_solver_lambda": lambda_component,
+        "partial_init": "balanced coupling of the same representation",
     },
     runtime_gw=runtime_gw,
     runtime_mgw_coupling=runtime_mgw_coupling,
 )
-figure67_solved["point_mean_distortion"] = point_distortion
-figure67_solved["component_mean_distortion"] = component_distortion
-print(f"lambda_tilde={lambda_tilde:.6f}")
+# Reported for the record: the balanced couplings must match the noise, and
+# the distortion they carry is what the partial couplings shed.
+figure67_solved["point_mean_distortion"] = gw_mean_distortion(
+    point_source_n, point_target_n, coupling_gw
+)
+figure67_solved["component_mean_distortion"] = gw_mean_distortion(
+    component_source_n, component_target_n, coupling_mgw
+)
 print(
     f"solver lambda: point={lambda_point:.6f}, "
     f"component={lambda_component:.6f}"
@@ -770,7 +766,7 @@ common_inputs = {
     },
     "point_cost_scale": figure67_problem["point_cost_scale"],
     "component_cost_scale": figure67_problem["component_cost_scale"],
-    "penalty_conversion": "Lambda = lambda_tilde * balanced mean distortion",
+    "partial_init": "balanced coupling of the same representation",
 }
 method_panels = []
 for method, key, solver_lambda in [
@@ -786,7 +782,6 @@ for method, key, solver_lambda in [
                 PAPER_LAMBDA if method in {"PGW2", "pMGW2"} else None
             ),
             "solver_lambda": solver_lambda,
-            "lambda_tilde": figure67_solved["lambda_tilde"],
             "solver": (
                 "POT gromov_wasserstein"
                 if method in {"GW2", "MGW2"}

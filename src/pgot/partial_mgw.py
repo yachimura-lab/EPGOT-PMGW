@@ -57,22 +57,6 @@ def gw_mean_distortion(C1, C2, coupling):
     return float(total / mass**2)
 
 
-def partial_gw_penalty(lambda_tilde, C1, C2, balanced_coupling):
-    """Convert the dimensionless penalty to a solver ``Lambda``.
-
-    The paper states a single ``lambda`` for the partial methods, but the
-    point-level and component-level problems normalize their cost matrices
-    by different constants, so the same number means different things. We
-    fix the convention by measuring ``lambda`` in units of the mean
-    distortion of the *balanced* optimum for the same representation:
-
-        Lambda = lambda_tilde * gw_mean_distortion(C1, C2, G_balanced)
-
-    ``lambda_tilde`` is then dimensionless and shared by both methods.
-    """
-    return float(lambda_tilde) * gw_mean_distortion(C1, C2, balanced_coupling)
-
-
 def barycentric_projection(coupling, Y, tol=0.0):
     """Row-barycentric projection of a coupling onto the target points.
 
@@ -270,6 +254,7 @@ def pMGW2_coup(
     C1=None,
     C2=None,
     coupling=None,
+    init_coupling=None,
     log=False,
 ):
     """Compute a partial-MGW coupling and barycentric map.
@@ -281,6 +266,14 @@ def pMGW2_coup(
     Pass ``mu``/``nu`` to reuse mixtures fitted elsewhere, and ``C1``/``C2``
     to reuse their pairwise Gaussian W2 matrices, so that a balanced and a
     partial run can be compared on exactly the same fit and cost.
+
+    ``init_coupling`` is the Frank-Wolfe starting point handed to the solver.
+    The problem is non-convex, and the solver's default start is the
+    independent coupling ``outer(a, b)``, which spreads every source component
+    over every target component. When a component of ``nu`` has no counterpart
+    in ``mu``, that start can leave the solver at the trivial empty coupling
+    even where a matching with strictly better objective exists, so callers
+    that already hold the balanced coupling should pass it here.
     """
     if mu is None:
         mu = _fit_gmm(X, n_components_X, random_state)
@@ -311,7 +304,7 @@ def pMGW2_coup(
             b,
             Lambda=Lambda,
             nb_dummies=1,
-            G0=None,
+            G0=None if init_coupling is None else np.asarray(init_coupling, float),
             thres=1,
             numItermax=None,
             numItermax_gw=1000,
