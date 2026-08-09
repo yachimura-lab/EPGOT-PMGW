@@ -493,7 +493,6 @@ Figure 7 displays the raw mixture barycentric maps, and Figure 6 applies nearest
 target assignment to those same maps.
 
 The dimensionality claim is limited to the coupling solve (300×310 versus 6×7).
-At N=300 the GMM fitting cost means this notebook does not claim end-to-end speedup.
 '''),
         ("code", r'''
 import os
