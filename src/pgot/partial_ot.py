@@ -383,6 +383,9 @@ def entropic_partial_displacement_interpolation(
     density. Each ``mu^t_kl`` comes from the closed form (4.17).
 
     Returns ``(weights, means, covs)``, with ``weights.sum() == Z_lambda``.
+
+    ``Lambda`` is required unless ``coupling`` is supplied, in which case the
+    coupling already fixes the penalty and ``Lambda`` is not read.
     """
     if coupling is None:
         gamma, solve_info = entropic_partial_coupling(
@@ -412,7 +415,7 @@ def entropic_partial_displacement_interpolation(
     return result
 
 
-def entropic_partial_coupling(mu, nu, epsilon=1e-2, Lambda=None, log=False):
+def entropic_partial_coupling(mu, nu, *, Lambda, epsilon=1e-2, log=False):
     """Solve the paper's component-level EPOT problem once.
 
     This separates cost construction and the solve from interpolation or
@@ -420,6 +423,10 @@ def entropic_partial_coupling(mu, nu, epsilon=1e-2, Lambda=None, log=False):
     pass the returned coupling to
     :func:`entropic_partial_displacement_interpolation` instead of silently
     solving the identical problem once per panel.
+
+    ``Lambda`` is the paper's ``lambda`` on the normalized cost scale, and is
+    keyword-only and required: this function always solves, and there is no
+    penalty that stands in for the balanced problem.
     """
     raw_cost = _cross_gaussian_cost_gmm(mu, nu)
     cost_scale = float(np.max(raw_cost))
@@ -441,8 +448,8 @@ def entropic_partial_coupling(mu, nu, epsilon=1e-2, Lambda=None, log=False):
         "coupling": gamma,
         "cost_matrix": normalized_cost,
         "cost_normalization_scale": cost_scale,
-        "paper_lambda": float(np.max(normalized_cost) if Lambda is None else Lambda),
-        "solver_lambda": float(np.max(normalized_cost) if Lambda is None else Lambda),
+        "paper_lambda": float(Lambda),
+        "solver_lambda": float(Lambda),
         "epsilon": float(epsilon),
     }
 
@@ -480,7 +487,9 @@ def entropic_partial_barycentric_map(
     weights with the normalized Gaussian cost (7.1), and the map is
     normalized by the matched density ``sum_kl omega_kl p_k(x)``.
 
-    ``Lambda`` is the paper's ``lambda`` on the normalized cost scale.
+    ``Lambda`` is the paper's ``lambda`` on the normalized cost scale. It is
+    required unless ``coupling`` is supplied, in which case the coupling
+    already fixes the penalty and ``Lambda`` is not read.
     """
     X = np.asarray(X, dtype=float)
     d = X.shape[1]
@@ -530,10 +539,11 @@ def _epot_component_coupling(
 ):
     """Solve (3.1) between mixture components on a normalized cost matrix.
 
-    ``Lambda`` is the paper's ``lambda``. ``None`` selects the balanced
-    limit: with ``M`` normalized to a maximum of one, ``Lambda = max(M)``
-    makes every real-real entry of the extended cost negative, so no mass is
-    left on the dummy node.
+    ``Lambda`` is the paper's ``lambda`` and must be given. No finite value
+    reproduces balanced entropic OT: for ``eps > 0`` every entry of the
+    extended kernel is strictly positive, so the dummy node keeps some mass
+    at any penalty, and the balanced problem is only the limit
+    ``Lambda -> infinity``.
     """
     if nb_dummies != 1:
         raise ValueError(
@@ -541,7 +551,11 @@ def _epot_component_coupling(
             f"nb_dummies={nb_dummies} is not supported."
         )
     if Lambda is None:
-        Lambda = float(np.max(M))
+        raise ValueError(
+            "Lambda must be specified. Balanced entropic OT is obtained only "
+            "in the limit Lambda -> infinity, not at any finite penalty; for "
+            "a balanced entropic coupling use ot.sinkhorn(a, b, M, reg=eps)."
+        )
     return entropic_partial_ot(
         a,
         b,
@@ -565,15 +579,17 @@ def compute_T_X_to_Z(
     Y,
     n_components_X,
     n_components_Y,
+    *,
+    Lambda,
     epsilon=1e-2,
-    Lambda=None,
     nb_dummies=1,
     random_state=DEFAULT_SEED,
     log=False,
 ):
     """Compute the partial-OT barycentric projection map (6.2).
 
-    ``Lambda`` is the paper's ``lambda`` in (3.1)/(4.4), on the scale of the
+    ``Lambda`` is keyword-only and required; this entry point always solves.
+    It is the paper's ``lambda`` in (3.1)/(4.4), on the scale of the
     normalized cost matrix (7.1).
 
     This compatibility entry point now uses the matched density

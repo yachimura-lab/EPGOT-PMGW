@@ -98,6 +98,26 @@ class PartialOTRegressionTests(unittest.TestCase):
         )
         np.testing.assert_allclose(legacy, canonical, atol=1e-12, rtol=1e-12)
 
+    def test_no_penalty_stands_in_for_the_balanced_problem(self):
+        # A finite Lambda never makes the dummy node empty at eps > 0, so a
+        # default penalty would hand back a partial coupling while the caller
+        # believed they had asked for balanced entropic OT.
+        with self.assertRaises(TypeError):
+            entropic_partial_coupling(self.source, self.target, epsilon=0.03)
+        with self.assertRaisesRegex(ValueError, "Lambda must be specified"):
+            entropic_partial_coupling(
+                self.source, self.target, epsilon=0.03, Lambda=None
+            )
+
+    def test_the_dummy_node_keeps_mass_at_the_penalty_that_was_the_default(self):
+        # The removed default was Lambda = max(M) = 1 on the normalized cost.
+        # It leaves matched mass short of one, which is what made calling it
+        # the balanced limit wrong.
+        coupling = entropic_partial_coupling(
+            self.source, self.target, epsilon=0.03, Lambda=1.0
+        )
+        self.assertLess(coupling.sum(), 1.0)
+
 
 if __name__ == "__main__":
     unittest.main()
