@@ -1,5 +1,7 @@
 """Partial optimal transport helpers used by the notebook experiments."""
 
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
 import ot
@@ -29,7 +31,19 @@ def entropic_partial_ot(
     stopThr=1e-9,
     remove_dummy=True,
 ):
-    """Compute entropic partial OT using a dummy node and Sinkhorn."""
+    """Solve the entropic partial OT problem (3.1) of the paper.
+
+    This is the canonical EPOT primitive for the whole package. It builds the
+    extended cost ``c_ij - 2*Lambda`` on the real-real block, appends the
+    dummy row and column with extended marginals ``(a, 1)`` and ``(b, 1)``,
+    and runs Sinkhorn so that the entropy applies to the *whole* extended
+    coupling. ``Lambda`` is therefore the paper's penalty ``lambda``
+    directly, on the scale of the normalized cost matrix (7.1).
+
+    Returns the real-real block ``omega^{eps,lambda}`` unless
+    ``remove_dummy`` is false, in which case the full extended coupling is
+    returned.
+    """
     a = np.asarray(a, dtype=float)
     b = np.asarray(b, dtype=float)
     M = np.asarray(M, dtype=float)
@@ -101,7 +115,25 @@ def partial_wasserstein_lagrange_entropic(
     log=False,
     **kwargs,
 ):
-    """Compute inequality-constrained entropic Lagrangian partial OT."""
+    """Deprecated: solves a *different* problem from the paper's (3.1).
+
+    This routine relaxes the mass with ``M - Lambda`` (a single ``Lambda``,
+    not ``2*Lambda``) and applies the entropy only to the real block, using
+    capped scaling against the inequality constraints ``gamma 1 <= a`` and
+    ``gamma^T 1 <= b``. Its ``Lambda`` therefore corresponds to ``2*lambda``
+    in the paper's convention, and even after that rescaling its minimizer
+    differs from (3.1) because the dummy row and column carry no entropy.
+
+    Use :func:`entropic_partial_ot` instead; it implements (3.1) exactly.
+    Kept only so that previously published results remain reproducible.
+    """
+    warnings.warn(
+        "partial_wasserstein_lagrange_entropic does not implement the "
+        "paper's (3.1): it uses 'M - Lambda' instead of 'M - 2*lambda' and "
+        "regularizes only the real block. Use entropic_partial_ot instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     del nb_dummies, kwargs
     a = np.asarray(a, float)
     b = np.asarray(b, float)
@@ -125,8 +157,6 @@ def partial_wasserstein_lagrange_entropic(
             break
 
     gamma = np.diag(u) @ kernel @ np.diag(v)
-    print(gamma)
-    print(np.sum(gamma))
 
     if log:
         return gamma, {
@@ -194,6 +224,24 @@ def _cross_gaussian_cost(mixX, mixY, clip=False):
     return cost
 
 
+def _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies):
+    """Solve (3.1) between mixture components for the Figure 5 helpers.
+
+    ``Lambda`` is the paper's ``lambda``. ``None`` selects the balanced
+    limit: with ``M`` normalized to a maximum of one, ``Lambda = max(M)``
+    makes every real-real entry of the extended cost negative, so no mass is
+    left on the dummy node.
+    """
+    if nb_dummies != 1:
+        raise ValueError(
+            "The paper's (3.1) uses exactly one dummy point; "
+            f"nb_dummies={nb_dummies} is not supported."
+        )
+    if Lambda is None:
+        Lambda = float(np.max(M))
+    return entropic_partial_ot(a, b, M, Lambda=Lambda, reg=epsilon)
+
+
 def compute_monge_map_matrix(CovK, CovL):
     """Return the optimal Gaussian transport-map matrix from K to L."""
     sqrtK = sqrtm(CovK).real
@@ -211,8 +259,17 @@ def compute_T_X_to_Z(
     Lambda=None,
     nb_dummies=1,
     random_state=DEFAULT_SEED,
+    log=False,
 ):
-    """Compute the original Figure 5 partial-OT barycentric projection."""
+    """Compute a partial-OT barycentric projection with the full-mixture denominator.
+
+    ``Lambda`` is the paper's ``lambda`` in (3.1)/(4.4), on the scale of the
+    normalized cost matrix (7.1).
+
+    Note that the denominator here is the *full* mixture density
+    ``sum_k a_k p_k(x)``, which is the balanced form (6.1) rather than the
+    partial form (6.2). Prefer :func:`compute_T_X_to_Z_C` for Figure 5.
+    """
     mixX, mixY = _fit_figure5_mixtures(
         X,
         Y,
@@ -227,15 +284,7 @@ def compute_T_X_to_Z(
 
     M = _cross_gaussian_cost(mixX, mixY)
     M = M / np.max(M)
-    gamma, _ = partial_wasserstein_lagrange_entropic(
-        a,
-        b,
-        M,
-        Lambda=Lambda,
-        epsilon=epsilon,
-        nb_dummies=nb_dummies,
-        log=True,
-    )
+    gamma = _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies)
 
     Z = np.zeros_like(X)
     d = X.shape[1]
@@ -268,6 +317,8 @@ def compute_T_X_to_Z(
                 Tkl = mixY.means_[l] + map_matrix @ (x - mixX.means_[k])
                 Tb += (gamma[k, l] / a[k]) * pi_x[k] * Tkl
         Z[i] = Tb
+    if log:
+        return Z, {"matched_mass": float(gamma.sum()), "coupling": gamma}
     return Z
 
 
@@ -280,8 +331,18 @@ def compute_T_X_to_Z_C(
     Lambda=1e-1,
     nb_dummies=1,
     random_state=DEFAULT_SEED,
+    log=False,
 ):
-    """Compute Figure 5's matched-density barycentric projection map."""
+    """Compute Figure 5's entropic partial barycentric projection map (6.2).
+
+    The component coupling is the real-real block of the paper's EPOT
+    problem (3.1)/(4.4), obtained from :func:`entropic_partial_ot`. The map
+    is normalized by the *matched* density ``sum_kl omega_kl p_k(x)``, as
+    (6.2) prescribes, not by the full mixture density.
+
+    ``Lambda`` is the paper's ``lambda``, on the scale of the normalized
+    cost matrix (7.1); it is passed to the solver unchanged.
+    """
     mixX, mixY = _fit_figure5_mixtures(
         X,
         Y,
@@ -297,24 +358,19 @@ def compute_T_X_to_Z_C(
 
     M = _cross_gaussian_cost(mixX, mixY, clip=True)
     M = M / np.max(M)
-    gamma, _ = partial_wasserstein_lagrange_entropic(
-        a,
-        b,
-        M,
-        Lambda=Lambda,
-        epsilon=epsilon,
-        nb_dummies=nb_dummies,
-        log=True,
-    )
+    gamma = _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies)
 
-    A_matrices = {}
-    for k in range(Kx):
-        for l in range(Ky):
-            if gamma[k, l] > 1e-10:
-                A_matrices[(k, l)] = compute_monge_map_matrix(
-                    mixX.covariances_[k],
-                    mixY.covariances_[l],
-                )
+    # Every component pair contributes to (6.2). Dropping small-weight pairs
+    # from the numerator while keeping them in the denominator would bias the
+    # map towards zero, so no threshold is applied here.
+    A_matrices = {
+        (k, l): compute_monge_map_matrix(
+            mixX.covariances_[k],
+            mixY.covariances_[l],
+        )
+        for k in range(Kx)
+        for l in range(Ky)
+    }
 
     Z = np.zeros_like(X)
     for i, x in enumerate(X):
@@ -331,11 +387,9 @@ def compute_T_X_to_Z_C(
         for k in range(Kx):
             for l in range(Ky):
                 denominator += gamma[k, l] * p_vals[k]
-                if (k, l) in A_matrices:
-                    Tkl = (
-                        mixY.means_[l]
-                        + A_matrices[(k, l)] @ (x - mixX.means_[k])
-                    )
-                    numerator += gamma[k, l] * p_vals[k] * Tkl
+                Tkl = mixY.means_[l] + A_matrices[(k, l)] @ (x - mixX.means_[k])
+                numerator += gamma[k, l] * p_vals[k] * Tkl
         Z[i] = numerator / (denominator + 1e-300)
+    if log:
+        return Z, {"matched_mass": float(gamma.sum()), "coupling": gamma}
     return Z
