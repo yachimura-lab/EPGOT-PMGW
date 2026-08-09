@@ -70,10 +70,6 @@ Every notebook's first cell is `from pgot import set_reproducible; set_reproduci
 
 Quarto renders `docs/notebook/*.ipynb` into the sidebar automatically (`_quarto.yml`). Notebooks that already carry outputs are published as-is rather than re-executed, so **committed outputs are what readers see** — after changing library code, re-run the affected notebooks and commit them with their outputs. `docs/index.qmd` is currently empty.
 
-### Legacy directories
-
-`forward/` (original delivered notebooks and a duplicate `computation/`) and `src/algorithm/` (standalone scripts, some with hardcoded absolute paths like `/home/arnold/...`) predate the `pgot` package. Nothing in `pgot` or `docs/notebook` imports them; they are kept for reference. Don't extend them — port to `pgot` + `docs/notebook` instead.
-
 ## Note on the README
 
 The README's "Repository layout" section still shows the notebooks as `src/figure*.ipynb`; they actually live in `docs/notebook/` (the links in its Notebooks table are correct). It also omits the vendored-submodule setup step. Worth fixing if you touch the README.
