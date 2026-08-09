@@ -1,6 +1,5 @@
 """Gaussian-mixture models, Gaussian W2 geometry, and transport maps."""
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as spl
 from scipy.stats import multivariate_normal
@@ -70,18 +69,6 @@ class GaussianMixture:
             )
             for k in range(self.K)
         )
-
-    def plot_scatter_2d(self, n_samples, T=None, *args, rng=None):
-        """Plot samples, optionally after applying a transport map."""
-        X, idx_list = self.sample(n_samples, True, rng=rng)
-        if T is not None:
-            Y = np.array([T(X[k], idx_list[k], *args) for k in range(len(X))])
-        else:
-            Y = X
-        for k in range(self.K):
-            Z = Y[idx_list == k]
-            plt.scatter(Z[:, 0], Z[:, 1], color=X[idx_list == k][:, 0], s=10)
-        plt.axis("equal")
 
     def pdist(self, f):
         """Compute the pairwise component-distance matrix."""
