@@ -22,7 +22,7 @@ git -C vendor/PGW_Metric checkout --detach 8a9002e14d6b17decf35e603e9a9e42aa8465
 # 2. Python env (installs the root project editable, which puts `src/` on sys.path)
 uv sync
 
-# 3. C++ engine — only needed for figure4.ipynb and src/algorithm/*.py
+# 3. C++ engine — only needed for the legacy src/algorithm/*.py scripts
 sudo dnf install -y eigen3-devel   # or the distro equivalent
 rm -rf src/computation/build
 cmake -S src/computation -B src/computation/build \
@@ -36,7 +36,7 @@ cmake --build src/computation/build
 Smoke test that all three landed:
 
 ```bash
-uv run python -c "import pgot, cpp_engine; from lib import gromov"
+uv run python -c "import pgot; from lib import gromov"   # add cpp_engine only for src/algorithm/
 ```
 
 ## Common commands
@@ -72,7 +72,7 @@ What makes the *partial* case different, and where bugs tend to hide: the coupli
 
 ### `src/computation/` — `cpp_engine`
 
-Eigen + pybind11 reimplementation of three hot routines (`GaussianW2`, `GaussianBarycenterW2`, `entropic_partial_ot`) used by `figure4.ipynb` for barycentric interpolation. It is a **parallel implementation, not a binding of the Python code** — changing the math in `pgot/gaussian.py` or `pgot/partial_ot.py` means changing `engine.cpp` too, or the two silently disagree. CMake writes the `.so` directly into `src/` (not into `build/`), which is importable because the editable install of the root project puts `src/` on `sys.path`. `.so` files are gitignored, so the build is per-machine.
+Eigen + pybind11 reimplementation of three hot routines (`GaussianW2`, `GaussianBarycenterW2`, `entropic_partial_ot`), now used only by the legacy `src/algorithm/*.py` scripts. `figure4.ipynb` moved to the `pgot` implementations, so no notebook needs this build. It is a **parallel implementation, not a binding of the Python code** — changing the math in `pgot/gaussian.py` or `pgot/partial_ot.py` means changing `engine.cpp` too, or the two silently disagree. CMake writes the `.so` directly into `src/` (not into `build/`), which is importable because the editable install of the root project puts `src/` on `sys.path`. `.so` files are gitignored, so the build is per-machine.
 
 ### Reproducibility contract
 

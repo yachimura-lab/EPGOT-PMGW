@@ -41,8 +41,11 @@ from .partial_ot import (
     densite_theorique2d,
     display_gmm,
     entropic_partial_barycentric_map,
+    entropic_partial_displacement_interpolation,
     entropic_partial_ot,
+    gaussian_displacement_interpolation,
     normalize_cost,
+    submixture_pdf,
     partial_wasserstein_lagrange_entropic,
     to_numpy,
 )
@@ -101,8 +104,11 @@ __all__ = [
     "densite_theorique2d",
     "display_gmm",
     "entropic_partial_barycentric_map",
+    "entropic_partial_displacement_interpolation",
     "entropic_partial_ot",
+    "gaussian_displacement_interpolation",
     "normalize_cost",
+    "submixture_pdf",
     "partial_wasserstein_lagrange_entropic",
     "to_numpy",
     # Partial mixture GW

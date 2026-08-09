@@ -240,6 +240,77 @@ def _cross_gaussian_cost_gmm(mu, nu, clip=True):
     return cost
 
 
+def gaussian_displacement_interpolation(mean0, cov0, mean1, cov1, t):
+    """Return the McCann displacement interpolation (4.17) in closed form.
+
+    ``((1 - t) Id + t T)_# N(mean0, cov0)`` where ``T`` is the Gaussian
+    optimal map (4.5). Writing ``B = (1 - t) Id + t A`` with ``A`` the map
+    matrix, the result is the Gaussian with mean ``(1-t) mean0 + t mean1``
+    and covariance ``B cov0 B^T``. No iteration is needed.
+    """
+    mean0 = np.asarray(mean0, dtype=float)
+    mean1 = np.asarray(mean1, dtype=float)
+    cov0 = np.asarray(cov0, dtype=float)
+    A = compute_monge_map_matrix(cov0, np.asarray(cov1, dtype=float))
+    B = (1.0 - t) * np.eye(cov0.shape[0]) + t * A
+    return (1.0 - t) * mean0 + t * mean1, B @ cov0 @ B.T
+
+
+def entropic_partial_displacement_interpolation(
+    mu,
+    nu,
+    t,
+    epsilon=1e-2,
+    Lambda=None,
+    log=False,
+):
+    """Return the entropic partial displacement interpolation (4.18).
+
+    The result is the **sub-probability** measure
+    ``mu^t_{eps,lambda} = sum_kl omega_kl mu^t_kl`` whose total mass is
+    ``Z_lambda <= 1``. Weights are the coupling entries themselves: they are
+    neither thresholded nor renormalized, so the mass carries through to the
+    density. Each ``mu^t_kl`` comes from the closed form (4.17).
+
+    Returns ``(weights, means, covs)``, with ``weights.sum() == Z_lambda``.
+    """
+    M = _cross_gaussian_cost_gmm(mu, nu)
+    M = M / np.max(M)
+    gamma = _epot_component_coupling(mu.weights, nu.weights, M, Lambda, epsilon)
+
+    weights, means, covs = [], [], []
+    for k in range(mu.K):
+        for l in range(nu.K):
+            mean, cov = gaussian_displacement_interpolation(
+                mu.comp_mean[k], mu.comp_cov[k], nu.comp_mean[l], nu.comp_cov[l], t
+            )
+            weights.append(gamma[k, l])
+            means.append(mean)
+            covs.append(cov)
+
+    weights = np.asarray(weights, dtype=float)
+    result = (weights, np.asarray(means), np.asarray(covs))
+    if log:
+        return result, {"matched_mass": float(gamma.sum()), "coupling": gamma}
+    return result
+
+
+def submixture_pdf(X, weights, means, covs):
+    """Evaluate a Gaussian mixture density without renormalizing the weights.
+
+    Unlike a probability mixture, ``weights`` may sum to less than one; the
+    returned density then integrates to that same mass. This is what (4.18)
+    requires.
+    """
+    X = np.asarray(X, dtype=float)
+    total = np.zeros(X.shape[0], dtype=float)
+    for w, mean, cov in zip(weights, means, covs):
+        if w == 0.0:
+            continue
+        total += w * sps.multivariate_normal.pdf(X, mean=mean, cov=cov)
+    return total
+
+
 def entropic_partial_barycentric_map(
     X,
     mu,
@@ -263,7 +334,7 @@ def entropic_partial_barycentric_map(
 
     M = _cross_gaussian_cost_gmm(mu, nu)
     M = M / np.max(M)
-    gamma = _figure5_component_coupling(
+    gamma = _epot_component_coupling(
         mu.weights, nu.weights, M, Lambda, epsilon, nb_dummies=1
     )
 
@@ -290,8 +361,8 @@ def entropic_partial_barycentric_map(
     return Z
 
 
-def _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies):
-    """Solve (3.1) between mixture components for the Figure 5 helpers.
+def _epot_component_coupling(a, b, M, Lambda, epsilon, nb_dummies=1):
+    """Solve (3.1) between mixture components on a normalized cost matrix.
 
     ``Lambda`` is the paper's ``lambda``. ``None`` selects the balanced
     limit: with ``M`` normalized to a maximum of one, ``Lambda = max(M)``
@@ -350,7 +421,7 @@ def compute_T_X_to_Z(
 
     M = _cross_gaussian_cost(mixX, mixY)
     M = M / np.max(M)
-    gamma = _figure5_component_coupling(a, b, M, Lambda, epsilon, nb_dummies)
+    gamma = _epot_component_coupling(a, b, M, Lambda, epsilon, nb_dummies)
 
     Z = np.zeros_like(X)
     d = X.shape[1]
