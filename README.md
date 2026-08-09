@@ -52,6 +52,7 @@ If uv is not installed yet, you can install it with the bundled script:
 ### 1. Install Python dependencies
 
 ```bash
+git submodule update --init --recursive
 uv sync
 ```
 
