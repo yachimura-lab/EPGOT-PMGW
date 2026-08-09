@@ -153,7 +153,7 @@ def _plot_epot_grid(records, shape, figsize, source, target):
         orientation="horizontal",
         fraction=0.045,
         pad=0.05,
-        label=r"coupling weight $\omega_{ij}^{\varepsilon,\lambda}$",
+        label=r"coupling weight $\omega_{kl}^{\varepsilon,\lambda}$",
     )
     return fig
 

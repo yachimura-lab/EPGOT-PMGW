@@ -72,9 +72,9 @@
   "notes": "3 x 7 paper sweep; shared coupling-weight color scale.",
   "outputs": [
     {
-      "bytes": 545689,
+      "bytes": 545525,
       "path": "outputs/figure3.pdf",
-      "sha256": "a86a7cabb179db37830216a8204329cd74cf085c043573d91dc101fe4176cd49"
+      "sha256": "984e96ee75e8e33b658d929111e6a104c927f83adb49f2e5e66e5b7fea604b6c"
     }
   ],
   "panels": [
@@ -98,7 +98,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0016041179915191606,
+      "runtime_seconds": 0.0013308240013429895,
       "solve_id": "91ed2a137231ce033e6864042f5b44c6843d67b7960be8d17b0b369162aab875",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -123,7 +123,7 @@
       "paper_lambda": 0.1875,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0018333409971091896,
+      "runtime_seconds": 0.0017524619906907901,
       "solve_id": "e1ccb2a6d8c26713da8ad5be40355f3ece6c3e3e6ea06e612d5e3f09ac61b4f6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.1875
@@ -148,7 +148,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.0012447150074876845,
+      "runtime_seconds": 0.0012169920082669705,
       "solve_id": "3d89c599f06f3e9e0ed2812e7ffdfef428b235b3cf92b22717f4812692ec1dab",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -173,7 +173,7 @@
       "paper_lambda": 0.3125,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0012435099924914539,
+      "runtime_seconds": 0.0012543129996629432,
       "solve_id": "e3ce11a6b99e0508dc151d021d96b40271fe10684841e8a75eed7fd14dac64b6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3125
@@ -198,7 +198,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0035995539947180077,
+      "runtime_seconds": 0.003490165006951429,
       "solve_id": "d4fb2e61c108c7c2c62c99a6a831ded500b0bf634a5e62e17b31fdb4b013c816",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -223,7 +223,7 @@
       "paper_lambda": 0.4375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.006443713995395228,
+      "runtime_seconds": 0.006134754003142007,
       "solve_id": "a5dcf8b57bd3d5f1f37561697310233eb89552ab39112fdde6e16e8692a901fb",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.4375
@@ -248,7 +248,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.21818432900181506,
+      "runtime_seconds": 0.21800930399331264,
       "solve_id": "17db219cd8a4b9f3b835210bd5d6ed011a47fa9e61a00aae8050234f7adea21c",
       "solver": "POT sinkhorn + SciPy SLSQP refinement",
       "solver_lambda": 0.5
@@ -273,7 +273,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.00018382200505584478,
+      "runtime_seconds": 0.00018527400970924646,
       "solve_id": "f27a642c35bb44660c7181a8bcda53d84e5add54540dc21999c4a8790cb9fce9",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -298,7 +298,7 @@
       "paper_lambda": 0.1875,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.00026739900931715965,
+      "runtime_seconds": 0.0002621100138640031,
       "solve_id": "859288a97a274339d719f0ff9ba99f1015eeb05112460ae29be46980e246555f",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.1875
@@ -323,7 +323,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.00026212999364361167,
+      "runtime_seconds": 0.00026008099666796625,
       "solve_id": "d859e026f53387b0a3c5c84905153a8f9029cd5888c73788bf7b9e946eaa70f1",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -348,7 +348,7 @@
       "paper_lambda": 0.3125,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.00041868799598887563,
+      "runtime_seconds": 0.00045599599252454937,
       "solve_id": "3298eb29a889ad84ede78dde002a10186522b1547ec28579d97d8ba31e0fd29b",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3125
@@ -373,7 +373,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.00048192399844992906,
+      "runtime_seconds": 0.0004720630095107481,
       "solve_id": "ef1017f8c4c208e25cee8b0d650516a892430427574cdf6a0f5ae76b33cb02c9",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -398,7 +398,7 @@
       "paper_lambda": 0.4375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0006921900057932362,
+      "runtime_seconds": 0.0007027309911791235,
       "solve_id": "443b1845e8dabd71b426bc7f17e5d8052f3affd068a2ba5ad5f93bcab02a5307",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.4375
@@ -423,7 +423,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 5.551115123125783e-17,
-      "runtime_seconds": 0.000899252001545392,
+      "runtime_seconds": 0.0009040549921337515,
       "solve_id": "e15f590755215ca8174000efc38361a7c82084a7e62387b63d9e30ddd357b116",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.5
@@ -448,7 +448,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.00015231799625325948,
+      "runtime_seconds": 0.0001509849971625954,
       "solve_id": "b87392caf2731a6edb73809a3a08409ddb9e4032e459e471276578cf40eff2aa",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -473,7 +473,7 @@
       "paper_lambda": 0.1875,
       "residual_tolerance": 1e-09,
       "row_residual": 5.551115123125783e-17,
-      "runtime_seconds": 0.00014908700541127473,
+      "runtime_seconds": 0.00014696299331262708,
       "solve_id": "025738c498a0b3e78a19b1c20822709149b531c3f1bdb3024e9f9e9830b820d6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.1875
@@ -498,7 +498,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.00014897200162522495,
+      "runtime_seconds": 0.0001479700003983453,
       "solve_id": "82f1ec729354ba9b031ecd60755f21afab14a428782bcad8dd7dff98f0b13617",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -523,7 +523,7 @@
       "paper_lambda": 0.3125,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.00033411198819521815,
+      "runtime_seconds": 0.00025241599360015243,
       "solve_id": "56cc8d0d4375f58fb45e4a29753053eb205141440e98c7cdb70fc7bbd3b7ada7",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3125
@@ -548,7 +548,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.00025815200933720917,
+      "runtime_seconds": 0.00025174301117658615,
       "solve_id": "84dba4f356e950a266e9599c1ba0933178f69a219bf58e3023169fdc6a1ce3c3",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -573,7 +573,7 @@
       "paper_lambda": 0.4375,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.00025637300859671086,
+      "runtime_seconds": 0.0002546129981055856,
       "solve_id": "2fb8d2e10cfcb8b9cea1a5d380808a03a43e4e2bb0ec92054ae32fd132c31f57",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.4375
@@ -598,7 +598,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0003632689913501963,
+      "runtime_seconds": 0.0003633599990280345,
       "solve_id": "1e270f7f7c9c9de9f1ee0dc7a98a9d91d9cb269c1a9e9656ce5178b6653fc393",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.5
@@ -610,7 +610,7 @@
     "sampling": null
   },
   "source": {
-    "commit": "5d09476fdc784dd43813520655244c3422ef3792",
+    "commit": "50d84027f825f2d38fc6d46a451c428978fe7c3e",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }
