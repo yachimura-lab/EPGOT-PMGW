@@ -1,0 +1,69 @@
+{
+  "description": "Canonical outputs after the final manuscript/code audit round",
+  "figures": [
+    {
+      "bytes": 36310,
+      "cell": 4,
+      "figure": 1,
+      "file": "figure01.png",
+      "notebook": "docs/notebook/figure1_2_3.ipynb",
+      "output": 0,
+      "sha256": "5d09e40b286b995b5fb1f26ba935d22ca0e04c0bc5b5f4ff1a8e2232430c8ec4"
+    },
+    {
+      "bytes": 73074,
+      "cell": 6,
+      "figure": 2,
+      "file": "figure02.png",
+      "notebook": "docs/notebook/figure1_2_3.ipynb",
+      "output": 1,
+      "sha256": "c5806f0b7fe96a44cd62c3f32dfb106efd6dcb37a4d746706d9524050d82564d"
+    },
+    {
+      "bytes": 259989,
+      "cell": 8,
+      "figure": 3,
+      "file": "figure03.png",
+      "notebook": "docs/notebook/figure1_2_3.ipynb",
+      "output": 1,
+      "sha256": "3aeedb014956c481b71832db679a0906db9c3a3d4ed6eb3afcfde0e1b7f5ba8c"
+    },
+    {
+      "bytes": 95635,
+      "cell": 5,
+      "figure": 4,
+      "file": "figure04.png",
+      "notebook": "docs/notebook/figure4.ipynb",
+      "output": 0,
+      "sha256": "d5125f10fc1f868d594a0d0dacedef7ddb99b24ccb4b2748daca5590bcd288dc"
+    },
+    {
+      "bytes": 131136,
+      "cell": 4,
+      "figure": 5,
+      "file": "figure05.png",
+      "notebook": "docs/notebook/figure5.ipynb",
+      "output": 0,
+      "sha256": "a818f96a06b9a16fcd1cde11243856aed68c9060a4e1a6f9f41c0941b2eaaebc"
+    },
+    {
+      "bytes": 678807,
+      "cell": 7,
+      "figure": 6,
+      "file": "figure06.png",
+      "notebook": "docs/notebook/PMGW_corrected.ipynb",
+      "output": 0,
+      "sha256": "9fa5ca4b61e4bfb50a60f8739a8d801beb236273f1be684316892d4a96e727cf"
+    },
+    {
+      "bytes": 363910,
+      "cell": 9,
+      "figure": 7,
+      "file": "figure07.png",
+      "notebook": "docs/notebook/PMGW_corrected.ipynb",
+      "output": 0,
+      "sha256": "7aa0a2e5cef4a0fcdf95585687dca8a45325101a9f84d392243e2d9fef065c50"
+    }
+  ],
+  "source_commit": "45b4e996c4bdc69b19af094c58da69f714f6b858"
+}
