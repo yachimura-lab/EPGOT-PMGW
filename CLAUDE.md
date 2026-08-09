@@ -59,6 +59,7 @@ quarto render docs                        # what Netlify runs (see netlify.toml)
 - `mgw.py`, `mew.py` — mixture Gromov-Wasserstein and mixture embedded W2, both full (non-partial) transport, via POT (`ot.gromov.*`).
 - `partial_ot.py` — entropic *partial* OT between mixture components plus the Figure 5 barycentric-projection maps (`compute_T_X_to_Z`, `compute_T_X_to_Z_C`).
 - `partial_mgw.py` — partial MGW: coupling from the vendored solver, matched-mass centering, Stiefel alignment, then `partial_mgw_barycentric_map`.
+- `legacy.py` — superseded solvers, deliberately **not** re-exported from the package root, so reaching one takes an explicit `from pgot.legacy import ...`. Nothing in the paper path imports it.
 - `paper_figures.py` — one canonical solve and one plotting function per paper figure (`solve_epot_panels`, `solve_point_cloud_matching`, `make_figure1`…`make_figure7`). The numerical work lives here, not in the notebooks; `metadata.py` turns each solve into a sidecar with `solve_id`, array hashes and residuals.
 
 The recurring pipeline shape across `MGW2_coup`, `MEW2_coup`, and `pMGW2_coup` is: fit an sklearn `GaussianMixture` to each point cloud → build a Gaussian-W2 cost matrix between components → solve for a coupling → recover an orthogonal alignment `P` by projected gradient descent on the Stiefel manifold → push points through a barycentric/randomized map → optionally snap to nearest target points via `NearestNeighbors`. New variants should follow that sequence rather than reinventing it.

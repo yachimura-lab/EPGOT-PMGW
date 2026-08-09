@@ -1,6 +1,5 @@
 """Partial optimal transport helpers used by the notebook experiments."""
 
-import warnings
 from time import perf_counter
 
 import matplotlib.pyplot as plt
@@ -213,67 +212,6 @@ def display_gmm(gmm, n=200, ax=0, bx=1, ay=0, by=1, cmap="gnuplot", axis=None):
     norm = LogNorm(vmin=Zmax * 1e-3, vmax=Zmax)
     axis.contourf(X, Y, Z, levels=levels, cmap=cmap, norm=norm)
     axis.set_aspect("equal")
-
-
-def partial_wasserstein_lagrange_entropic(
-    a,
-    b,
-    M,
-    Lambda=None,
-    epsilon=1e-2,
-    nb_dummies=1,
-    log=False,
-    **kwargs,
-):
-    """Deprecated: solves a *different* problem from the paper's (3.1).
-
-    This routine relaxes the mass with ``M - Lambda`` (a single ``Lambda``,
-    not ``2*Lambda``) and applies the entropy only to the real block, using
-    capped scaling against the inequality constraints ``gamma 1 <= a`` and
-    ``gamma^T 1 <= b``. Its ``Lambda`` therefore corresponds to ``2*lambda``
-    in the paper's convention, and even after that rescaling its minimizer
-    differs from (3.1) because the dummy row and column carry no entropy.
-
-    Use :func:`entropic_partial_ot` instead; it implements (3.1) exactly.
-    Kept only so that previously published results remain reproducible.
-    """
-    warnings.warn(
-        "partial_wasserstein_lagrange_entropic does not implement the "
-        "paper's (3.1): it uses 'M - Lambda' instead of 'M - 2*lambda' and "
-        "regularizes only the real block. Use entropic_partial_ot instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    del nb_dummies, kwargs
-    a = np.asarray(a, float)
-    b = np.asarray(b, float)
-    M = np.asarray(M, float)
-
-    if Lambda is None:
-        Lambda = float(np.max(M)) + 1.0
-
-    cost = M - Lambda
-    kernel = np.exp(-cost / epsilon)
-    u = np.ones_like(a)
-    v = np.ones_like(b)
-
-    for _ in range(2000):
-        u_prev = u.copy()
-        Kv = kernel @ v
-        u = np.minimum(a / (Kv + 1e-300), 1.0)
-        KTu = kernel.T @ u
-        v = np.minimum(b / (KTu + 1e-300), 1.0)
-        if np.linalg.norm(u - u_prev) < 1e-14:
-            break
-
-    gamma = np.diag(u) @ kernel @ np.diag(v)
-
-    if log:
-        return gamma, {
-            "transported_mass": np.sum(gamma),
-            "cost": np.sum(gamma * M),
-        }
-    return gamma
 
 
 def normalize_cost(C):

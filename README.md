@@ -54,6 +54,12 @@ Figures 1–5 use `pgot.entropic_partial_ot`, the extended dummy-point problem
 `(a, 1)` and `(b, 1)`, and entropy is applied to the full extended coupling.
 Therefore `Lambda` is exactly the paper's `lambda`, without rescaling.
 
+No figure in this repository uses `pgot.legacy`. That module holds
+`partial_wasserstein_lagrange_entropic`, which relaxes the mass with
+`M - Lambda` and regularizes only the real block, so it solves a different
+problem from (3.1); it is kept solely to reproduce results published with it
+and is not exported from the package root.
+
 For Figures 6–7, both partial solvers receive the paper's `lambda=0.01`
 unchanged, on cost matrices already divided by their own pair maximum. PGW
 and pMGW both transport `300/310` mass, leaving the ten noise points

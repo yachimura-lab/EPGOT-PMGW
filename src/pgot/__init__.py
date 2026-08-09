@@ -51,7 +51,6 @@ from .partial_ot import (
     gaussian_displacement_interpolation,
     normalize_cost,
     submixture_pdf,
-    partial_wasserstein_lagrange_entropic,
     to_numpy,
 )
 from .metadata import (
@@ -136,7 +135,6 @@ __all__ = [
     "gaussian_displacement_interpolation",
     "normalize_cost",
     "submixture_pdf",
-    "partial_wasserstein_lagrange_entropic",
     "to_numpy",
     # Partial mixture GW
     "alignment_grad",
