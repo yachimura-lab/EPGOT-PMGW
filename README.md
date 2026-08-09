@@ -27,7 +27,7 @@ Each notebook corresponds to figures in the paper. You can browse them directly 
 │   │   ├── engine.cpp      #   Fast GaussianW2 / W2 barycenter implementations
 │   │   └── CMakeLists.txt  #   Builds the cpp_engine module into src/
 │   ├── figure1_2_3.ipynb   # Notebook reproducing Figures 1–3
-│   ├── figure4.ipynb       # Notebook reproducing Figure 4 (uses cpp_engine)
+│   ├── figure4.ipynb       # Notebook reproducing Figure 4
 │   └── figure5.ipynb       # Notebook reproducing Figure 5
 ├── docs/                   # Quarto documentation site (published on Netlify)
 │   └── notebook/           #   Notebooks published on the site
@@ -41,7 +41,7 @@ Each notebook corresponds to figures in the paper. You can browse them directly 
 
 - Python 3.13+
 - [uv](https://docs.astral.sh/uv/) (for dependency management)
-- CMake, a C++17 compiler, and Eigen3 (to build the C++ engine)
+- CMake, a C++17 compiler, and Eigen3 (only to build the C++ engine for the legacy `src/algorithm/` scripts)
 
 If uv is not installed yet, you can install it with the bundled script:
 
@@ -58,7 +58,7 @@ uv sync
 
 ### 2. Build the C++ computation engine (cpp_engine)
 
-This builds the fast computation module used by `figure4.ipynb` and others. First install Eigen3 (example for Fedora / Amazon Linux):
+This builds the fast computation module used by the legacy `src/algorithm/*.py` scripts. The notebooks under `docs/notebook/` no longer need it, so this step is optional. First install Eigen3 (example for Fedora / Amazon Linux):
 
 ```bash
 sudo dnf install -y eigen3-devel

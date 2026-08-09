@@ -2,7 +2,7 @@
 
 - **対象論文**: `review/Entropic_Partial_Optimal_Transport_and_Gromov__Wasserstein_Distances_between_Gaussian_Mixtrues.pdf`（Yachimura–Zou, Section 7 “Numerical Experiments”, pp. 29–36）
 - **対象コード**: `docs/notebook/{figure1_2_3,figure4,figure5,PMGW_corrected}.ipynb`、`src/pgot/`、`src/computation/engine.cpp`、`vendor/PGW_Metric/lib/gromov.py`
-- **リポジトリ**: `1834ea2`（`42ee1ad` に issue #6 の P0-1〜3 を適用した状態。submodule `vendor/PGW_Metric` = `8a9002e`）
+- **リポジトリ**: `main`（issue #6 の P0 のうち Figure 4・Figure 5 分を適用した状態。submodule `vendor/PGW_Metric` = `8a9002e`）
 - **実行環境**: Python 3.13.15 / POT 0.9.7 / NumPy 2.4.6 / SciPy 1.18.0 / scikit-learn 1.9.0 / Matplotlib 3.11.0
 - **併読**: `review/code_audit_figures_1_7.pdf`（2026-08-03）。本書 §5 で各指摘と照合する。
 - **対応 issue**: [#6 \[Paper reproducibility\] Figure 1–7 の生成コードを論文の定義・実験条件に揃える](https://github.com/yachimura-lab/EPGOT-PMGW/issues/6)。本書は同 issue が「詳細は `review/paper_figure_source_audit.md` に記録した」と参照する詳細記録である。
@@ -11,19 +11,19 @@
 
 ## 1. 結論サマリ
 
-保存済み出力は概ね掲載図に対応するが、**Figure 2 の生成セルが存在せず、Figure 6–7 は論文記述と数値的に不一致**である。Figure 5 の solver と λ は `1834ea2` で (3.1) に一致させた。
+保存済み出力は概ね掲載図に対応するが、**Figure 2 の生成セルが存在せず、Figure 6–7 は論文記述と数値的に不一致**である。Figure 4 と Figure 5 は issue #6 の P0 で論文の定義に揃えた。
 
 | Fig | 論文の設定 | 実装の状態 | 判定 |
 |---|---|---|---|
 | 1 | λ=0.3, ε=0.01 | 数値は完全一致（mass=0.9000）。線の着色規則のみ掲載図と異なる | **B**（体裁のみ） |
 | 2 | λ∈{0,0.125,0.25,0.375,0.5}, ε=0.01 | **生成セルなし**。ただし数値は現行コードで完全に再現する | **B**（描画欠落・数値は健全） |
 | 3 | λ 7値 × ε∈{0.01,0.11,0.21} | cell 6 が一致。1 panel で Sinkhorn 非収束 | **B** |
-| 4 | (4.18) の劣確率測度 | 総和 1 へ再正規化 **＋** panel ごとに density level 自動調整 | **A**（描いている対象が違う） |
+| 4 | (4.18) の劣確率測度 | 質量 `Z_λ` を保持し全 panel 共通 density level。(4.17) は閉形式 | **B** |
 | 5 | (a) λ=0.25 / (b) λ=0.5 | 既知 GMM + (3.1) の dummy-point EPOT。composite layout のみ未対応 | **B** |
 | 6 | 半径 4・z=0、λ=0.01、barycentric→nearest | データ・λ・成分数・点対応がすべて不一致 | **A** |
 | 7 | barycentric projection map | (a) の alignment が (6.7) と異なる | **A** |
 
-A = 論文記述と数値的に不一致（要対応）、B = 数値は妥当で体裁・欠落の問題。判定は `1834ea2` 時点。
+A = 論文記述と数値的に不一致（要対応）、B = 数値は妥当で体裁・欠落の問題。
 
 ---
 
@@ -106,29 +106,25 @@ cell 6 が生成元であり、**パラメータは論文と厳密一致**する
 
 ### 3.4 Figure 4 — §7.1.4（displacement interpolation (4.18)）
 
-**パラメータは一致**: `configs` = (Λ=0.25, ε=0.03), (Λ=0.25, ε=0.1), (Λ=0.5, ε=0.03) ✓、`t_list = np.linspace(0,1,5)` = {0, 0.25, 0.5, 0.75, 1.0} ✓。`cpp_engine::entropic_partial_ot` は Python 版と同一規約（`M -= 2.0*Lambda` + dummy node）なので Λ はそのまま論文 λ である。
+**パラメータは一致**: `configs` = (Λ=0.25, ε=0.03), (Λ=0.25, ε=0.1), (Λ=0.5, ε=0.03) ✓、`t_list = np.linspace(0,1,5)` = {0, 0.25, 0.5, 0.75, 1.0} ✓。
 
-**描いている対象が (4.18) ではない。** cell 3 の末尾:
+notebook は `entropic_partial_displacement_interpolation` で (4.18) を評価する。coupling entry は**閾値も再正規化もかけず**そのまま重みに使うので、描かれる密度の積分は各行の `Z_λ` に一致する（数値積分で確認、誤差 <2e-4）:
 
-```python
-return GaussianMixture(np.array(new_w) / np.sum(new_w), new_m, new_c)
-```
+| 行 | (ε, λ) | `Z_λ` |
+|---|---|---|
+| 1 | (0.03, 0.25) | 0.8875742 |
+| 2 | (0.10, 0.25) | 0.6807441 |
+| 3 | (0.03, 0.50) | 0.9937141 |
 
-(4.18) の `µ^t_{ε,λ} = Σ_kl ω^{ε,λ}_kl µ^t_kl` は総質量 `Z_λ < 1` の**劣確率測度**だが、ここで総和 1 に再正規化しているため実際に描かれるのは `µ^t_{ε,λ} / Z_λ` である。
+密度 level は全 15 panel で共通（`4.001e-04 .. 4.001e-01`）。**再正規化の除去と共通 level は両方必要**である。`display_gmm` が panel ごとに `z_max` を決めていた旧実装では、劣確率測度を渡しても質量差は見えなかった。
 
-**再正規化を外すだけでは不十分である。** `display_gmm`（cell 2）が
+component 補間は (4.17) の閉形式
+`µ^t_kl = ((1−t)Id + t T_kl)_# µ^0_k`（平均 `(1−t)m_0k + t m_1l`、共分散 `B Σ_0k Bᵀ`、`B = (1−t)I + t A_kl`）
+を直接使う。反復 W₂ barycenter（20 iter）との差は共分散で 3.1e-07 であり、閉形式の方が厳密。
 
-```python
-z_max = max(Z.max(), 1e-8)
-levels = np.logspace(np.log10(z_max * 1e-3), np.log10(z_max), 7)
-```
-
-と **panel ごとに density level を自前で決めている**ため、仮に劣確率測度を渡しても質量差は可視化されない。**再正規化の除去と全 panel 共通 level の指定は両方必要**である。
-
-その他:
-
-- `if W[i, j] > 1e-5` の打ち切りは (4.18) にない。成分対は 6 個しかないので閾値は不要。
-- 2 Gaussian の補間に `GaussianBarycenterW2(..., 20)`（反復 W₂ barycenter, 20 iter）を使っている。(4.17) は `µ^t_kl = ((1−t)Id + t T_kl)_# µ^0_k` という**閉形式**であり、そちらの方が厳密かつ再現的。
+> **`cpp_engine` への依存を解消した。** 旧実装は `cpp_engine` の `GaussianW2` / `GaussianBarycenterW2` / `entropic_partial_ot` を使っていた。`.so` は gitignore されるためビルドしないと Figure 4 を再実行できず、本監査でも当初は再実行できなかった。現在は `pgot` の実装のみを使う。
+>
+> なお両実装は完全には一致しない。`GaussianW2` の差は 5.7e-14 だが、**EPOT は (λ=0.5, ε=0.03) で coupling が最大 7.6e-04、matched mass が 0.9929587（C++）と 0.9937141（Python）で食い違う**。C++ 側の Sinkhorn が `‖u − u_prev‖_∞ < 1e-7` で打ち切るのに対し POT は周辺分布の残差で判定するためで、C++ 版の方が収束が甘い。Python 版に統一したことで Figure 4 の第 3 行と Figure 5(b) が同じ `Z_λ = 0.9937141` を報告するようになった。
 
 ### 3.5 Figure 5 — §7.1.5（barycentric projection map (6.2)）
 
@@ -319,7 +315,7 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 | 1 | Fig 1: 数値一致・線色/凡例が掲載図と異なる | ✅ **支持** | mass=0.9000 を実測確認 |
 | 2 | Fig 2: 1×5 sweep の生成セルなし | ✅ **支持（軽減）** | 描画欠落のみ。数値は 5 点とも完全再現（§3.2） |
 | 3 | Fig 3: 概ね一致・1 panel で Sinkhorn 非収束 | ✅ **支持** | colorbar 上限の由来を特定（§3.3-2） |
-| 4 | Fig 4: 総和 1 へ再正規化し (4.18) を描いていない | ✅ **支持（強化）** | 再正規化に加え panel ごとの level 自動調整も要修正（§3.4） |
+| 4 | Fig 4: 総和 1 へ再正規化し (4.18) を描いていない | ✅ **支持 → 解消** | 再正規化と panel ごとの level 調整を両方撤去（§3.4） |
 | 5 | Fig 5: λ=0.5 と表示しつつ solver に 2λ=1.0 | ❌ **panel の帰属が誤り**（解消済み） | 齟齬は (b) ではなく **(a)** 側にあった。`1834ea2` で solver を (3.1) に統一し両 panel を再生成（§3.5-1） |
 | 6 | Fig 6: データ・λ・成分数・point 対応が不一致 | ✅ **支持（強化）** | λ=0.01 が効かないのは geometry 由来。論文どおりの半径 4 に直せば PGW は λ=0.01 で `300/310`（§3.6-2） |
 | 7 | Fig 6 と 7 が別 solve で同一 coupling 由来と保証されない | ⚠️ **格下げ** | 実測で完全一致。P0 → 保守性の改善項目（§3.6-7） |
@@ -333,8 +329,8 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 | §1 Fig 2 | λ∈{0,0.125,0.25,0.375,0.5}, ε=0.01 の専用セルを追加 | ✅ 支持 |
 | §1 Fig 3 | 非収束 panel の再計算、colorbar の明示、cell 13/15 の整理 | ✅ 支持（現行 cell 7/8） |
 | §1 冒頭 | markdown の entropy 式が (3.1) と異なる | ⚠️ **現行版に該当なし**。なお `entropic_partial_ot` の実装は (3.1) どおり拡張行列全体に entropy を課しており正しい |
-| §2 Fig 4 | `W[i,j] > 1e-5` の閾値は (4.18) にない | ✅ 支持 |
-| §2 Fig 4 | 反復 barycenter ではなく (4.17) の閉形式を使う | ✅ 支持 |
+| §2 Fig 4 | `W[i,j] > 1e-5` の閾値は (4.18) にない | ✅ **解消**。閾値を撤去し 6 対すべてを保持（§3.4） |
+| §2 Fig 4 | 反復 barycenter ではなく (4.17) の閉形式を使う | ✅ **解消**（§3.4） |
 | §3 Fig 5 | `Lambda=Lambda` に直して Fig 5(b) を再生成 | ❌ **単独では逆効果**。倍化のみ外すと (b) は 1.0000→0.8989 と論文値 0.9932 から離れる。`1834ea2` では solver を `entropic_partial_ot` に差し替えたうえで倍化を外し、(a)(b) 両方を再生成した（§3.5-1） |
 | §3 Fig 5 | λ ごとに GMM を fit し直す構造 | ✅ **解消**。notebook は既知 GMM を直接使い、両 λ で同一の component parameters / cost を共有する（§3.5-1） |
 | §4.1 | source 半径 10 / z 分散 0、target 半径 8・高さ 25、noise (20,0,25)・半径 0.6、target は affine 変換 | ✅ **全項目を実測で確認**（§3.6-1） |
@@ -362,9 +358,10 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 
 issue #6 の方針「**原則として論文を正とし、source code / notebook / docs を修正する**」に従う。以下は issue の P0/P1 タスクに対応する。
 
-### 解消済み（`1834ea2`）
+### 解消済み
 
 - **Figure 5 の solver と λ** — `compute_T_X_to_Z_C` を `entropic_partial_ot` に差し替え、同時に cell 5 の `Lambda = 2 * Lambda` を廃止して (a)(b) を再生成。`partial_wasserstein_lagrange_entropic` は deprecate。あわせて (6.2) の分子だけに掛かっていた `gamma>1e-10` の閾値を除去。
+- **Figure 4 の (4.18) 描画** — 再正規化と `W>1e-5` 閾値を撤去して質量 `Z_λ` を保持し、全 panel 共通 density level に変更。(4.17) は閉形式に置き換え、`cpp_engine` 依存を解消（§3.4）。
 - **Figure 5 の fit 共有** — §7.1.5 どおり既知 GMM を使う `entropic_partial_barycentric_map` を追加し、notebook をそれに切り替え。両 λ が同一の component parameters / cost を共有する。`compute_T_X_to_Z_C` は fit する薄い wrapper として残した（§3.5-1）。
 
 ### P0（数学的意味・比較条件）
@@ -372,26 +369,25 @@ issue #6 の方針「**原則として論文を正とし、source code / noteboo
 1. **Figures 6–7 の geometry** — 半径 4 の ring から source/target を**独立に** 300 点ずつ、別分布の noise 10 点。これにより point-level PGW は論文どおり λ=0.01 で `300/310` を達成する（§3.6-2）。
 2. **penalty 換算規約の明示** — pMGW は component-level の正規化スケールでは λ=0.01 で matched mass 0 になるため、**論文の λ から各 solver input への換算を数式で固定**し、論文側にもその換算を記載する。閾値を超えれば両者とも `300/310` で頭打ちになる（§3.6-2）。
 3. **Figures 6–7 の比較条件** — source 6 / target 7 成分を 1 回だけ fit して MGW/pMGW で共有。balanced MGW の alignment を full-mean centered mixtures で計算（§3.6-4）。raw GW/PGW を barycentric projection + nearest-target に統一し、unmatched row は描かない（§3.6-5）。手法ごとに 1 回だけ solve し、Figure 7 = raw map、Figure 6 = その nearest-neighbor 版とする（§3.6-7）。
-4. **Figure 4** — 再正規化と `W>1e-5` 閾値を外して質量 `Z_λ` を保持し、**かつ**全 panel 共通 density level を使う（§3.4）。Gaussian 補間は (4.17) の閉形式に置き換える。
 
 ### P1（Figure と主張）
 
-5. **Figure 2** — 1×5 の描画セルを追加（数値は現行コードで再現済み、§3.2）。**Figure 1** — weight の連続 colormap + 横 colorbar に戻し、label/legend を外す。
-6. **Figure 3** — 非収束 panel の再計算と residual の保存、colorbar 上限の明示、cell 7/8 の出力名衝突の解消（§3.3）。
-7. **point-level GW** — 無効な `epsilon=5e-3` を削除（図の再生成は不要、§3.6-6）。
-8. **composite layout** — Figures 5–7 の掲載図と同じ組版を notebook から直接保存する（§4）。
-9. **計算量の主張** — coupling dimension 削減に限定するか、N を増やした solver-only benchmark を追加（§3.6-8）。
+4. **Figure 2** — 1×5 の描画セルを追加（数値は現行コードで再現済み、§3.2）。**Figure 1** — weight の連続 colormap + 横 colorbar に戻し、label/legend を外す。
+5. **Figure 3** — 非収束 panel の再計算と residual の保存、colorbar 上限の明示、cell 7/8 の出力名衝突の解消（§3.3）。
+6. **point-level GW** — 無効な `epsilon=5e-3` を削除（図の再生成は不要、§3.6-6）。
+7. **composite layout** — Figures 5–7 の掲載図と同じ組版を notebook から直接保存する（§4）。
+8. **計算量の主張** — coupling dimension 削減に限定するか、N を増やした solver-only benchmark を追加（§3.6-8）。
 
 ### その他
 
-10. `compute_T_X_to_Z` の分母が (6.2) ではなく全混合密度である点を是正するか、公開 API から外す（§3.5-2）。
-11. 再生成により掲載 PDF と外観が変わるため、issue #6 の方針 7・8 に従い差分を [#8](https://github.com/yachimura-lab/EPGOT-PMGW/issues/8) に記録する。
+9. `compute_T_X_to_Z` の分母が (6.2) ではなく全混合密度である点を是正するか、公開 API から外す（§3.5-2）。
+10. 再生成により掲載 PDF と外観が変わるため、issue #6 の方針 7・8 に従い差分を [#8](https://github.com/yachimura-lab/EPGOT-PMGW/issues/8) に記録する。
 
 ---
 
 ## 7. 本監査の限界
 
-- **Figure 4 は再実行できていない**。`cpp_engine` の `.so` は gitignore されており、本監査ではビルドしていない。`engine.cpp` のソース読解により penalty 規約が Python 版と一致することは確認済みだが、`GaussianBarycenterW2` の数値挙動は未検証。
+- **`cpp_engine` の数値挙動は Figure 4 の範囲でのみ検証した。** `GaussianW2`（差 5.7e-14）、`GaussianBarycenterW2`（(4.17) 閉形式との差 3.1e-07）、`entropic_partial_ot`（(λ=0.5, ε=0.03) で coupling 最大 7.6e-04 の差）を比較している。legacy の `src/algorithm/*.py` が使う経路は未検証。
 - 掲載図との比較は**論文 PDF から抽出したテキスト・軸目盛り・caption**に基づく。図の画素単位の照合は行っていない。
 - Figure 1/3 の「線の色が掲載図と異なる」は、前回監査の記述と論文本文（"The width and color of each line indicate the corresponding coupling weight"）に依拠している。
 - **§3.6-2 の「論文どおりの geometry」は本書による再構成である。** 論文は target ring の高さと noise の分布を明示していないため、高さ h ∈ {8, 10, 12}、noise は中心 `(2.5·radius, 0, h)`・半径 0.3 の球内一様として検証した。matched mass `300/310` は h に依らず同一だったが、noise の配置を大きく変えれば λ の閾値は動きうる。実装時には論文側にも高さと noise 分布を明記する必要がある。
