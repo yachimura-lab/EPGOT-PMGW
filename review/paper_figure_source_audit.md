@@ -5,6 +5,7 @@
 - **リポジトリ**: `42ee1ad`（submodule `vendor/PGW_Metric` = `8a9002e`）
 - **実行環境**: Python 3.13.15 / POT 0.9.7 / NumPy 2.4.6 / SciPy 1.18.0 / scikit-learn 1.9.0 / Matplotlib 3.11.0
 - **併読**: `review/code_audit_figures_1_7.pdf`（2026-08-03）。本書 §5 で各指摘と照合する。
+- **対応 issue**: [#6 \[Paper reproducibility\] Figure 1–7 の生成コードを論文の定義・実験条件に揃える](https://github.com/yachimura-lab/EPGOT-PMGW/issues/6)。本書は同 issue が「詳細は `review/paper_figure_source_audit.md` に記録した」と参照する詳細記録である。
 
 ---
 
@@ -18,7 +19,7 @@
 | 2 | λ∈{0,0.125,0.25,0.375,0.5}, ε=0.01 | **生成セルなし**。ただし数値は現行コードで完全に再現する | **B**（描画欠落・数値は健全） |
 | 3 | λ 7値 × ε∈{0.01,0.11,0.21} | cell 6 が一致。1 panel で Sinkhorn 非収束 | **B** |
 | 4 | (4.18) の劣確率測度 | 総和 1 へ再正規化 **＋** panel ごとに density level 自動調整 | **A**（描いている対象が違う） |
-| 5 | (a) λ=0.25 / (b) λ=0.5 | **(b) は正しい。(a) が実際には λ≈0.125**。さらに Fig 1–4 と別 solver | **A** |
+| 5 | (a) λ=0.25 / (b) λ=0.5 | **齟齬は (a) にある**（論文値との差 0.293、(b) は 0.007）。さらに Fig 1–4 と別 solver | **A** |
 | 6 | 半径 4・z=0、λ=0.01、barycentric→nearest | データ・λ・成分数・点対応がすべて不一致 | **A** |
 | 7 | barycentric projection map | (a) の alignment が (6.7) と異なる | **A** |
 
@@ -42,7 +43,7 @@ A = 論文記述と数値的に不一致（要対応）、B = 数値は妥当で
 | `pgot.partial_wasserstein_lagrange_entropic`<br>(`partial_ot.py:113`) | `M − Lambda` | 不等式制約 capped scaling、実ブロックのみに entropy | **`Lambda = 2λ`** | Fig 5 |
 | `lib.gromov.partial_gromov_ver1`<br>(`tensor_dot_param`) | `f1(r)=r²−2Λ` ⇒ 歪み `|C1−C2|²−2Λ` | Frank–Wolfe + dummy node | **`Lambda = λ`**（(5.4) と一致） | Fig 6(b)(d), 7(b) |
 
-**したがって `figure5.ipynb` の `Lambda = 2 * Lambda` は誤りではなく、論文 λ へ換算するための正しい変換である。**（§3.5、§5 の指摘 5 を参照。）
+**したがって現行コードにおける `figure5.ipynb` の `Lambda = 2 * Lambda` は誤りではなく、論文 λ へ換算するための正しい変換である。**（§3.5、§5 の指摘 5 を参照。）ただし solver を `entropic_partial_ot` に統一すれば倍化は二重適用になるため、**その差し替えとセットで廃止する**のが正しい修正である（§6 P0-1）。
 
 数値による裏付け（ε=0.03、GA/GB は §7.1 の厳密パラメータ）:
 
@@ -92,6 +93,8 @@ A = 論文記述と数値的に不一致（要対応）、B = 数値は妥当で
 
 cell 6 が生成元であり、**パラメータは論文と厳密一致**する。
 
+配置は `plt.subplots(len(reg_list), len(Lambda_list))` = **3 行（ε）× 7 列（λ）**。
+
 - `np.arange(0.125, 0.5625, 0.0625)` = {0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5} ✓
 - `np.arange(0.01, 0.31, 0.1)` = {0.01, 0.11, 0.21} ✓
 - viridis + 横 colorbar も掲載図と一致 ✓
@@ -115,7 +118,7 @@ return GaussianMixture(np.array(new_w) / np.sum(new_w), new_m, new_c)
 
 (4.18) の `µ^t_{ε,λ} = Σ_kl ω^{ε,λ}_kl µ^t_kl` は総質量 `Z_λ < 1` の**劣確率測度**だが、ここで総和 1 に再正規化しているため実際に描かれるのは `µ^t_{ε,λ} / Z_λ` である。
 
-**前回監査より踏み込んだ点**: 再正規化を外すだけでは不十分である。`display_gmm`（cell 2）が
+**再正規化を外すだけでは不十分である。** `display_gmm`（cell 2）が
 
 ```python
 z_max = max(Z.max(), 1e-8)
@@ -133,7 +136,7 @@ levels = np.logspace(np.log10(z_max * 1e-3), np.log10(z_max), 7)
 
 **一致している点**: 各 GMM から 2000 サンプル ✓、ε=0.03 ✓、`ts = np.arange(0.2, 1.01, 0.2)` = {0.2, 0.4, 0.6, 0.8, 1.0} ✓。
 
-#### (1) λ の不一致は (b) ではなく **(a)** にある
+#### (1) λ の不一致は **(a)** にある
 
 §2 の通り `partial_wasserstein_lagrange_entropic` は `M − Lambda` なので、論文 λ を渡すには 2 倍が必要。
 
@@ -142,9 +145,23 @@ levels = np.logspace(np.log10(z_max * 1e-3), np.log10(z_max), 7)
 | cell 4 | `Lambda=Lambda`（=0.25） | 0.25 | **0.125** | 0.5918 | λ=0.25 と主張 ❌ |
 | cell 5 | `Lambda=2*Lambda`（=0.5→1.0） | 1.0 | **0.5** | 1.0000 | λ=0.5 ✅ |
 
-参照値（§2 の表）: 論文 λ=0.125 の lagrange mass は 0.5815 で cell 4 の 0.5918 に近く、論文 λ=0.25 の 0.9022 とは明確に異なる。**Figure 5(a) が λ≈0.125 の結果**である。
+`figure5.ipynb` と同じ条件（2000 サンプル → 2/3 成分 fit、ε=0.03）で測ると:
 
-> **修正方針は前回監査と逆**: cell 5 の `2*Lambda` を残し、cell 4 を `Lambda=2*Lambda` に揃えて **Figure 5(a) を再生成**する。（あるいは `compute_T_X_to_Z_C` 側で `M − 2*Lambda` に統一し、両セルとも素の λ を渡す。後者の方が Fig 1–4 と規約が揃うので望ましい。）
+| 論文 λ | dummy EPOT (3.1) | lagrange(`Lambda`=λ) | lagrange(`Lambda`=2λ) |
+|---|---|---|---|
+| 0.25 | 0.8847946 | **0.5917881** | 0.8988555 |
+| 0.5 | 0.9932484 | 0.8988555 | **1.0000000** |
+
+太字が notebook の保存出力と一致する値である（cell 4 = 0.5917881、cell 5 = 1.0000000）。論文値との差は:
+
+- **cell 5（=Figure 5(b)）**: 1.0000000 vs 0.9932484 → **0.0068**
+- **cell 4（=Figure 5(a)）**: 0.5917881 vs 0.8847946 → **0.2930**
+
+**齟齬は (a) にある。** (b) の `2 * Lambda` は現行 solver に対する正しい換算である。
+
+> **修正方針（issue #6 の P0 に従う）**: `compute_T_X_to_Z_C` の solver を `entropic_partial_ot`（`M − 2λ` + dummy node）に差し替え、`partial_wasserstein_lagrange_entropic` は rename/deprecate する。**その差し替えを行った時点で cell 5 の `Lambda = 2 * Lambda` は二重適用になるため廃止する**（issue の P0 タスク「`Lambda=2 * Lambda` を廃止」はこの意味で正しい）。両 panel とも素の λ を渡し、**(a) (b) の両方を再生成する**。
+>
+> 現行 solver を残したまま `2*Lambda` だけを外すと (b) が 1.0000 → 0.8989 と論文値から離れるため、**solver 差し替えと `2*Lambda` 廃止は必ずセットで行うこと**。
 
 #### (2) Figure 5 だけ別の EPOT solver を使っている
 
@@ -186,25 +203,37 @@ levels = np.logspace(np.log10(z_max * 1e-3), np.log10(z_max), 7)
 - cell 3 が生成する 2D 標本 `P1_2d` は**捨てられており**、cell 4/7 では行数だけが再利用される。
 - **source の z 分散が厳密に 0** のため共分散が z 方向に特異。6 成分 full-covariance GMM の fit が通るのは sklearn の `reg_covar=1e-6` のおかげであり、論文 §4 の「全共分散が正定値」という仮定を満たさない。
 
-> 掲載 Figure 6 の軸範囲（x: −10…20、y: −15…15、z: 0…30）は**この scale 済みデータと整合する**。つまり図はこのパイプラインから生成されており、**論文本文の記述の方が誤っている**。
+> 掲載 Figure 6 の軸範囲（x: −10…20、y: −15…15、z: 0…30）は**この scale 済みデータと整合する**。つまり掲載図は論文本文が記述する geometry ではなく、このパイプラインから生成されている。geometry を論文どおりに直せば**掲載図の外観は必ず変わる**ため、再生成と差分記録が要る。
 
-#### (2) λ が論文と不一致、かつ論文の値では図が作れない
+#### (2) λ が論文と不一致で、成立するかは geometry に依存する
 
 論文は partial 系で λ=0.01 と記す。実装は:
 
 - point-level PGW（cell 15）: `gromov.partial_gromov_ver1(..., Lambda=0.04)`
 - pMGW（cell 10/11）: `pMGW2_coup(..., Lambda=0.10)` → 同じ `partial_gromov_ver1` へ
 
-§2 の通り `partial_gromov_ver1` の `Lambda` は**すでに論文 (5.4) の λ そのもの**なので、規約の違いでは説明できない。さらに λ=0.01 を実際に流すと:
+§2 の通り `partial_gromov_ver1` の `Lambda` は**すでに論文 (5.4) の λ そのもの**なので、規約の違いでは説明できない。
 
-| 手法 | λ=0.01 | λ = コードの値 |
-|---|---|---|
-| point-level PGW | matched mass = **0.0000** | 0.9677（λ=0.04） |
-| pMGW | `ValueError: Z_lambda = 0.0` | 正常（λ=0.10） |
+**λ=0.01 が成立するかは geometry に依存する。** 現行の scale 済み geometry と、論文どおりに直した geometry（半径 4 の ring から source 300 点、高さ h の対応 ring から**独立に** 300 点、別分布の noise 10 点）で matched mass を比較した:
 
-**論文の λ=0.01 は、この正規化スケール上では matched mass が 0 になる実行不能な値**である。単なる転記ミスではなく、記述を実測値に合わせる必要がある。
+| geometry | 手法 | λ=0.01 | λ = コードの値 |
+|---|---|---|---|
+| 現行（半径 10 / 8、affine 変換） | point-level PGW | **0.0000** | 0.9677（λ=0.04） |
+| 現行 | pMGW | `ValueError: Z_lambda = 0.0` | 0.9677（λ=0.10） |
+| 論文どおり（半径 4、独立標本） | point-level PGW | **0.9677419** ✅ | 0.9677419（λ=0.04） |
+| 論文どおり | pMGW | **0.0000000** ❌ | 0.9677419（λ=0.10） |
 
-なお 2 手法の λ（0.04 と 0.10）は正規化スケールが異なる（point-level は二乗ユークリッド距離/最大値、component-level は W₂²/最大値）ため、**同じ数学的 penalty ではない**。
+- **point-level PGW** は、geometry を論文に戻せば λ=0.01 で `300/310 = 0.9677419` を輸送する（h = 8 / 10 / 12 のいずれでも同じ）。**geometry と penalty は一体で直す必要がある。**
+- **pMGW では、geometry を直しても λ=0.01 では matched mass が 0 のままである。** 閾値を走査すると:
+
+| 正規化スケール | λ=0.005 | 0.01 | 0.02 | 0.04 以上 |
+|---|---|---|---|---|
+| point-level（二乗距離/max） | 0.9677419 | 0.9677419 | 0.9677419 | 0.9677419 |
+| component-level（W₂²/max, 6/7 fit） | — | **0.0000000** | 0.9677419 | 0.9677419 |
+
+閾値を超えれば両者とも厳密に `300/310` で頭打ちになる（target 側の 300 点分の質量が上限）ので、**λ の正確な値ではなく「閾値を超えているか」だけが効く**。閾値が 2〜4 倍ずれるのは正規化スケールが違うためで、point-level は二乗ユークリッド距離/最大値、component-level は W₂²/最大値である。
+
+**したがって、論文の単一の λ=0.01 を両 solver にそのまま書くことはできない。** 論文の λ から各 solver input への換算規約を数式で固定し、論文とコードの双方に記載する必要がある。
 
 #### (3) GMM 成分数が非対称
 
@@ -213,7 +242,7 @@ levels = np.logspace(np.log10(z_max * 1e-3), np.log10(z_max), 7)
 
 Figure 6(c) と 6(d) の差には「partial 化」と「target 成分数 6→7」の両方が混入する。
 
-#### (4) 【新規指摘】balanced 側の alignment が (6.7) と異なる
+#### (4) balanced 側の alignment が (6.7) と異なる
 
 論文 (6.7) は**中心化した成分**上で Stiefel 最適化を行う（(6.6) の matched means で中心化、balanced なら全混合平均に一致）。
 
@@ -228,7 +257,7 @@ diag(P_uncentered) = [0.9917, 0.9921, 0.9996]
 diag(P_centered)   = [0.8569, 0.9818, 0.8702]
 ```
 
-したがって **Figure 6(c) / 7(a) は (6.7) を実装していない**。これは (3) とは独立した第 2 の比較条件の非対称性である。前回監査には含まれていない。
+したがって **Figure 6(c) / 7(a) は (6.7) を実装していない**。これは (3) とは独立した第 2 の比較条件の非対称性である。
 
 #### (5) Figure 6(a),(b) は barycentric projection ではない
 
@@ -302,6 +331,8 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 
 （論文外の出力: `GMMs.eps`, `fig_lambda_epsilon_sweep.eps`）
 
+**掲載図の composite layout を直接保存するセルが存在しない。** 論文の Figure 5 は (a)/(b) の 2 段組、Figure 6 は (a)–(d) の 4 panel、Figure 7 は (a)/(b) の 2 panel だが、ノートブックはいずれも **1 panel（または 1 行）ずつ別ファイルに保存**しており、掲載図の組版は notebook の外で行われている。したがって「保存出力 → 掲載図」の対応がファイル単位で追跡できない。
+
 ---
 
 ## 5. `code_audit_figures_1_7.pdf` の指摘との照合
@@ -314,8 +345,8 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 | 2 | Fig 2: 1×5 sweep の生成セルなし | ✅ **支持（軽減）** | 描画欠落のみ。数値は 5 点とも完全再現（§3.2） |
 | 3 | Fig 3: 概ね一致・1 panel で Sinkhorn 非収束 | ✅ **支持** | colorbar 上限の由来を特定（§3.3-2） |
 | 4 | Fig 4: 総和 1 へ再正規化し (4.18) を描いていない | ✅ **支持（強化）** | 再正規化に加え panel ごとの level 自動調整も要修正（§3.4） |
-| 5 | Fig 5: λ=0.5 と表示しつつ solver に 2λ=1.0 | ❌ **要修正** | `2*Lambda` は**正しい換算**。不一致は **(a)** 側（§3.5-1） |
-| 6 | Fig 6: データ・λ・成分数・point 対応が不一致 | ✅ **支持（強化）** | λ=0.01 は実行不能と判明（§3.6-2） |
+| 5 | Fig 5: λ=0.5 と表示しつつ solver に 2λ=1.0 | ❌ **要修正** | 現行コードでは `2*Lambda` が**正しい換算**。不一致は **(a)** 側（§3.5-1） |
+| 6 | Fig 6: データ・λ・成分数・point 対応が不一致 | ✅ **支持（強化）** | λ=0.01 が効かないのは geometry 由来。論文どおりの半径 4 に直せば PGW は λ=0.01 で `300/310`（§3.6-2） |
 | 7 | Fig 6 と 7 が別 solve で同一 coupling 由来と保証されない | ⚠️ **格下げ** | 実測で完全一致。P0 → 保守性の改善項目（§3.6-7） |
 
 ### 本文の個別指摘
@@ -329,10 +360,10 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 | §1 冒頭 | markdown の entropy 式が (3.1) と異なる | ⚠️ **現行版に該当なし**。なお `entropic_partial_ot` の実装は (3.1) どおり拡張行列全体に entropy を課しており正しい |
 | §2 Fig 4 | `W[i,j] > 1e-5` の閾値は (4.18) にない | ✅ 支持 |
 | §2 Fig 4 | 反復 barycenter ではなく (4.17) の閉形式を使う | ✅ 支持 |
-| §3 Fig 5 | `Lambda=Lambda` に直して Fig 5(b) を再生成 | ❌ **逆**。cell 5 は正しい。cell 4 を `2*Lambda` に揃えて **Fig 5(a)** を再生成 |
+| §3 Fig 5 | `Lambda=Lambda` に直して Fig 5(b) を再生成 | ❌ **単独では逆効果**。現行 solver のまま倍化を外すと (b) は 1.0000→0.8989 と論文値 0.9932 から離れる。solver を `entropic_partial_ot` に差し替えたうえで倍化を外し、(a)(b) 両方を再生成する（§6 P0-1） |
 | §3 Fig 5 | λ ごとに GMM を fit し直す構造 | ⚠️ **事実だが影響なし**。`random_state` 固定で fit は同一（冗長計算のみ） |
 | §4.1 | source 半径 10 / z 分散 0、target 半径 8・高さ 25、noise (20,0,25)・半径 0.6、target は affine 変換 | ✅ **全項目を実測で確認**（§3.6-1） |
-| §4.2 | λ_PGW=0.04, λ_pMGW=0.10 が論文の 0.01 と不一致 | ✅ **支持（強化）**。両者とも規約は (5.4) と同一。λ=0.01 は実行不能 |
+| §4.2 | λ_PGW=0.04, λ_pMGW=0.10 が論文の 0.01 と不一致 | ✅ **支持（強化）**。両者とも係数規約は (5.4) と同一だが正規化スケールが異なる。λ=0.01 が効かないのは geometry 由来（§3.6-2） |
 | §4.2 | balanced 6/6 vs partial 6/7 で条件が不公平 | ✅ 支持 |
 | §4.3 | Fig 6(a),(b) は argmax であり barycentric projection ではない | ✅ 支持。描画閾値も 2 panel で不一致 |
 | §4.4 | Fig 6 と 7 を 1 回の solve から作る | ⚠️ 格下げ（上記 #7） |
@@ -354,12 +385,28 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 
 ## 6. 修正の優先順位
 
-1. **Figure 5(a)** — cell 4 の λ 換算を cell 5 に揃えて再生成（または `compute_T_X_to_Z_C` を `M − 2λ` に統一し両セルを素の λ に）。あわせて §7.1.5 の solver 記述を実装に合わせる（§3.5-2）。
-2. **Figure 6–7** — 論文本文のデータ記述を実データ（半径 10 / z=0、target 半径 8・高さ 25）に合わせるか、コードを記述に合わせて全面再生成。λ は実行可能な実測値に修正。balanced/partial の成分数と alignment 中心化（§3.6-4）を揃える。Fig 6(a),(b) を barycentric projection + nearest-point に統一するか、論文の説明を argmax に合わせる。
-3. **Figure 4** — 再正規化の除去 **かつ** 全 panel 共通 density level。または §7.1.4 と caption を「正規化した matched-mass interpolation」と明記。
-4. **Figure 2** — 描画セルの追加（数値は現行コードで再現済み）。**Figure 1** — weight 着色 + 横 colorbar 版の復元。
-5. **Figure 3** — 非収束 panel の再計算、colorbar 上限の明示、cell 7/8 の出力名衝突の解消。
-6. 計算量の主張（§3.6-8）と、`compute_T_X_to_Z` の分母（§3.5-3）の是正。
+issue #6 の方針「**原則として論文を正とし、source code / notebook / docs を修正する**」に従う。以下は issue の P0/P1 タスクに対応する。
+
+### P0（数学的意味・比較条件）
+
+1. **Figure 5** — `compute_T_X_to_Z_C` の solver を `entropic_partial_ot` に差し替え、**同時に** cell 5 の `Lambda = 2 * Lambda` を廃止する（片方だけ行わないこと、§3.5-1）。(a) (b) とも再生成。`partial_wasserstein_lagrange_entropic` は rename/deprecate。
+2. **Figures 6–7 の geometry** — 半径 4 の ring から source/target を**独立に** 300 点ずつ、別分布の noise 10 点。これにより point-level PGW は論文どおり λ=0.01 で `300/310` を達成する（§3.6-2）。
+3. **penalty 換算規約の明示** — pMGW は component-level の正規化スケールでは λ=0.01 で matched mass 0 になるため、**論文の λ から各 solver input への換算を数式で固定**し、論文側にもその換算を記載する。閾値を超えれば両者とも `300/310` で頭打ちになる（§3.6-2）。
+4. **Figures 6–7 の比較条件** — source 6 / target 7 成分を 1 回だけ fit して MGW/pMGW で共有。balanced MGW の alignment を full-mean centered mixtures で計算（§3.6-4）。raw GW/PGW を barycentric projection + nearest-target に統一し、unmatched row は描かない（§3.6-5）。手法ごとに 1 回だけ solve し、Figure 7 = raw map、Figure 6 = その nearest-neighbor 版とする（§3.6-7）。
+5. **Figure 4** — 再正規化と `W>1e-5` 閾値を外して質量 `Z_λ` を保持し、**かつ**全 panel 共通 density level を使う（§3.4）。Gaussian 補間は (4.17) の閉形式に置き換える。
+
+### P1（Figure と主張）
+
+6. **Figure 2** — 1×5 の描画セルを追加（数値は現行コードで再現済み、§3.2）。**Figure 1** — weight の連続 colormap + 横 colorbar に戻し、label/legend を外す。
+7. **Figure 3** — 非収束 panel の再計算と residual の保存、colorbar 上限の明示、cell 7/8 の出力名衝突の解消（§3.3）。
+8. **point-level GW** — 無効な `epsilon=5e-3` を削除（図の再生成は不要、§3.6-6）。
+9. **composite layout** — Figures 5–7 の掲載図と同じ組版を notebook から直接保存する（§4）。
+10. **計算量の主張** — coupling dimension 削減に限定するか、N を増やした solver-only benchmark を追加（§3.6-8）。
+
+### その他
+
+11. `compute_T_X_to_Z` の分母が (6.2) ではなく全混合密度である点を是正するか、公開 API から外す（§3.5-3）。
+12. 再生成により掲載 PDF と外観が変わるため、issue #6 の方針 7・8 に従い差分を [#8](https://github.com/yachimura-lab/EPGOT-PMGW/issues/8) に記録する。
 
 ---
 
@@ -368,4 +415,5 @@ N=300 のこの例では **end-to-end の高速化は示せていない**。「c
 - **Figure 4 は再実行できていない**。`cpp_engine` の `.so` は gitignore されており、本監査ではビルドしていない。`engine.cpp` のソース読解により penalty 規約が Python 版と一致することは確認済みだが、`GaussianBarycenterW2` の数値挙動は未検証。
 - 掲載図との比較は**論文 PDF から抽出したテキスト・軸目盛り・caption**に基づく。図の画素単位の照合は行っていない。
 - Figure 1/3 の「線の色が掲載図と異なる」は、前回監査の記述と論文本文（"The width and color of each line indicate the corresponding coupling weight"）に依拠している。
+- **§3.6-2 の「論文どおりの geometry」は本書による再構成である。** 論文は target ring の高さと noise の分布を明示していないため、高さ h ∈ {8, 10, 12}、noise は中心 `(2.5·radius, 0, h)`・半径 0.3 の球内一様として検証した。matched mass `300/310` は h に依らず同一だったが、noise の配置を大きく変えれば λ の閾値は動きうる。実装時には論文側にも高さと noise 分布を明記する必要がある。
 - 実測値はすべて `set_reproducible()`（seed=42）下で `42ee1ad` / POT 0.9.7 において取得したもの。
