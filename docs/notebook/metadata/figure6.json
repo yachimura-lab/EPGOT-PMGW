@@ -120,7 +120,7 @@
       "minimum_entry": 0.0,
       "paper_lambda": null,
       "row_residual": 6.505213034913027e-17,
-      "runtime_seconds": 0.2625559350126423,
+      "runtime_seconds": 0.25869735500600655,
       "solve_id": "aaf07168ac29f59367f46fd8ec67b824382aa08190f2227ce1b046ab895b03eb",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -142,7 +142,7 @@
       "minimum_entry": 0.0,
       "paper_lambda": 0.01,
       "row_residual": 0.0,
-      "runtime_seconds": 0.17600296500313561,
+      "runtime_seconds": 0.1689804399939021,
       "solve_id": "7100a94e4f234069606cbcb329858779ef90c92be47ac63abdc1d64dd7ad64f8",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -164,7 +164,7 @@
       "minimum_entry": 0.0,
       "paper_lambda": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.10909216200525407,
+      "runtime_seconds": 0.1071291700063739,
       "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -186,7 +186,7 @@
       "minimum_entry": 0.0,
       "paper_lambda": 0.01,
       "row_residual": 0.0,
-      "runtime_seconds": 0.135420560836792,
+      "runtime_seconds": 0.13724541664123535,
       "solve_id": "5a39269c9131e99831304d1138a0690d2dd21f328a8158c5476fbfcbcac5dc29",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.013249170800775967
@@ -200,8 +200,8 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "f87ed8ee38acc6349ea89a11933dfc8f1c179d24",
-    "dirty": true,
+    "commit": "f22a88de38369bd90e3cb05474c67cba2928463a",
+    "dirty": false,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }
 }
