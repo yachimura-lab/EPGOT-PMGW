@@ -198,6 +198,15 @@ def partial_mgw_barycentric_map(
     ``sum[k,l] gamma[k,l] p_mu_k(x)`` rather than by the full mixture
     density. A zero matched density makes the map undefined and raises
     ``FloatingPointError``.
+
+    The source points and the source components are carried into the target
+    dimension by ``P.T`` first, and each component map is then taken between
+    the projected source Gaussian and the target Gaussian. This
+    implementation coincides with (6.8)--(6.9) in the square case ``d == d'``,
+    which is the setting used in the paper experiments (``d == d' == 3`` in
+    Section 7.2). For ``d > d'`` the composition above need not agree with
+    (6.8), which builds the component map in the source dimension ``d`` and
+    applies ``P.T`` last.
     """
     X = np.asarray(X, dtype=float)
     single = X.ndim == 1

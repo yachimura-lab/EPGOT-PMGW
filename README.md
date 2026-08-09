@@ -70,6 +70,14 @@ Reducing the coupling from `300×310` to `6×7` is a solver-dimensionality
 result, not an end-to-end speed claim at `N=300`, because GMM fitting also
 takes time.
 
+`partial_mgw_barycentric_map` carries the source points and components into
+the target dimension by `P.T` and then maps between the projected source
+Gaussian and the target Gaussian. This implementation coincides with
+(6.8)–(6.9) in the square case `d = d'`, which is the setting used in the
+paper experiments (`d = d' = 3` in Section 7.2). The general case `d > d'`,
+where (6.8) builds the component map in the source dimension and applies
+`P.T` last, is not implemented.
+
 ## Reproducibility
 
 `.python-version`, exact direct requirements in `pyproject.toml`, and
