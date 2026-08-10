@@ -451,7 +451,7 @@ figure5 = make_figure5(
     source_points, target_points, figure5_records, times=FIGURE5_TIMES
 )
 figure5_path = OUTPUT_DIR / "figure5.pdf"
-figure5.savefig(figure5_path, format="pdf", bbox_inches="tight")
+figure5.savefig(figure5_path, format="pdf", bbox_inches="tight", dpi=300)
 write_figure_sidecar(
     METADATA_DIR / "figure5.json",
     figure=5,
