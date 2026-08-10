@@ -43,19 +43,6 @@
 - `src/pgot/paper_figures.py`
 - 論文の実験条件
 
-### 14. `d > d'` が未実装であること
-
-現在の `partial_mgw_barycentric_map` は、論文実験で使う `d=d'=3` には対応していますが、一般の `d>d'` は未実装です。
-
-- [ ] 論文が一般次元への対応を主張していないことを確認する。
-- [ ] READMEまたは公開ドキュメントにlimitationsとして明記する。
-
-対象:
-
-- `DEVELOPMENT.md`
-- `src/pgot/partial_mgw.py`
-- 論文の定理・実装説明
-
 ## 追加推奨
 
 - [ ] `LICENSE` を追加する。

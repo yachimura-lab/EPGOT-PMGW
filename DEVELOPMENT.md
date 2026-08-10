@@ -58,14 +58,6 @@ coupling — the `6×7` component problem stalls at the empty coupling at
 `lambda=0.01`, even though the coupling reached from the balanced start
 scores a strictly better objective.
 
-`partial_mgw_barycentric_map` carries the source points and components into
-the target dimension by `P.T` and then maps between the projected source
-Gaussian and the target Gaussian. This implementation coincides with
-(6.8)–(6.9) in the square case `d = d'`, which is the setting used in the
-paper experiments (`d = d' = 3` in Section 7.2). The general case `d > d'`,
-where (6.8) builds the component map in the source dimension and applies
-`P.T` last, is not implemented.
-
 ## Notebook workflow
 
 Rebuild the notebook source cells and then execute all notebooks from clean
