@@ -1,4 +1,4 @@
-# EPGOT-pMGW — Entropic Partial Gromov Optimal Transport
+# EPGOT-pMGW — Entropic Partial Optimal Transport and Partial Gromov--Wasserstein Distance between Gaussian Mixtures
 
 This repository publishes research code and canonical notebooks for Figures
 1–7 of the EPGOT/pMGW paper. Numerical pipelines live in `src/pgot/`; executed
