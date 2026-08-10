@@ -8,6 +8,16 @@ notebooks and figure provenance live under `docs/notebook/`.
 
 [Rendered notebooks and publication site](https://epgot-pmgw.netlify.app/)
 
+## Authors
+
+- Toshiaki Yachimura, Mathematical Science Center for Co-creative Society,
+  Tohoku University, Sendai 980-0845, Japan.
+  Email: [toshiaki.yachimura.a4@tohoku.ac.jp](mailto:toshiaki.yachimura.a4@tohoku.ac.jp)
+
+- Xiaocheng Zou, Mathematical Institute, Tohoku University, Sendai 980-8578,
+  Japan. Email:
+  [zou.xiaocheng.t3@dc.tohoku.ac.jp](mailto:zou.xiaocheng.t3@dc.tohoku.ac.jp)
+
 ## Paper figures
 
 | Paper figure | Notebook | Canonical content |

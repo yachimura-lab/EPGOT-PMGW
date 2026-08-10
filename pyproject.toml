@@ -1,6 +1,10 @@
 [project]
 name = "pgot"
 version = "0.1.0"
+authors = [
+    { name = "Toshiaki Yachimura", email = "toshiaki.yachimura.a4@tohoku.ac.jp" },
+    { name = "Xiaocheng Zou", email = "zou.xiaocheng.t3@dc.tohoku.ac.jp" },
+]
 description = "Add your description here"
 readme = "README.md"
 license = "CC-BY-4.0"

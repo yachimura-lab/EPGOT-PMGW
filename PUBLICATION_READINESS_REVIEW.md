@@ -9,8 +9,8 @@
 
 ### 8. `pyproject.toml` の仮説明を変更する
 
-- [ ] `description = "Add your description here"` を正式な説明へ変更する。
-- [ ] 公開パッケージとして配布する場合はauthors、URLsも追加する。
+- [ ] `description = "Add your description here"` を適切な説明へ変更する。
+- [ ] 公開パッケージとして配布する場合はproject URLsも追加する。
 
 対象:
 
@@ -29,6 +29,6 @@
 ## 追加推奨
 
 - [ ] `CITATION.cff` またはBibTeX citationを追加する。
-- [ ] READMEに論文URL、著者、arXiv/DOI、引用方法を追加する。
-- [ ] `pyproject.toml` にauthors、project URLsを追加する。
+- [ ] READMEに論文URL、arXiv/DOI、引用方法を追加する。
+- [ ] `pyproject.toml` にproject URLsを追加する。
 - [ ] 公開直前にNetlifyとGitHubのリンクを手動確認する。
