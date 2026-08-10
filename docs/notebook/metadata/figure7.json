@@ -14,8 +14,8 @@
   "figure": 7,
   "generated_at": "2000-01-01T00:00:00+00:00",
   "inputs": {
-    "component_cost_scale": 195.43322120774667,
-    "point_cost_scale": 214.21762363723474,
+    "component_cost_scale": 195.85172873363885,
+    "point_cost_scale": 215.61643505740528,
     "source_gmm": {
       "covariances": {
         "dtype": "float64",
@@ -53,7 +53,7 @@
     "target_gmm": {
       "covariances": {
         "dtype": "float64",
-        "sha256": "60d2c058a1b3a79ee22ff376e7541c044eaeef33d5e7d70d6893752f5422a7a9",
+        "sha256": "0a680e7c7441183a8c9ff23edbe60bdbe982726afb81ee64f515fa68955ff6f2",
         "shape": [
           7,
           3,
@@ -62,7 +62,7 @@
       },
       "means": {
         "dtype": "float64",
-        "sha256": "0ddf56c75b7c7c6032f018281e39f19e50d2a0f126fee20ccb31565d78973abb",
+        "sha256": "4ff4fb3e33803d6de3eab195843c026a4312a8cf591e2d1a065aebd8dfc01efd",
         "shape": [
           7,
           3
@@ -70,7 +70,7 @@
       },
       "weights": {
         "dtype": "float64",
-        "sha256": "cd95844429bd49855313f8113c03572086cf0e8c520612e282c4a10c700e0a5f",
+        "sha256": "fe3375f90c37e1955df61f4e727d60e019e59d01b38961e242b37087d71dfc80",
         "shape": [
           7
         ]
@@ -78,9 +78,9 @@
     },
     "target_noise_points": {
       "dtype": "float64",
-      "sha256": "a5a23e951635f273746127976429b33bdcf8db0dffa026934947ad99553263a5",
+      "sha256": "8ce373505fffcc870917672cb242d8bf527659a9ee03bc6b09805af05dbe8c66",
       "shape": [
-        10,
+        50,
         3
       ]
     },
@@ -96,19 +96,19 @@
   "notes": "solve_id values are identical to the balanced and partial mixture GW panels in Figure 6.",
   "outputs": [
     {
-      "bytes": 254795,
-      "path": "outputs/figure7.pdf",
-      "sha256": "9523b98020106b42c0c80b5c59486302c2162fa306b36e03fe7de64347704b0c"
+      "bytes": 359236,
+      "path": "outputs/figure7.png",
+      "sha256": "1009ff9077718532e98f6f11d3d4244561f511cb4891eabf7d643d52179a2e0f"
     }
   ],
   "panels": [
     {
-      "column_residual": 2.7755575615628914e-17,
+      "column_residual": 0.0,
       "constraint": "balanced marginal",
-      "cost_normalization_scale": 195.43322120774667,
+      "cost_normalization_scale": 195.85172873363885,
       "coupling": {
         "dtype": "float64",
-        "sha256": "bde2f8764a7141815ed9837605c53a90eb677589b293509506b0ee5a17cb6b2d",
+        "sha256": "f45351df419c90f485723bdeebc7da8543e11e49c04ed0993df51a2119f5fb50",
         "shape": [
           6,
           7
@@ -120,31 +120,31 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.10461906499403995,
-      "solve_id": "081db0c37cdb4d21165e9612ded0cddbe4248d0dd722b3ec67f6a443224d7018",
+      "runtime_seconds": 0.1633681550010806,
+      "solve_id": "3402fec2722c1dee1cfda85cad39bdf963204f4bfaa75b1bfaaa32a258bfb7c3",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
     },
     {
       "column_residual": 0.0,
       "constraint": "sub-marginal",
-      "cost_normalization_scale": 195.43322120774667,
+      "cost_normalization_scale": 195.85172873363885,
       "coupling": {
         "dtype": "float64",
-        "sha256": "622b148a75662aa5f04db05c707b2f592f94b8853a2dc79f3d8ad1728147cb34",
+        "sha256": "4fa95fafd25738d164c5740a0f65df8f3cd561d74e85bd7105c252e8d7c98f59",
         "shape": [
           6,
           7
         ]
       },
-      "matched_mass": 0.9677419354838708,
+      "matched_mass": 0.8571428571428571,
       "method": "pMGW2",
       "minimum_entry": 0.0,
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.15224957466125488,
-      "solve_id": "a2b3f272ea072409519b4bc40def14cc16038ba16d29e5c92b6e3cc2ca46e7dd",
+      "runtime_seconds": 0.041605234146118164,
+      "solve_id": "548aad3b53b717e2dea93ce3b8f6ea58f4e3c6720c78ee738624bebc14c41646",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
     }
@@ -157,7 +157,7 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "994d19d548dd8093ea0a314379a032a4a41430bf",
+    "commit": "44d16a06cc4bc8c49ef0417c327890c492c78358",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }

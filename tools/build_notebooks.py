@@ -486,13 +486,13 @@ plt.show()
         ("markdown", r'''
 # Paper Figures 6–7 — point and mixture GW
 
-Source and target rings are independent samples from radius-4 GMMs; ten points
+Source and target rings are independent samples from radius-4 GMMs; 50 points
 from a separate ball distribution are added to the target. The 6/7-component
 fit and its W2 matrices are shared. Every method is solved exactly once:
 Figure 7 displays the raw mixture barycentric maps, and Figure 6 applies nearest
 target assignment to those same maps.
 
-The dimensionality claim is limited to the coupling solve (300×310 versus 6×7).
+The dimensionality claim is limited to the coupling solve (300×350 versus 6×7).
 '''),
         ("code", r'''
 import os
@@ -540,7 +540,7 @@ POINTS = 300              # points sampled from each ring
 SIGMA = 0.2               # component standard deviation, covariance 0.04 I_3
 RADIUS = 4.0              # ring radius, identical for source and target
 HEIGHT = 10.0             # the target ring lies in the plane z = HEIGHT
-NOISE_POINTS = 10         # outlying points added to the target
+NOISE_POINTS = 50         # outlying points added to the target
 NOISE_CENTRE = np.array([2.5 * RADIUS, 0.0, HEIGHT])  # centre of the noise ball
 NOISE_RADIUS = 0.3        # radius of that ball
 
@@ -819,8 +819,8 @@ for method, key, solver_lambda, cost_scale in [
 '''),
         ("code", r'''
 figure6 = make_figure6(figure67_data, figure67_solved)
-figure6_path = OUTPUT_DIR / "figure6.pdf"
-figure6.savefig(figure6_path, format="pdf", bbox_inches="tight")
+figure6_path = OUTPUT_DIR / "figure6.png"
+figure6.savefig(figure6_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure6.json",
     figure=6,
@@ -842,8 +842,8 @@ plt.show()
 '''),
         ("code", r'''
 figure7 = make_figure7(figure67_data, figure67_solved)
-figure7_path = OUTPUT_DIR / "figure7.pdf"
-figure7.savefig(figure7_path, format="pdf", bbox_inches="tight")
+figure7_path = OUTPUT_DIR / "figure7.png"
+figure7.savefig(figure7_path, format="png", bbox_inches="tight")
 mixture_panels = [
     panel for panel in method_panels if panel["method"] in {"MGW2", "pMGW2"}
 ]

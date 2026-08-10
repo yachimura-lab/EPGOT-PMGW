@@ -48,7 +48,7 @@ and is not exported from the package root.
 
 For Figures 6–7, both partial solvers receive the paper's `lambda=0.01`
 unchanged, on cost matrices already divided by their own pair maximum. PGW
-and pMGW both transport `300/310` mass, leaving the ten noise points
+and pMGW both transport `300/350` mass, leaving the 50 noise points
 unmatched.
 
 Partial GW is non-convex, so the Frank-Wolfe starting point is part of the

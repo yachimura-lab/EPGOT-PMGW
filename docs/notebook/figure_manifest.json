@@ -45,7 +45,7 @@
     },
     "6": {
       "notebook": "figure6_7.ipynb",
-      "canonical_output": "outputs/figure6.pdf",
+      "canonical_output": "outputs/figure6.png",
       "sidecar": "metadata/figure6.json",
       "paper_lambda": 0.01,
       "point_solver_lambda": 0.01,
@@ -55,7 +55,7 @@
     },
     "7": {
       "notebook": "figure6_7.ipynb",
-      "canonical_output": "outputs/figure7.pdf",
+      "canonical_output": "outputs/figure7.png",
       "sidecar": "metadata/figure7.json",
       "shared_solves": ["MGW2", "pMGW2"],
       "solver": "same solve IDs as Figure 6"

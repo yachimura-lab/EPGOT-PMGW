@@ -165,10 +165,10 @@ class Figure67RegressionTests(unittest.TestCase):
         )
         self.assertGreater(source[:, 2].std(), 0.1)
         self.assertFalse(np.allclose(source[:, :2], target_ring[:, :2]))
-        self.assertEqual(len(self.data["noise"]), 10)
+        self.assertEqual(len(self.data["noise"]), 50)
 
-    def test_partial_methods_match_300_over_310(self):
-        expected = 300 / 310
+    def test_partial_methods_match_300_over_350(self):
+        expected = 300 / 350
         self.assertAlmostEqual(self.solved["coupling_pgw"].sum(), expected, places=12)
         self.assertAlmostEqual(self.solved["coupling_pmgw"].sum(), expected, places=12)
         self.assertAlmostEqual(self.solved["lambda_point"], 0.01, places=12)
@@ -192,7 +192,7 @@ class Figure67RegressionTests(unittest.TestCase):
             tol=1e-12,
             verbose=False,
         )
-        self.assertEqual(stalled.sum(), 0.0)
+        self.assertAlmostEqual(stalled.sum(), 0.0, places=12)
 
         def objective(coupling):
             mass = coupling.sum()

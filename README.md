@@ -28,7 +28,8 @@ parameters, matched mass, residuals, runtime, solve ID, and output SHA-256.
 
 `.python-version`, exact direct requirements in `pyproject.toml`, and
 `uv.lock` fix the environment. Notebook sampling uses explicit local NumPy
-generators; Figures 6–7 use separate generators for source, target, and noise.
+generators; Figures 6–7 use separate generators for source, target, and 50 noise
+points.
 
 Requirements are Python 3.13.15, `uv`, and the checked-out PGW_Metric
 submodule. To reproduce the executed notebooks from clean kernels:
