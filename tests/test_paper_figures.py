@@ -33,7 +33,6 @@ from pgot import (
     make_figure1,
     make_figure2,
     make_figure3,
-    make_figure5,
     solve_epot_panels,
     solve_point_cloud_matching,
 )
@@ -150,25 +149,6 @@ class CanonicalEPOTFigureTests(unittest.TestCase):
         self.assertEqual(len(figures[2].axes), 22)
         for figure in figures:
             figure.clear()
-
-    def test_figure5_scatter_collections_are_rasterized(self):
-        source_points = np.array([[0.0, 0.0], [1.0, 1.0]])
-        target_points = np.array([[2.0, 2.0], [3.0, 3.0]])
-        records = [
-            {
-                "mapped": np.array([[0.5, 0.5], [1.5, 1.5]]),
-                "paper_lambda": 0.25,
-                "matched_mass": 0.9,
-            }
-        ]
-
-        figure = make_figure5(source_points, target_points, records, times=[0.5])
-
-        self.assertEqual(len(figure.axes[0].collections), 3)
-        self.assertTrue(
-            all(collection.get_rasterized() for collection in figure.axes[0].collections)
-        )
-        figure.clear()
 
 
 class Figure67RegressionTests(unittest.TestCase):

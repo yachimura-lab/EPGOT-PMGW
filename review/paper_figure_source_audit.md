@@ -49,7 +49,7 @@ Lambda_solver
 | 2 | `outputs/figure2.pdf` | `epsilon=0.01`, `lambda=[0,0.125,0.25,0.375,0.5]` の正確な 1×5 sweep |
 | 3 | `outputs/figure3.pdf` | 3 epsilon rows × 7 lambda columns。colorbar は全 coupling の最大 weight（約 0.45）を明示。全 panel の residual と停止条件を保存 |
 | 4 | `outputs/figure4.pdf` | (4.18) の sub-probability measure。threshold/再正規化なし、全 panel 共通 density level、(4.17) の閉形式 |
-| 5 | `outputs/figure5.pdf` | 既知 GMM、dummy-point EPOT、matched-density map (6.2)、2×5 composite。両 lambda で同じ GMM/cost |
+| 5 | `outputs/figure5.png` | 既知 GMM、dummy-point EPOT、matched-density map (6.2)、2×5 composite。両 lambda で同じ GMM/cost |
 | 6 | `outputs/figure6.pdf` | 半径 4 の独立 ring + noise 10 点。全4手法を barycentric projection + nearest target に統一した 2×2 composite |
 | 7 | `outputs/figure7.pdf` | Figure 6 と同じ MGW2/pMGW2 solve の raw maps。1×2 composite |
 

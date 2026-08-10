@@ -212,15 +212,9 @@ def make_figure5(source_points, target_points, records, times):
         for col, t in enumerate(times):
             axis = axes[row, col]
             interpolated = (1.0 - t) * source_points + t * record["mapped"]
-            axis.scatter(
-                *source_points.T, s=3, c="red", alpha=0.18, rasterized=True
-            )
-            axis.scatter(
-                *target_points.T, s=3, c="blue", alpha=0.18, rasterized=True
-            )
-            axis.scatter(
-                *interpolated.T, s=4, c="green", alpha=0.65, rasterized=True
-            )
+            axis.scatter(*source_points.T, s=3, c="red", alpha=0.18)
+            axis.scatter(*target_points.T, s=3, c="blue", alpha=0.18)
+            axis.scatter(*interpolated.T, s=4, c="green", alpha=0.65)
             axis.set_xlim(-12, 12)
             axis.set_ylim(-12, 12)
             axis.set_aspect("equal", adjustable="box")

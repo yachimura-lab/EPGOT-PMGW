@@ -93,9 +93,9 @@
   "notes": "Known GMM parameters; canonical dummy-point EPOT and matched-density map (6.2).",
   "outputs": [
     {
-      "bytes": 621170,
-      "path": "outputs/figure5.pdf",
-      "sha256": "478e3fa4806459e04347e630738f87812ce23e59b8bd2f3153c83b65c5f3e754"
+      "bytes": 131136,
+      "path": "outputs/figure5.png",
+      "sha256": "a818f96a06b9a16fcd1cde11243856aed68c9060a4e1a6f9f41c0941b2eaaebc"
     }
   ],
   "panels": [
@@ -135,7 +135,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-08,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.005676325001331861,
+      "runtime_seconds": 0.003056830999412341,
       "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -176,7 +176,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-08,
       "row_residual": 5.551115123125783e-17,
-      "runtime_seconds": 0.019466925001324853,
+      "runtime_seconds": 0.01455130100112001,
       "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.5
@@ -189,7 +189,7 @@
     "target_sampling": 53
   },
   "source": {
-    "commit": "6fa326735cc919d4a8231eead257ff899bf30639",
+    "commit": "d2a1ff19ba9f487a7c8dfb6886124848f83bafa7",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }

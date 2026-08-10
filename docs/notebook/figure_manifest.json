@@ -36,7 +36,7 @@
     },
     "5": {
       "notebook": "figure5.ipynb",
-      "canonical_output": "outputs/figure5.pdf",
+      "canonical_output": "outputs/figure5.png",
       "sidecar": "metadata/figure5.json",
       "lambda": [0.25, 0.5],
       "epsilon": 0.03,

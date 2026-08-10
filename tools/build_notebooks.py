@@ -368,7 +368,8 @@ plt.show()
 
 The known Section 7.1 mixtures are used directly. Samples are only evaluation
 points. Each lambda is solved once, and the exact same coupling is reused for
-its map and all five interpolation panels in the two-row paper layout.
+its map and all five interpolation panels in the two-row paper layout. The
+figure is saved as a PNG at its native resolution without a DPI override.
 '''),
         ("code", r'''
 import os
@@ -450,8 +451,8 @@ for record in figure5_records:
 figure5 = make_figure5(
     source_points, target_points, figure5_records, times=FIGURE5_TIMES
 )
-figure5_path = OUTPUT_DIR / "figure5.pdf"
-figure5.savefig(figure5_path, format="pdf", bbox_inches="tight", dpi=300)
+figure5_path = OUTPUT_DIR / "figure5.png"
+figure5.savefig(figure5_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure5.json",
     figure=5,

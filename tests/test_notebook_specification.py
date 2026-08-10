@@ -42,6 +42,23 @@ def literal(text, name):
     raise AssertionError(f"{name} is not assigned as a literal")
 
 
+def call_keyword_literals(text, variable, method):
+    """Literal keyword arguments for ``variable.method(...)`` in ``text``."""
+    for node in ast.walk(ast.parse(text)):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == method
+            and isinstance(node.func.value, ast.Name)
+            and node.func.value.id == variable
+        ):
+            return {
+                keyword.arg: ast.literal_eval(keyword.value)
+                for keyword in node.keywords
+            }
+    raise AssertionError(f"{variable}.{method}(...) is not called")
+
+
 def mixture_arguments(text, variable):
     """The three arrays passed to ``variable = GaussianMixture(...)``."""
     for node in ast.parse(text).body:
@@ -102,6 +119,9 @@ class NotebooksStateTheSweeps(unittest.TestCase):
         self.assertEqual(
             literal(text, "SAMPLES_PER_MIXTURE"), spec.SAMPLES_PER_MIXTURE
         )
+        savefig_options = call_keyword_literals(text, "figure5", "savefig")
+        self.assertEqual(savefig_options["format"], "png")
+        self.assertNotIn("dpi", savefig_options)
 
     def test_figure67_geometry_and_penalty(self):
         text = source_of("PMGW_corrected")
