@@ -7,14 +7,6 @@
 
 ## 公開品質として変更推奨
 
-### 8. `pyproject.toml` にproject URLsを追加する
-
-- [ ] 公開パッケージとして配布する場合はproject URLsも追加する。
-
-対象:
-
-- `pyproject.toml`
-
 ### 12. `results published with it` の表現を確認する
 
 - [ ] 対応する既公開成果がない場合は `historical results` または `earlier experimental results` に変更する。
@@ -29,4 +21,5 @@
 
 - [ ] `CITATION.cff` またはBibTeX citationを追加する。
 - [ ] READMEに論文URL、arXiv/DOI、引用方法を追加する。
+- [ ] 論文公開時に `pyproject.toml` の `[project.urls]` へ `Paper` URLを追加する。
 - [ ] 公開直前にNetlifyとGitHubのリンクを手動確認する。

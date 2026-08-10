@@ -24,6 +24,12 @@ dependencies = [
     "torch==2.13.0",
 ]
 
+[project.urls]
+Homepage = "https://epgot-pmgw.netlify.app/"
+Documentation = "https://epgot-pmgw.netlify.app/"
+Source = "https://github.com/yachimura-lab/EPGOT-PMGW"
+Issues = "https://github.com/yachimura-lab/EPGOT-PMGW/issues"
+
 [tool.uv.sources]
 pgw-metric-vendored = { path = "vendor" }
 torch = { index = "pytorch-cpu" }
