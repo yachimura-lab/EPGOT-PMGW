@@ -71,3 +71,12 @@ MPLCONFIGDIR=/tmp/matplotlib \
 export QUARTO_PYTHON="$PWD/.venv/bin/python"
 quarto render docs
 ```
+
+## License
+
+Except for third-party material in the `vendor/PGW_Metric` submodule, this
+repository is licensed under the [Creative Commons Attribution 4.0
+International License](https://creativecommons.org/licenses/by/4.0/)
+(`CC-BY-4.0`). The submodule remains subject to its upstream terms. The full
+license text is available in
+[`LICENSE.txt`](https://github.com/yachimura-lab/EPGOT-PMGW/blob/main/LICENSE.txt).

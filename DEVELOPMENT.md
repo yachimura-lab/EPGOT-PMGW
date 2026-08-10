@@ -13,6 +13,7 @@ reproducing the results, see the [README](README.md).
 ├── tests/                     # Mathematical/reproducibility regressions
 ├── tools/build_notebooks.py   # Rebuild concise notebook source cells
 ├── tools/execute_notebooks.py # Execute all notebooks from clean kernels
+├── LICENSE.txt                # CC BY 4.0 legal text
 ├── pyproject.toml             # Exact direct dependency versions
 └── uv.lock                    # Complete resolved environment
 ```

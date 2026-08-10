@@ -53,6 +53,13 @@ paper experiments (`d = d' = 3` in Section 7.2). The general case `d > d'`,
 where (6.8) builds the component map in the source dimension and applies
 `P.T` last, is not implemented.
 
+## License
+
+Except for third-party material in the `vendor/PGW_Metric` submodule, this
+repository is licensed under the [Creative Commons Attribution 4.0
+International License](LICENSE.txt) (`CC-BY-4.0`). The submodule remains
+subject to its upstream terms.
+
 Mathematical conventions, repository structure, notebook regeneration,
 testing, and documentation-site maintenance are described in the
 [development guide](DEVELOPMENT.md).
