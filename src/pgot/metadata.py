@@ -146,7 +146,9 @@ def write_figure_sidecar(
 
     NumPy arrays are represented by shape, dtype and SHA-256 rather than
     expanded into JSON. This keeps point-level couplings compact while still
-    making the exact solve traceable.
+    making the exact solve traceable. ``generated_at`` records when the
+    sidecar was actually written, while ``source_date_epoch`` records the
+    fixed timestamp used to make rendered figure bytes reproducible.
     """
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -163,9 +165,10 @@ def write_figure_sidecar(
 
     source_epoch = int(os.environ.get("SOURCE_DATE_EPOCH", "946684800"))
     payload = {
-        "schema_version": 1,
+        "schema_version": 2,
         "figure": int(figure),
-        "generated_at": datetime.fromtimestamp(source_epoch, timezone.utc).isoformat(),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_date_epoch": source_epoch,
         "source": git_revision(),
         "environment": runtime_environment(),
         "seeds": _jsonify(seeds),
