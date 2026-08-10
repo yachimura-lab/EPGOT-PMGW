@@ -1,8 +1,9 @@
 """Section 7 constants, duplicated here so the tests are self-contained.
 
-This module deliberately mirrors the notebook values for use only by the
-tests. ``test_notebook_specification.py`` asserts that the two agree, so drift
-in either place fails the suite rather than passing silently.
+The paper defines the experiment, and the generated notebook source is its
+executable specification. This test-only module deliberately mirrors those
+values. ``test_notebook_specification.py`` asserts that the copies agree, so
+drift fails the suite rather than passing silently.
 """
 
 import numpy as np
@@ -64,8 +65,9 @@ def normalized_cross_cost(source, target):
 def point_cloud_data(seed=None):
     """The Section 7.2 rings and noise, taken from the notebook itself.
 
-    The notebook is the authority for the geometry, so the test executes its
-    data cell instead of keeping a second implementation that could drift.
+    The generated notebook source is the executable specification for the
+    paper-defined geometry, so the test executes its data cell instead of
+    keeping a second implementation that could drift.
     """
     import io
     import json

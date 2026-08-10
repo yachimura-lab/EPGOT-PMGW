@@ -1,10 +1,10 @@
-"""The notebooks must state Section 7 in full, and agree with each other.
+"""The generated notebooks must mirror the paper and agree with each other.
 
-Paper-specific experiment values live in the notebook cells rather than in
-the reusable ``pgot`` package, so the published page can be checked against
-the paper. That leaves the Section 7.1 mixtures duplicated across three
-notebooks and copied once more into ``paper_setup`` for the tests. These
-checks keep the copies synchronized.
+The paper defines the experiment. Its values live in the generated notebook
+source, which is the executable specification, rather than in the reusable
+``pgot`` package. The Section 7.1 mixtures are therefore duplicated across
+three notebooks and copied once more into ``paper_setup`` for the tests.
+These checks keep the executable specification synchronized with the paper.
 """
 
 import ast

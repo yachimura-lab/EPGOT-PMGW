@@ -16,27 +16,6 @@
 
 - `pyproject.toml`
 
-### 11. source of truthの説明を統一する
-
-- [ ] 論文とノートブックのどちらがauthorityかを一貫して説明する。
-
-現在は次の記述が混在しています。
-
-- manifest / 公開サイト: paper equations and Section 7 conditions are the source of truth
-- tests: notebooks are the authority
-
-推奨する整理:
-
-> The paper defines the experiment. The generated notebook source is the
-> executable specification and must mirror the paper exactly.
-
-対象:
-
-- `docs/index.qmd`
-- `docs/notebook/figure_manifest.json`
-- `tests/test_notebook_specification.py`
-- `tests/paper_setup.py`
-
 ### 12. `results published with it` の表現を確認する
 
 - [ ] 対応する既公開成果がない場合は `historical results` または `earlier experimental results` に変更する。

@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
-  "source_of_truth": "paper equations and Section 7 experiment conditions",
+  "experiment_authority": "paper",
+  "executable_specification": "generated notebook source; must mirror the paper exactly",
   "figures": {
     "1": {
       "notebook": "figure1_2_3.ipynb",
