@@ -15,8 +15,8 @@ Rendered notebooks: https://epgot-pmgw.netlify.app/
 | 3 | [figure1_2_3.ipynb](docs/notebook/figure1_2_3.ipynb) | 3×7 ε/λ sweep with stopping residuals |
 | 4 | [figure4.ipynb](docs/notebook/figure4.ipynb) | Sub-probability interpolation (4.18), closed form (4.17) |
 | 5 | [figure5.ipynb](docs/notebook/figure5.ipynb) | Matched-density map (6.2), two-row paper layout |
-| 6 | [PMGW_corrected.ipynb](docs/notebook/PMGW_corrected.ipynb) | Four barycentric-projection-based nearest assignments |
-| 7 | [PMGW_corrected.ipynb](docs/notebook/PMGW_corrected.ipynb) | Raw MGW/pMGW maps from the same solves as Figure 6 |
+| 6 | [figure6_7.ipynb](docs/notebook/figure6_7.ipynb) | Four barycentric-projection-based nearest assignments |
+| 7 | [figure6_7.ipynb](docs/notebook/figure6_7.ipynb) | Raw MGW/pMGW maps from the same solves as Figure 6 |
 
 The machine-readable mapping is
 [`figure_manifest.json`](docs/notebook/figure_manifest.json). Each figure has a

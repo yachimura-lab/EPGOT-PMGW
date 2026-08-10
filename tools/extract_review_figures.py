@@ -15,7 +15,7 @@ MAPPING = {
     "figure1_2_3.ipynb": ["figure01.png", "figure02.png", "figure03.png"],
     "figure4.ipynb": ["figure04.png"],
     "figure5.ipynb": ["figure05.png"],
-    "PMGW_corrected.ipynb": ["figure06.png", "figure07.png"],
+    "figure6_7.ipynb": ["figure06.png", "figure07.png"],
 }
 
 

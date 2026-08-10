@@ -482,7 +482,7 @@ write_figure_sidecar(
 plt.show()
 '''),
     ],
-    "PMGW_corrected.ipynb": [
+    "figure6_7.ipynb": [
         ("markdown", r'''
 # Paper Figures 6–7 — point and mixture GW
 

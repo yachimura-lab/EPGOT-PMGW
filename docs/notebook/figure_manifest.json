@@ -44,7 +44,7 @@
       "solver": "pgot.entropic_partial_coupling"
     },
     "6": {
-      "notebook": "PMGW_corrected.ipynb",
+      "notebook": "figure6_7.ipynb",
       "canonical_output": "outputs/figure6.pdf",
       "sidecar": "metadata/figure6.json",
       "paper_lambda": 0.01,
@@ -54,7 +54,7 @@
       "solver": "POT GW and PGW_Metric partial_gromov_ver1"
     },
     "7": {
-      "notebook": "PMGW_corrected.ipynb",
+      "notebook": "figure6_7.ipynb",
       "canonical_output": "outputs/figure7.pdf",
       "sidecar": "metadata/figure7.json",
       "shared_solves": ["MGW2", "pMGW2"],

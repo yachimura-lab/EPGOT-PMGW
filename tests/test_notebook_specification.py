@@ -104,7 +104,7 @@ class NotebooksStateTheSweeps(unittest.TestCase):
         )
 
     def test_figure67_geometry_and_penalty(self):
-        text = source_of("PMGW_corrected")
+        text = source_of("figure6_7")
         for name, expected in [
             ("COMPONENTS", spec.COMPONENTS),
             ("POINTS", spec.POINTS),

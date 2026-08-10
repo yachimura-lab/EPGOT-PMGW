@@ -78,7 +78,7 @@ def point_cloud_data(seed=None):
             Path(__file__).resolve().parents[1]
             / "docs"
             / "notebook"
-            / "PMGW_corrected.ipynb"
+            / "figure6_7.ipynb"
         ).read_text()
     )
     cell = next(
@@ -88,7 +88,7 @@ def point_cloud_data(seed=None):
     )
     namespace = {}
     with redirect_stdout(io.StringIO()):
-        exec(compile(cell, "PMGW_corrected:data", "exec"), namespace)
+        exec(compile(cell, "figure6_7:data", "exec"), namespace)
     data = namespace["figure67_data"]
     if seed is not None and data["seed"] != seed:
         raise AssertionError(

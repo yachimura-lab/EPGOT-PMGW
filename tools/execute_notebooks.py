@@ -12,7 +12,7 @@ NOTEBOOKS = [
     "figure1_2_3.ipynb",
     "figure4.ipynb",
     "figure5.ipynb",
-    "PMGW_corrected.ipynb",
+    "figure6_7.ipynb",
 ]
 
 
