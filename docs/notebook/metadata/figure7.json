@@ -120,7 +120,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.16263764500035904,
+      "runtime_seconds": 0.157245779002551,
       "solve_id": "3402fec2722c1dee1cfda85cad39bdf963204f4bfaa75b1bfaaa32a258bfb7c3",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -143,7 +143,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.04140186309814453,
+      "runtime_seconds": 0.039051055908203125,
       "solve_id": "548aad3b53b717e2dea93ce3b8f6ea58f4e3c6720c78ee738624bebc14c41646",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -157,8 +157,8 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "5cef88a0c20026b53da7760f4864099ef43d9e08",
-    "dirty": true,
+    "commit": "3b867882823a1aa4e60241864970e791e545095a",
+    "dirty": false,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }
 }

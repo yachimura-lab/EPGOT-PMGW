@@ -98,7 +98,7 @@
       "paper_lambda": 0.0,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.21575201199812,
+      "runtime_seconds": 0.21121704100005445,
       "solve_id": "fd824af97b3fecb3419528e020329c45306ba8dc6b704072efe79296dfcfe595",
       "solver": "POT sinkhorn + SciPy SLSQP refinement",
       "solver_lambda": 0.0
@@ -123,7 +123,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0014362670008267742,
+      "runtime_seconds": 0.0009223859997291584,
       "solve_id": "91ed2a137231ce033e6864042f5b44c6843d67b7960be8d17b0b369162aab875",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -148,7 +148,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.0018977059989992995,
+      "runtime_seconds": 0.0012558890011860058,
       "solve_id": "3d89c599f06f3e9e0ed2812e7ffdfef428b235b3cf92b22717f4812692ec1dab",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -173,7 +173,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.005415733998233918,
+      "runtime_seconds": 0.003392945000086911,
       "solve_id": "d4fb2e61c108c7c2c62c99a6a831ded500b0bf634a5e62e17b31fdb4b013c816",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -198,7 +198,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.2106808099997579,
+      "runtime_seconds": 0.20815629299977445,
       "solve_id": "17db219cd8a4b9f3b835210bd5d6ed011a47fa9e61a00aae8050234f7adea21c",
       "solver": "POT sinkhorn + SciPy SLSQP refinement",
       "solver_lambda": 0.5
@@ -210,8 +210,8 @@
     "sampling": null
   },
   "source": {
-    "commit": "5cef88a0c20026b53da7760f4864099ef43d9e08",
-    "dirty": true,
+    "commit": "3b867882823a1aa4e60241864970e791e545095a",
+    "dirty": false,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }
 }

@@ -7,36 +7,10 @@
 
 ## 最優先
 
-### 4. manifestが参照する成果物を公開対象に含める（対応済み）
-
-- [x] manifestのFigures 1–7をPNG出力へ統一し、実ファイルを生成する。
-- [x] `outputs/figure1.png`–`outputs/figure7.png` を公開成果物としてGit追跡する。
-- [x] sidecarのoutput hashが生成されたファイルと一致することを確認する。
-
-Figures 1–7のPNGは生成済みで、sidecarのpath、bytes、SHA-256と一致しています。全PNGをGit追跡し、fresh cloneでmanifestの全出力を検証できる状態にしました。
-
-### 5. provenanceをcleanな状態で再生成する
-
-- [ ] sidecarの `dirty` をすべて `false` にする。
-- [ ] sidecarのsource commitを公開対象コミットに更新する。
-- [ ] 全ノートブック、sidecar、Figure成果物をcleanなコミットから再生成する。
-
-現在のsidecarはすべて `dirty: true` で、Figures 1–5とFigures 6–7がそれぞれ古いsource commitを記録しています。
-
-対象:
-
-- `docs/notebook/metadata/figure1.json`
-- `docs/notebook/metadata/figure2.json`
-- `docs/notebook/metadata/figure3.json`
-- `docs/notebook/metadata/figure4.json`
-- `docs/notebook/metadata/figure5.json`
-- `docs/notebook/metadata/figure6.json`
-- `docs/notebook/metadata/figure7.json`
-
 ### 6. `generated_at = 2000-01-01` の意味を修正する
 
 - [ ] 固定された再現ビルド時刻を実際の生成日時として表示しない。
-- [ ] `generated_at` を `source_date_epoch` に変更するか、実際の生成日時を別途記録する。
+- [ ] `generated_at` は実際の生成日時を別途記録する。
 - [ ] schema versionを更新する。
 
 現在の `generated_at: "2000-01-01T00:00:00+00:00"` は、Matplotlib成果物の再現性確保に使う `SOURCE_DATE_EPOCH` であり、実際の生成日時ではありません。
