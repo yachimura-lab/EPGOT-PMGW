@@ -48,18 +48,10 @@ The machine-readable mapping is in
 
 ## Figures 6–7 penalty scale
 
-Point and mixture costs use different normalization constants. A shared
-dimensionless value $\widetilde\lambda$ is therefore converted separately:
-
-$$
-\Lambda_{\mathrm{solver}}
-= \widetilde\lambda\,
-D_{\mathrm{match}}(C_1,C_2,\Gamma_{\mathrm{balanced}}).
-$$
-
-The paper's point-level $\lambda=0.01$ fixes $\widetilde\lambda$. In the
-canonical run this gives point input `0.010000` and component input
-`0.013249`; PGW and pMGW both transport $300/350$ mass.
+Point and mixture costs are each divided by their own pair maximum. The
+paper's $\lambda=0.01$ is passed unchanged to both partial solvers on their
+respective normalized cost matrices. In the canonical run, PGW and pMGW both
+transport $300/350$ mass.
 
 The mixture representation reduces the coupling dimensions from
 $300\times350$ to $6\times7$. This is a solver-dimensionality claim, not an
