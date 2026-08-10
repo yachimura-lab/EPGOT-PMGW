@@ -12,7 +12,7 @@
     "python": "3.13.15"
   },
   "figure": 6,
-  "generated_at": "2000-01-01T00:00:00+00:00",
+  "generated_at": "2026-08-10T06:53:43.810392+00:00",
   "inputs": {
     "component_cost_scale": 195.85172873363885,
     "point_cost_scale": 215.61643505740528,
@@ -120,7 +120,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.4234339300019201,
+      "runtime_seconds": 0.3712131229985971,
       "solve_id": "b97de426b234a9a0c99e7fe8121a12963c23c849f0a89bd72ce475923bb6150e",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -143,7 +143,7 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.3272961500006204,
+      "runtime_seconds": 0.33646898699953454,
       "solve_id": "c14390e2cafbc542e82199c77f1edb3f1edbad7103ee44aff64c34e67c4a992d",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
@@ -166,7 +166,7 @@
       "paper_lambda": null,
       "partial_init": null,
       "row_residual": 0.0,
-      "runtime_seconds": 0.157245779002551,
+      "runtime_seconds": 0.16092066400233307,
       "solve_id": "3402fec2722c1dee1cfda85cad39bdf963204f4bfaa75b1bfaaa32a258bfb7c3",
       "solver": "POT gromov_wasserstein",
       "solver_lambda": null
@@ -189,13 +189,13 @@
       "paper_lambda": 0.01,
       "partial_init": "balanced coupling of the same representation",
       "row_residual": 0.0,
-      "runtime_seconds": 0.039051055908203125,
+      "runtime_seconds": 0.03843188285827637,
       "solve_id": "548aad3b53b717e2dea93ce3b8f6ea58f4e3c6720c78ee738624bebc14c41646",
       "solver": "PGW_Metric partial_gromov_ver1",
       "solver_lambda": 0.01
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "seeds": {
     "fit": 42,
     "noise_sampling": 44,
@@ -203,8 +203,9 @@
     "target_sampling": 43
   },
   "source": {
-    "commit": "3b867882823a1aa4e60241864970e791e545095a",
+    "commit": "790127da4aa2d0543743f97d0b2d2e27d1375ace",
     "dirty": false,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
-  }
+  },
+  "source_date_epoch": 946684800
 }

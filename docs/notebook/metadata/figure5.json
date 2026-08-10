@@ -12,7 +12,7 @@
     "python": "3.13.15"
   },
   "figure": 5,
-  "generated_at": "2000-01-01T00:00:00+00:00",
+  "generated_at": "2026-08-10T06:53:33.544375+00:00",
   "inputs": {
     "source_evaluation_points": {
       "dtype": "float64",
@@ -135,7 +135,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-08,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0022053710017644335,
+      "runtime_seconds": 0.002062747000309173,
       "solve_id": "89174be316c5ac42bb57e4267d1a8cdcb3257f3ee269357660d1bb6c34f45a26",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -176,21 +176,22 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-08,
       "row_residual": 5.551115123125783e-17,
-      "runtime_seconds": 0.007617019000463188,
+      "runtime_seconds": 0.007882351001171628,
       "solve_id": "7b7b51bca693830a901e096a5f011cffe7477df0f9397e01ed453f604dafd3c6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.5
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "seeds": {
     "fit": null,
     "source_sampling": 52,
     "target_sampling": 53
   },
   "source": {
-    "commit": "3b867882823a1aa4e60241864970e791e545095a",
+    "commit": "790127da4aa2d0543743f97d0b2d2e27d1375ace",
     "dirty": false,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
-  }
+  },
+  "source_date_epoch": 946684800
 }

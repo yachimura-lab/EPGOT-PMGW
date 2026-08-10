@@ -12,7 +12,7 @@
     "python": "3.13.15"
   },
   "figure": 3,
-  "generated_at": "2000-01-01T00:00:00+00:00",
+  "generated_at": "2026-08-10T06:53:15.702453+00:00",
   "inputs": {
     "cost": "squared Gaussian W2 divided by its cross-matrix maximum",
     "cost_scale": 445.2540510775958,
@@ -98,7 +98,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0015436770008818712,
+      "runtime_seconds": 0.0015230449971568305,
       "solve_id": "91ed2a137231ce033e6864042f5b44c6843d67b7960be8d17b0b369162aab875",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -123,7 +123,7 @@
       "paper_lambda": 0.1875,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0016818509975564666,
+      "runtime_seconds": 0.001792334998754086,
       "solve_id": "e1ccb2a6d8c26713da8ad5be40355f3ece6c3e3e6ea06e612d5e3f09ac61b4f6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.1875
@@ -148,7 +148,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.0011837749989354052,
+      "runtime_seconds": 0.0011644580008578487,
       "solve_id": "3d89c599f06f3e9e0ed2812e7ffdfef428b235b3cf92b22717f4812692ec1dab",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -173,7 +173,7 @@
       "paper_lambda": 0.3125,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.001248330001544673,
+      "runtime_seconds": 0.0011889089983014856,
       "solve_id": "e3ce11a6b99e0508dc151d021d96b40271fe10684841e8a75eed7fd14dac64b6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3125
@@ -198,7 +198,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0036363959989103023,
+      "runtime_seconds": 0.0035359960020286962,
       "solve_id": "d4fb2e61c108c7c2c62c99a6a831ded500b0bf634a5e62e17b31fdb4b013c816",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -223,7 +223,7 @@
       "paper_lambda": 0.4375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.006282376001763623,
+      "runtime_seconds": 0.006104137999500381,
       "solve_id": "a5dcf8b57bd3d5f1f37561697310233eb89552ab39112fdde6e16e8692a901fb",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.4375
@@ -248,7 +248,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.20777144900057465,
+      "runtime_seconds": 0.21089079899684293,
       "solve_id": "17db219cd8a4b9f3b835210bd5d6ed011a47fa9e61a00aae8050234f7adea21c",
       "solver": "POT sinkhorn + SciPy SLSQP refinement",
       "solver_lambda": 0.5
@@ -273,7 +273,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.00018960599845740944,
+      "runtime_seconds": 0.00018483000167179853,
       "solve_id": "f27a642c35bb44660c7181a8bcda53d84e5add54540dc21999c4a8790cb9fce9",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -298,7 +298,7 @@
       "paper_lambda": 0.1875,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.0002533529986976646,
+      "runtime_seconds": 0.000264655001956271,
       "solve_id": "859288a97a274339d719f0ff9ba99f1015eeb05112460ae29be46980e246555f",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.1875
@@ -323,7 +323,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.0002509060032025445,
+      "runtime_seconds": 0.0002519310000934638,
       "solve_id": "d859e026f53387b0a3c5c84905153a8f9029cd5888c73788bf7b9e946eaa70f1",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -348,7 +348,7 @@
       "paper_lambda": 0.3125,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.00034511999911046587,
+      "runtime_seconds": 0.0003560479999578092,
       "solve_id": "3298eb29a889ad84ede78dde002a10186522b1547ec28579d97d8ba31e0fd29b",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3125
@@ -373,7 +373,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0005684160023520235,
+      "runtime_seconds": 0.00045730999772786163,
       "solve_id": "ef1017f8c4c208e25cee8b0d650516a892430427574cdf6a0f5ae76b33cb02c9",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -398,7 +398,7 @@
       "paper_lambda": 0.4375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0006949449998501223,
+      "runtime_seconds": 0.0006537109984492417,
       "solve_id": "443b1845e8dabd71b426bc7f17e5d8052f3affd068a2ba5ad5f93bcab02a5307",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.4375
@@ -423,7 +423,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 5.551115123125783e-17,
-      "runtime_seconds": 0.0008620090011390857,
+      "runtime_seconds": 0.0008440269994025584,
       "solve_id": "e15f590755215ca8174000efc38361a7c82084a7e62387b63d9e30ddd357b116",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.5
@@ -448,7 +448,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.00014373299927683547,
+      "runtime_seconds": 0.00014338000255520456,
       "solve_id": "b87392caf2731a6edb73809a3a08409ddb9e4032e459e471276578cf40eff2aa",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -473,7 +473,7 @@
       "paper_lambda": 0.1875,
       "residual_tolerance": 1e-09,
       "row_residual": 5.551115123125783e-17,
-      "runtime_seconds": 0.0001412780002283398,
+      "runtime_seconds": 0.00016124600006151013,
       "solve_id": "025738c498a0b3e78a19b1c20822709149b531c3f1bdb3024e9f9e9830b820d6",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.1875
@@ -498,7 +498,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.00013872999988961965,
+      "runtime_seconds": 0.00014594700041925535,
       "solve_id": "82f1ec729354ba9b031ecd60755f21afab14a428782bcad8dd7dff98f0b13617",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -523,7 +523,7 @@
       "paper_lambda": 0.3125,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.00023742700068396516,
+      "runtime_seconds": 0.0002454589994158596,
       "solve_id": "56cc8d0d4375f58fb45e4a29753053eb205141440e98c7cdb70fc7bbd3b7ada7",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3125
@@ -548,7 +548,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0002418769981886726,
+      "runtime_seconds": 0.00023930700263008475,
       "solve_id": "84dba4f356e950a266e9599c1ba0933178f69a219bf58e3023169fdc6a1ce3c3",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -573,7 +573,7 @@
       "paper_lambda": 0.4375,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0002366480002820026,
+      "runtime_seconds": 0.00023849799981690012,
       "solve_id": "2fb8d2e10cfcb8b9cea1a5d380808a03a43e4e2bb0ec92054ae32fd132c31f57",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.4375
@@ -598,20 +598,21 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0003382840004633181,
+      "runtime_seconds": 0.0003385700001672376,
       "solve_id": "1e270f7f7c9c9de9f1ee0dc7a98a9d91d9cb269c1a9e9656ce5178b6653fc393",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.5
     }
   ],
-  "schema_version": 1,
+  "schema_version": 2,
   "seeds": {
     "fit": null,
     "sampling": null
   },
   "source": {
-    "commit": "3b867882823a1aa4e60241864970e791e545095a",
+    "commit": "790127da4aa2d0543743f97d0b2d2e27d1375ace",
     "dirty": false,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
-  }
+  },
+  "source_date_epoch": 946684800
 }
