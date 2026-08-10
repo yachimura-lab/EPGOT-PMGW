@@ -26,37 +26,9 @@
 - `DEVELOPMENT.md`
 - `src/pgot/legacy.py`
 
-## 削除せず、論文・公開ページにも明記すべき制約
-
-### 13. Partial GWの初期値依存性
-
-次の説明は削除せず、論文または公開READMEからも確認できるようにしてください。
-
-- Partial GWは非凸である。
-- point/componentの両方でbalanced couplingを初期値として使う。
-- component problemはsolverのdefault startでは空結合付近に停滞する。
-
-対象:
-
-- `DEVELOPMENT.md`
-- `tools/build_notebooks.py`
-- `src/pgot/paper_figures.py`
-- 論文の実験条件
-
 ## 追加推奨
 
 - [ ] `CITATION.cff` またはBibTeX citationを追加する。
 - [ ] READMEに論文URL、著者、arXiv/DOI、引用方法を追加する。
 - [ ] `pyproject.toml` にauthors、project URLsを追加する。
 - [ ] 公開直前にNetlifyとGitHubのリンクを手動確認する。
-
-## 既存のpublication-readinessブランチについて
-
-未統合の `agent/publication-readiness` ブランチには、次の修正案があります。
-
-- 公開向けREADME・サイト冒頭文
-- Figures 6–7のlambda説明
-- `generated_at` から `source_date_epoch` への変更
-- Figure成果物の追跡
-
-ただし、このブランチにはnoise pointsが10点だった時点の記述や、Figures 6–7をPDFとして扱う変更も含まれます。現在の50点・PNG仕様へ調整せず、そのままマージしないでください。
