@@ -72,10 +72,6 @@ coupling — the `6×7` component problem stalls at the empty coupling at
 `lambda=0.01`, even though the coupling reached from the balanced start
 scores a strictly better objective.
 
-Reducing the coupling from `300×310` to `6×7` is a solver-dimensionality
-result, not an end-to-end speed claim at `N=300`, because GMM fitting also
-takes time.
-
 `partial_mgw_barycentric_map` carries the source points and components into
 the target dimension by `P.T` and then maps between the projected source
 Gaussian and the target Gaussian. This implementation coincides with
