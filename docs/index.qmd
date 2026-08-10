@@ -1,11 +1,11 @@
-# Entropic Partial Optimal Transport and Gromov–Wasserstein
+# Entropic Partial Optimal Transport and Partial Gromov–Wasserstein Distance between Gaussian Mixtures
 
-This site publishes the canonical, executed notebooks for Figures 1–7 of the
-paper. The paper equations and Section 7 experiment conditions are the source
-of truth. Every figure has one unique PNG output and a JSON sidecar containing
-parameters, seeds, fitted inputs, normalization scales, solver input, matched
-mass, marginal residuals, runtime, source revisions, coupling hashes, and output
-hashes.
+This site accompanies the EPGOT-pMGW paper and publishes its canonical,
+executed notebooks for Figures 1–7. The paper equations and Section 7
+experiment conditions are the source of truth. Every figure has one unique PNG
+output and a JSON sidecar containing parameters, seeds, fitted inputs,
+normalization scales, solver input, matched mass, marginal residuals, runtime,
+source revisions, coupling hashes, and output hashes.
 
 ## EPOT convention
 

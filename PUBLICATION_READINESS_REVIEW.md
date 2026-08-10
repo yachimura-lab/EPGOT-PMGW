@@ -7,31 +7,6 @@
 
 ## 公開品質として変更推奨
 
-### 7. プロジェクト名と冒頭説明を統一する
-
-- [ ] README、公開サイト、Quartoのタイトルを正式な論文タイトルへ統一する。
-- [ ] `EPGOT/pMGW` と `EPGOT-pMGW` の表記を統一する。
-- [ ] READMEのNetlify URLを説明付きMarkdownリンクにする。
-
-現在、次のタイトルが混在しています。
-
-- `EPGOT-pMGW — Entropic Partial Optimal Transport and Partial Gromov--Wasserstein Distance between Gaussian Mixtures`
-- `Entropic Partial Optimal Transport and Gromov–Wasserstein`
-- `Entropic Partial OT`
-
-README冒頭の推奨例:
-
-> This repository accompanies the EPGOT-pMGW paper. It provides
-> implementations of entropic partial optimal transport between Gaussian
-> mixtures and partial mixture Gromov–Wasserstein matching, together with
-> executed notebooks that reproduce Figures 1–7.
-
-対象:
-
-- `README.md`
-- `docs/index.qmd`
-- `docs/_quarto.yml`
-
 ### 8. `pyproject.toml` の仮説明を変更する
 
 - [ ] `description = "Add your description here"` を正式な説明へ変更する。
@@ -43,7 +18,7 @@ README冒頭の推奨例:
 
 ### 9. 未使用のテンプレート `main.py` を削除する
 
-- [ ] 使用予定がなければ `main.py` を削除する。
+- [ ] 使用予定がないので、 `main.py` を削除する。
 
 現在は次の出力だけを行うテンプレートです。
 

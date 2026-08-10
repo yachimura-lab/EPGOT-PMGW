@@ -1,10 +1,12 @@
-# EPGOT-pMGW — Entropic Partial Optimal Transport and Partial Gromov--Wasserstein Distance between Gaussian Mixtures
+# Entropic Partial Optimal Transport and Partial Gromov–Wasserstein Distance between Gaussian Mixtures
 
-This repository publishes research code and canonical notebooks for Figures
-1–7 of the EPGOT/pMGW paper. Numerical pipelines live in `src/pgot/`; executed
+This repository accompanies the EPGOT-pMGW paper. It provides implementations
+of entropic partial optimal transport between Gaussian mixtures and partial
+mixture Gromov–Wasserstein matching, together with executed notebooks that
+reproduce Figures 1–7. Numerical pipelines live in `src/pgot/`; executed
 notebooks and figure provenance live under `docs/notebook/`.
 
-Rendered notebooks: https://epgot-pmgw.netlify.app/
+[Rendered notebooks and publication site](https://epgot-pmgw.netlify.app/)
 
 ## Paper figures
 
