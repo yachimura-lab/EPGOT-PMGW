@@ -1,10 +1,10 @@
 """The notebooks must state Section 7 in full, and agree with each other.
 
-Issue #21 moved every value the paper asserts out of ``pgot`` and into the
-notebook cells, so that the published page can be checked against the paper.
-That leaves the Section 7.1 mixtures duplicated across three notebooks and
-copied once more into ``paper_setup`` for the tests. These checks are what
-keeps the copies honest.
+Paper-specific experiment values live in the notebook cells rather than in
+the reusable ``pgot`` package, so the published page can be checked against
+the paper. That leaves the Section 7.1 mixtures duplicated across three
+notebooks and copied once more into ``paper_setup`` for the tests. These
+checks keep the copies synchronized.
 """
 
 import ast

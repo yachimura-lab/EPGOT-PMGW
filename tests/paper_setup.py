@@ -1,9 +1,8 @@
 """Section 7 constants, duplicated here so the tests are self-contained.
 
-The notebooks are the authority for these values (issue #21). This module is
-a deliberate second copy used only by the tests;
-``test_notebook_specification.py`` asserts that the two agree, so drift in
-either place fails the suite rather than passing silently.
+This module deliberately mirrors the notebook values for use only by the
+tests. ``test_notebook_specification.py`` asserts that the two agree, so drift
+in either place fails the suite rather than passing silently.
 """
 
 import numpy as np

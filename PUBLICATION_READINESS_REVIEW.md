@@ -16,18 +16,6 @@
 
 - `pyproject.toml`
 
-### 10. 内部レビュー・Issue番号の記述を削除または一般化する
-
-- [ ] `tools/extract_review_figures.py` が不要なら削除する。
-- [ ] 残す場合は `issue #8`、`after-issue6`、`review/` 依存を一般的な名前へ変更する。
-- [ ] テスト内の `Issue #21` を、Issue番号に依存しない設計理由へ変更する。
-
-対象:
-
-- `tools/extract_review_figures.py`
-- `tests/test_notebook_specification.py`
-- `tests/paper_setup.py`
-
 ### 11. source of truthの説明を統一する
 
 - [ ] 論文とノートブックのどちらがauthorityかを一貫して説明する。
