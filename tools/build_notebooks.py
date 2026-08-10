@@ -104,8 +104,8 @@ figure1_records = solve_epot_panels(
     [FIGURE1_LAMBDA], [FIGURE1_EPSILON], source, target, cost, cost_scale
 )
 figure1 = make_figure1(figure1_records, source, target)
-figure1_path = OUTPUT_DIR / "figure1.pdf"
-figure1.savefig(figure1_path, format="pdf", bbox_inches="tight")
+figure1_path = OUTPUT_DIR / "figure1.png"
+figure1.savefig(figure1_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure1.json",
     figure=1,
@@ -130,8 +130,8 @@ figure2_records = solve_epot_panels(
     FIGURE2_LAMBDAS, [FIGURE2_EPSILON], source, target, cost, cost_scale
 )
 figure2 = make_figure2(figure2_records, source, target)
-figure2_path = OUTPUT_DIR / "figure2.pdf"
-figure2.savefig(figure2_path, format="pdf", bbox_inches="tight")
+figure2_path = OUTPUT_DIR / "figure2.png"
+figure2.savefig(figure2_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure2.json",
     figure=2,
@@ -162,8 +162,8 @@ figure3_records = solve_epot_panels(
 figure3 = make_figure3(
     figure3_records, source, target, (len(FIGURE3_EPSILONS), len(FIGURE3_LAMBDAS))
 )
-figure3_path = OUTPUT_DIR / "figure3.pdf"
-figure3.savefig(figure3_path, format="pdf", bbox_inches="tight")
+figure3_path = OUTPUT_DIR / "figure3.png"
+figure3.savefig(figure3_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure3.json",
     figure=3,
@@ -339,8 +339,8 @@ for row, solve in enumerate(row_solves):
         axis.set_xticks([])
         axis.set_yticks([])
 figure4.tight_layout()
-figure4_path = OUTPUT_DIR / "figure4.pdf"
-figure4.savefig(figure4_path, format="pdf", bbox_inches="tight")
+figure4_path = OUTPUT_DIR / "figure4.png"
+figure4.savefig(figure4_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure4.json",
     figure=4,
@@ -450,8 +450,8 @@ for record in figure5_records:
 figure5 = make_figure5(
     source_points, target_points, figure5_records, times=FIGURE5_TIMES
 )
-figure5_path = OUTPUT_DIR / "figure5.pdf"
-figure5.savefig(figure5_path, format="pdf", bbox_inches="tight")
+figure5_path = OUTPUT_DIR / "figure5.png"
+figure5.savefig(figure5_path, format="png", bbox_inches="tight")
 write_figure_sidecar(
     METADATA_DIR / "figure5.json",
     figure=5,

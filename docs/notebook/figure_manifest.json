@@ -4,7 +4,7 @@
   "figures": {
     "1": {
       "notebook": "figure1_2_3.ipynb",
-      "canonical_output": "outputs/figure1.pdf",
+      "canonical_output": "outputs/figure1.png",
       "sidecar": "metadata/figure1.json",
       "lambda": 0.3,
       "epsilon": 0.01,
@@ -12,7 +12,7 @@
     },
     "2": {
       "notebook": "figure1_2_3.ipynb",
-      "canonical_output": "outputs/figure2.pdf",
+      "canonical_output": "outputs/figure2.png",
       "sidecar": "metadata/figure2.json",
       "lambda": [0.0, 0.125, 0.25, 0.375, 0.5],
       "epsilon": 0.01,
@@ -20,7 +20,7 @@
     },
     "3": {
       "notebook": "figure1_2_3.ipynb",
-      "canonical_output": "outputs/figure3.pdf",
+      "canonical_output": "outputs/figure3.png",
       "sidecar": "metadata/figure3.json",
       "lambda": [0.125, 0.1875, 0.25, 0.3125, 0.375, 0.4375, 0.5],
       "epsilon": [0.01, 0.11, 0.21],
@@ -28,7 +28,7 @@
     },
     "4": {
       "notebook": "figure4.ipynb",
-      "canonical_output": "outputs/figure4.pdf",
+      "canonical_output": "outputs/figure4.png",
       "sidecar": "metadata/figure4.json",
       "lambda_epsilon": [[0.25, 0.03], [0.25, 0.1], [0.5, 0.03]],
       "t": [0.0, 0.25, 0.5, 0.75, 1.0],
@@ -36,7 +36,7 @@
     },
     "5": {
       "notebook": "figure5.ipynb",
-      "canonical_output": "outputs/figure5.pdf",
+      "canonical_output": "outputs/figure5.png",
       "sidecar": "metadata/figure5.json",
       "lambda": [0.25, 0.5],
       "epsilon": 0.03,

@@ -20,7 +20,7 @@ Rendered notebooks: https://epgot-pmgw.netlify.app/
 
 The machine-readable mapping is
 [`figure_manifest.json`](docs/notebook/figure_manifest.json). Each figure has a
-unique PDF and JSON sidecar; the sidecar stores source and vendored-solver
+unique PNG and JSON sidecar; the sidecar stores source and vendored-solver
 revisions, versions, seeds, fitted-input and coupling hashes, paper and solver
 parameters, matched mass, residuals, runtime, solve ID, and output SHA-256.
 

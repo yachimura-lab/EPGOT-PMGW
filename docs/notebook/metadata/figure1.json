@@ -72,9 +72,9 @@
   "notes": "Known GMMs; no sampling or fitting.",
   "outputs": [
     {
-      "bytes": 40915,
-      "path": "outputs/figure1.pdf",
-      "sha256": "5181b633a160478a5b6970d6951da34809907dbeb6d1e9037d7819974326dbe9"
+      "bytes": 36310,
+      "path": "outputs/figure1.png",
+      "sha256": "5d09e40b286b995b5fb1f26ba935d22ca0e04c0bc5b5f4ff1a8e2232430c8ec4"
     }
   ],
   "panels": [
@@ -98,7 +98,7 @@
       "paper_lambda": 0.3,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0021020819986006245,
+      "runtime_seconds": 0.0020884170007775538,
       "solve_id": "a82e4c1de2d943497888c787f014ab0ba118a3671b0a7d75ca976fe7f20e7a17",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.3
@@ -110,7 +110,7 @@
     "sampling": null
   },
   "source": {
-    "commit": "50d84027f825f2d38fc6d46a451c428978fe7c3e",
+    "commit": "5cef88a0c20026b53da7760f4864099ef43d9e08",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }

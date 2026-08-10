@@ -7,91 +7,13 @@
 
 ## 最優先
 
-### 1. Figures 6–7 の lambda の説明を実装に合わせる（対応済み）
+### 4. manifestが参照する成果物を公開対象に含める（対応済み）
 
-- [x] `docs/index.qmd` の変換式と component input `0.013249` を削除する。
-- [x] point/component の両solverへ `lambda=0.01` をそのまま渡す説明に置き換える。
+- [x] manifestのFigures 1–7をPNG出力へ統一し、実ファイルを生成する。
+- [x] `outputs/figure1.png`–`outputs/figure7.png` を公開成果物としてGit追跡する。
+- [x] sidecarのoutput hashが生成されたファイルと一致することを確認する。
 
-変更前の `docs/index.qmd` には次の説明がありました。
-
-> Point and mixture costs use different normalization constants. A shared
-> dimensionless value is therefore converted separately.
-
-実装・manifest・sidecarに合わせ、現在は次の条件を記載しています。
-
-- point solver input: `0.01`
-- component solver input: `0.01`
-- PGW matched mass: `300/350`
-- pMGW matched mass: `300/350`
-
-推奨記述:
-
-> Point and mixture costs are each divided by their own pair maximum. The
-> paper's lambda=0.01 is passed unchanged to both partial solvers on their
-> respective normalized cost matrices. In the canonical run, PGW and pMGW
-> both transport 300/350 mass.
-
-対象:
-
-- `docs/index.qmd`
-- `tools/build_notebooks.py`
-- `docs/notebook/figure_manifest.json`
-- `docs/notebook/metadata/figure6.json`
-- `docs/notebook/metadata/figure7.json`
-
-### 2. 最終論文とのFigure番号を照合する
-
-- [ ] GW/noise実験が最終原稿のFigure 5かFigures 6–7かを確定する。
-- [ ] README、公開サイト、ノートブック名、manifestを同じ番号へ統一する。
-
-今回の作業依頼ではGW/noise実験を「Figure 5」と呼んでいましたが、現在のリポジトリではFigures 6–7として扱っています。
-
-同時に、最終原稿と以下を照合してください。
-
-- noise points: `50`
-- source points: `300`
-- target points: `350`
-- transported mass: `300/350`
-- point-level coupling dimension: `300×350`
-- mixture-level coupling dimension: `6×7`
-- 式番号: `(3.1)`, `(4.17)`, `(4.18)`, `(6.2)`, `(6.8)–(6.9)`
-- Section番号: `7.1.1–7.1.5`, `7.2`
-
-対象:
-
-- `README.md`
-- `docs/index.qmd`
-- `tools/build_notebooks.py`
-- `docs/notebook/*.ipynb`
-- `docs/notebook/figure_manifest.json`
-
-### 3. 「すべてのFigureがPDF」という記述を変更する
-
-- [ ] `unique PDF` / `Every figure has one unique PDF output` を削除または変更する。
-- [ ] 成果物形式を統一するか、形式に依存しない記述へ変更する。
-
-現在のmanifestは次の構成です。
-
-- Figures 1–5: PDF
-- Figures 6–7: PNG
-
-形式を混在させる場合の推奨記述:
-
-> Each figure has one canonical output and an accompanying JSON sidecar.
-
-対象:
-
-- `README.md`
-- `docs/index.qmd`
-- `docs/notebook/figure_manifest.json`
-
-### 4. manifestが参照する成果物を公開対象に含める
-
-- [ ] Figures 1–5 のPDFを追跡するか、manifestから存在しない出力への参照を削除する。
-- [ ] `outputs/figure6.png` と `outputs/figure7.png` を公開成果物として追跡するか方針を明記する。
-- [ ] sidecarのoutput hashが公開されたファイルと一致することを確認する。
-
-監査時点では、manifestが参照するFigures 1–5のPDFは存在せず、Figures 6–7のPNGは未追跡です。fresh cloneでmanifestの全出力を検証できる状態にする必要があります。
+Figures 1–7のPNGは生成済みで、sidecarのpath、bytes、SHA-256と一致しています。全PNGをGit追跡し、fresh cloneでmanifestの全出力を検証できる状態にしました。
 
 ### 5. provenanceをcleanな状態で再生成する
 

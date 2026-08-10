@@ -2,7 +2,7 @@
 
 This site publishes the canonical, executed notebooks for Figures 1–7 of the
 paper. The paper equations and Section 7 experiment conditions are the source
-of truth. Every figure has one unique PDF output and a JSON sidecar containing
+of truth. Every figure has one unique PNG output and a JSON sidecar containing
 parameters, seeds, fitted inputs, normalization scales, solver input, matched
 mass, marginal residuals, runtime, source revisions, coupling hashes, and output
 hashes.

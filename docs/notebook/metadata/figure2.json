@@ -72,9 +72,9 @@
   "notes": "Exact 1 x 5 paper sweep.",
   "outputs": [
     {
-      "bytes": 142916,
-      "path": "outputs/figure2.pdf",
-      "sha256": "e2571a6a610abc0e68f8e278bcef719e1944346a9cf885888ae38ec70ff88e2d"
+      "bytes": 73074,
+      "path": "outputs/figure2.png",
+      "sha256": "c5806f0b7fe96a44cd62c3f32dfb106efd6dcb37a4d746706d9524050d82564d"
     }
   ],
   "panels": [
@@ -98,7 +98,7 @@
       "paper_lambda": 0.0,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.21910909601137973,
+      "runtime_seconds": 0.21575201199812,
       "solve_id": "fd824af97b3fecb3419528e020329c45306ba8dc6b704072efe79296dfcfe595",
       "solver": "POT sinkhorn + SciPy SLSQP refinement",
       "solver_lambda": 0.0
@@ -123,7 +123,7 @@
       "paper_lambda": 0.125,
       "residual_tolerance": 1e-09,
       "row_residual": 2.220446049250313e-16,
-      "runtime_seconds": 0.0008343039953615516,
+      "runtime_seconds": 0.0014362670008267742,
       "solve_id": "91ed2a137231ce033e6864042f5b44c6843d67b7960be8d17b0b369162aab875",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.125
@@ -148,7 +148,7 @@
       "paper_lambda": 0.25,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.0012034449900966138,
+      "runtime_seconds": 0.0018977059989992995,
       "solve_id": "3d89c599f06f3e9e0ed2812e7ffdfef428b235b3cf92b22717f4812692ec1dab",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.25
@@ -173,7 +173,7 @@
       "paper_lambda": 0.375,
       "residual_tolerance": 1e-09,
       "row_residual": 1.1102230246251565e-16,
-      "runtime_seconds": 0.0035566760052461177,
+      "runtime_seconds": 0.005415733998233918,
       "solve_id": "d4fb2e61c108c7c2c62c99a6a831ded500b0bf634a5e62e17b31fdb4b013c816",
       "solver": "POT sinkhorn",
       "solver_lambda": 0.375
@@ -198,7 +198,7 @@
       "paper_lambda": 0.5,
       "residual_tolerance": 1e-09,
       "row_residual": 0.0,
-      "runtime_seconds": 0.23446392400364857,
+      "runtime_seconds": 0.2106808099997579,
       "solve_id": "17db219cd8a4b9f3b835210bd5d6ed011a47fa9e61a00aae8050234f7adea21c",
       "solver": "POT sinkhorn + SciPy SLSQP refinement",
       "solver_lambda": 0.5
@@ -210,7 +210,7 @@
     "sampling": null
   },
   "source": {
-    "commit": "50d84027f825f2d38fc6d46a451c428978fe7c3e",
+    "commit": "5cef88a0c20026b53da7760f4864099ef43d9e08",
     "dirty": true,
     "pgw_metric_commit": "8a9002e14d6b17decf35e603e9a9e42aa8465e04"
   }
