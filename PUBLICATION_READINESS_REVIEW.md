@@ -16,18 +16,6 @@
 
 - `pyproject.toml`
 
-### 9. 未使用のテンプレート `main.py` を削除する
-
-- [ ] 使用予定がないので、 `main.py` を削除する。
-
-現在は次の出力だけを行うテンプレートです。
-
-```text
-Hello from epgot-pmgw!
-```
-
-パッケージやCLIから参照されていません。
-
 ### 10. 内部レビュー・Issue番号の記述を削除または一般化する
 
 - [ ] `tools/extract_review_figures.py` が不要なら削除する。
