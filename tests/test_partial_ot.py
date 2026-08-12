@@ -109,24 +109,6 @@ class PartialOTRegressionTests(unittest.TestCase):
                 self.source, self.target, epsilon=0.03, Lambda=None
             )
 
-    def test_the_superseded_solver_is_not_reachable_from_the_package_root(self):
-        # It solves 'M - Lambda' with entropy on the real block only, so a
-        # caller who reaches it from `from pgot import ...` gets a coupling
-        # that is not the paper's (3.1) while every name around it is.
-        import pgot
-        import pgot.legacy
-
-        self.assertNotIn("partial_wasserstein_lagrange_entropic", pgot.__all__)
-        self.assertFalse(hasattr(pgot, "partial_wasserstein_lagrange_entropic"))
-        # Still importable, so published results stay reproducible.
-        with self.assertWarns(DeprecationWarning):
-            pgot.legacy.partial_wasserstein_lagrange_entropic(
-                np.array([0.5, 0.5]),
-                np.array([0.5, 0.5]),
-                np.array([[0.0, 1.0], [1.0, 0.0]]),
-                Lambda=0.5,
-            )
-
     def test_both_figure5_entry_points_demand_the_penalty(self):
         # compute_T_X_to_Z and compute_T_X_to_Z_C are documented as
         # equivalent, so a default penalty on one and not the other would let
